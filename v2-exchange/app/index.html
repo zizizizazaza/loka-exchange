@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loka · Exchange</title>
+<meta name="description" content="Exchange prototype: markets for cash-flow assets settled in AIUSD, starting with compute credit.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@200;300;400;500;600&family=Geist+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>
+/* 交易所版本原型（决策见 docs-internal/交易所-决策说明-v0.1.md）。基础样式沿用投资人端，下面「交易所」一段是新增的。
+   顶部导航：Markets（市场首页）· Asset（#/asset/<代号>，资产详情）· Trade（单个市场的交易页）· Earn（两个金库）· Portfolio（统一账户）· Issue（发行方入口）· Transparency · Deposit（铸造/赎回）。数据全部是虚构示例。 */
+:root{
+  --bg:#f4f4f2;
+  --paper:#ffffff;
+  --paper-2:#fafaf8;
+  --mist:#ecedea;
+  --line:rgba(14,15,15,.09);
+  --line-2:rgba(14,15,15,.16);
+  --ink:#0e0f0f;
+  --ink-2:#4a4f4d;
+  --ink-3:#848986;
+  --accent:#3d6f5b;
+  --accent-soft:#e3ece7;
+  --accent-line:#cfe0d7;
+  --amber:#8a5a12;
+  --amber-soft:#f6eedf;
+  --amber-line:#ead9b8;
+  --r-card:20px;
+  --maxw:1240px;
+  --gutter:40px;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:0}
+.ph,.ph-light{line-height:1}
+.muted{color:var(--ink-3)}
+
+/* ---------- 深色侧边栏 + 内容区 ----------
+   侧边栏白底、右侧一条细线，上面是导航，底部是账户。不做顶栏汇总条，汇总数字只在公开验证页。 */
+.brand{font-weight:500;font-size:16px;letter-spacing:.02em;text-decoration:none;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.brand-mark{flex:none;width:24px;height:24px;border-radius:7px;border:1.5px solid currentColor;position:relative}
+.brand-mark::after{content:"";position:absolute;inset:5px;border-radius:2px;background:currentColor;opacity:.9}
+.side{--s-ink:var(--ink);--s-2:var(--ink-2);--s-3:var(--ink-3);--s-line:var(--line);
+  position:fixed;top:0;bottom:0;left:0;width:264px;display:flex;flex-direction:column;padding:28px 16px 18px;background:var(--paper);border-right:1px solid var(--line);color:var(--s-ink);z-index:30;overflow-y:auto;transition:transform .35s var(--ease)}
+.side .brand{padding:0 12px;margin-bottom:32px}
+.nav{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.nav-h{margin:22px 0 6px;padding:0 12px;font-size:12px;font-weight:400;letter-spacing:.02em;color:var(--s-3)}
+nav .nav-h:first-child{margin-top:0}
+.item{position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:10px;text-decoration:none;font-size:15px;color:var(--s-2);transition:color .2s,background-color .2s}
+.item i{flex:none;font-size:19px}
+.item:hover{color:var(--s-ink)}
+.item[aria-current="page"]{color:var(--s-ink);background:var(--bg);font-weight:500}
+.item[aria-current="page"]::before{content:"";position:absolute;left:-16px;top:12px;bottom:12px;width:2px;border-radius:0 2px 2px 0;background:var(--accent)}
+.acct{margin-top:auto;padding-top:24px}
+.acct-card{padding:14px;border-radius:14px;border:1px solid var(--s-line);background:var(--bg)}
+.acct-card .addr{display:flex;align-items:center;gap:10px;font-size:13px}
+.acct-card .addr .ph-light{font-size:17px;color:var(--s-2)}
+.acct-card .ver{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;color:var(--accent)}
+.acct-card .ver::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.acct-links{display:flex;flex-wrap:wrap;gap:6px 16px;padding:14px 4px 0;font-size:12.5px;color:var(--s-3)}
+.acct-links a{text-decoration:none}
+.acct-links a:hover{color:var(--s-ink)}
+.shell{margin-left:264px;min-height:100vh;display:flex;flex-direction:column}
+.mbar{display:none}
+.side-scrim{display:none}
+
+/* ---------- 按钮 ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;height:48px;padding:0 8px 0 24px;border-radius:999px;border:1px solid transparent;font-size:14.5px;font-weight:500;white-space:nowrap;cursor:pointer;text-decoration:none;transition:background-color .3s var(--ease),border-color .3s var(--ease),transform .15s var(--ease),opacity .2s}
+.btn:active{transform:scale(.985)}
+.btn .go{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:14px;transition:transform .35s var(--ease)}
+.btn:hover .go{transform:rotate(-45deg)}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary .go{background:rgba(255,255,255,.14)}
+.btn-primary:hover{background:#262928}
+.btn-ghost{padding:0 22px;background:transparent;border-color:var(--line-2);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--ink)}
+.btn-sm{height:36px;padding:0 16px;font-size:13.5px}
+.btn[disabled]{opacity:.38;pointer-events:none}
+.btn-block{width:100%;justify-content:space-between}
+
+/* ---------- 通用 ---------- */
+main{flex:1;width:100%}
+main.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter));margin:0;padding:64px var(--gutter) 96px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;margin-bottom:40px}
+.page-head h1{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.05;letter-spacing:-.02em;margin:0}
+.page-head p{margin:12px 0 0;color:var(--ink-2);max-width:40em}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-card)}
+.pill{display:inline-flex;align-items:center;gap:8px;height:26px;font-size:12.5px;border-radius:999px;padding:0 11px;white-space:nowrap;border:1px solid var(--line-2);color:var(--ink-2)}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.open{color:var(--ink);background:var(--paper)}
+.pill.verifying{color:var(--amber);background:var(--amber-soft);border-color:var(--amber-line)}
+.pill.repaying{color:var(--accent);background:var(--accent-soft);border-color:var(--accent-line)}
+.pill.locked{color:var(--ink-2);background:var(--mist);border-color:transparent}
+.pill.plain::before{display:none}
+.bar{height:6px;border-radius:3px;background:var(--mist);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:3px;transition:width .8s var(--ease)}
+.seg{display:inline-flex;background:var(--mist);border-radius:999px;padding:4px;gap:2px}
+.seg button{border:0;background:none;height:34px;padding:0 16px;border-radius:999px;font-size:13.5px;color:var(--ink-2);cursor:pointer;transition:background-color .2s,color .2s,box-shadow .2s}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(14,15,15,.08),0 0 0 1px var(--line)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:right;padding:0 0 12px;white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{padding:13px 0;border-top:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl td+td,.tbl th+th{padding-left:20px}
+.neg{color:var(--amber)}
+.pos{color:var(--accent)}
+.txlink{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12.5px;text-decoration:none;color:var(--ink-2);border-bottom:1px solid var(--line-2);transition:color .2s,border-color .2s}
+.txlink:hover{color:var(--ink);border-color:var(--ink)}
+.txlink .ph-light{font-size:12px}
+.fade{animation:fade .5s var(--ease)}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- 项目列表 ---------- */
+.filters{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.plist{overflow:hidden}
+.prow,.phead{display:grid;grid-template-columns:minmax(260px,2.3fr) 1fr 1.5fr .7fr .7fr 1fr 24px;gap:24px;align-items:center;padding:0 28px}
+.phead{height:48px;border-bottom:1px solid var(--line)}
+.prow{min-height:96px;text-decoration:none;border-top:1px solid var(--line);transition:background-color .2s}
+.prow:first-of-type{border-top:0}
+.prow:hover{background:var(--paper-2)}
+.prow:hover .chev{transform:translateX(3px);color:var(--ink)}
+.pname b{display:block;font-weight:500;font-size:15.5px}
+.pname span{font-size:13px;color:var(--ink-3)}
+.pv{font-size:15px}
+.pv small{display:block;font-size:12.5px;color:var(--ink-3)}
+.sub-cell .bar{margin:8px 0 6px}
+.sub-cell small{font-size:12.5px;color:var(--ink-3)}
+.chev{color:var(--ink-3);transition:transform .3s var(--ease),color .2s}
+.list-note{font-size:12.5px;color:var(--ink-3);margin:14px 4px 0}
+.empty{padding:56px 28px;text-align:center;color:var(--ink-3)}
+
+/* ---------- 项目详情 ---------- */
+.crumb{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-3);margin-bottom:28px}
+.crumb a{text-decoration:none}
+.crumb a:hover{color:var(--ink)}
+.dhead{display:flex;justify-content:space-between;align-items:flex-end;gap:32px}
+.dtitle{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 12px}
+.dhead h1{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.05;letter-spacing:-.02em;margin:0}
+.dmeta{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;color:var(--ink-2);font-size:14px}
+.dmeta span{display:inline-flex;align-items:center;gap:7px}
+.dmeta .ph-light{font-size:16px;color:var(--ink-3)}
+.dact{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.dact small{font-size:12.5px;color:var(--ink-3)}
+/* 关键数字和进度放进同一块面板，正文前只留一条带子 */
+.dsum{margin:32px 0 0;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-card)}
+.kstats{display:grid;grid-template-columns:repeat(4,1fr)}
+.kstats div{padding:20px 24px 18px}
+.kstats div+div{border-left:1px solid var(--line)}
+.kstats span{display:block;font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.kstats b{font-weight:300;font-size:28px;line-height:1.15;letter-spacing:-.025em}
+.kstats b small{font-size:13px;font-weight:400;letter-spacing:0;color:var(--ink-3);margin-left:6px}
+.kstats em{display:block;font-style:normal;font-size:12.5px;color:var(--ink-3);margin-top:2px}
+/* 进度：一行小字，弱化处理，只有当前阶段稍微突出 */
+.stages{display:flex;margin:0;padding:0 24px;list-style:none;border-top:1px solid var(--line);background:var(--paper-2);border-radius:0 0 var(--r-card) var(--r-card)}
+.stage{flex:1;display:flex;align-items:center;gap:8px;min-width:0;padding:10px 0;font-size:12px;color:var(--ink-3)}
+.stage+.stage{padding-left:16px}
+.stage i{flex:none;width:13px;height:13px;border-radius:50%;border:1.2px solid var(--line-2);display:grid;place-items:center;font-size:8px;color:#fff}
+.stage div{display:flex;align-items:baseline;gap:6px;min-width:0;white-space:nowrap}
+.stage b{font-weight:400;font-size:12px;color:var(--ink-3)}
+.stage span{overflow:hidden;text-overflow:ellipsis;color:#a3a7a4}
+.stage.done i{background:#b7bbb8;border-color:#b7bbb8}
+.stage.now b{color:var(--ink-2);font-weight:500}
+.stage.now span{color:var(--ink-3)}
+.stage.now i{border-color:var(--amber)}
+.stage.now.ok i{border-color:var(--accent)}
+
+.tabs{display:flex;gap:28px;margin:44px 0 0;border-bottom:1px solid var(--line)}
+.tabs a{position:relative;display:flex;align-items:center;gap:8px;padding:0 0 16px;font-size:14.5px;text-decoration:none;color:var(--ink-3);transition:color .2s}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current="page"]{color:var(--ink)}
+.tabs a[aria-current="page"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;background:var(--ink)}
+.tabs .count{font-family:var(--mono);font-size:11px;border-radius:999px;padding:1px 7px;background:var(--mist);color:var(--ink-2)}
+.dbody{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;margin-top:36px;align-items:start}
+.aside{position:sticky;top:32px;display:grid;gap:14px}
+.sec-t{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:0 0 18px}
+.sec-t h2{font-family:var(--serif);font-weight:400;font-size:20px;letter-spacing:-.01em;margin:0}
+.sec-t p{margin:0;font-size:13.5px;color:var(--ink-3)}
+.block+.block{margin-top:56px}
+
+/* 放款条件 */
+.cond-sum{display:flex;align-items:center;gap:22px;padding:22px 26px;border-bottom:1px solid var(--line)}
+.cond-sum b{font-weight:200;font-size:40px;letter-spacing:-.03em;line-height:1}
+.cond-sum b small{font-size:14px;font-weight:400;letter-spacing:0;color:var(--ink-3);margin-left:6px}
+.segs6{flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.segs6 i{height:8px;border-radius:2px;background:var(--mist)}
+.segs6 i.met{background:var(--accent)}
+.segs6 i.progress,.segs6 i.pending{background:repeating-linear-gradient(135deg,var(--amber-line) 0 4px,var(--amber-soft) 4px 8px)}
+.cond-sum p{margin:0;font-size:13px;color:var(--ink-2);max-width:20em}
+.cond{border-top:1px solid var(--line)}
+.cond:first-of-type{border-top:0}
+.cond-h{width:100%;display:grid;grid-template-columns:36px minmax(0,1fr) auto 22px;gap:18px;align-items:center;padding:22px 26px;background:none;border:0;text-align:left;cursor:pointer;transition:background-color .2s}
+.cond-h:hover{background:var(--paper-2)}
+.cidx{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:12px;border:1px solid var(--line-2);color:var(--ink-2)}
+.cond.met .cidx{background:var(--accent);border-color:var(--accent);color:#fff}
+.cond.progress .cidx,.cond.pending .cidx{border-color:var(--amber-line);background:var(--amber-soft);color:var(--amber)}
+.cond-h b{display:block;font-weight:500;font-size:15.5px}
+.cond-h span.d{display:block;font-size:13.5px;color:var(--ink-2);margin-top:2px}
+.cstate{text-align:right;font-size:13px;white-space:nowrap}
+.cstate em{display:block;font-style:normal;font-size:12px;color:var(--ink-3);margin-top:2px}
+.cond.met .cstate strong{color:var(--accent);font-weight:500}
+.cond.progress .cstate strong,.cond.pending .cstate strong{color:var(--amber);font-weight:500}
+.cond.todo .cstate strong{color:var(--ink-3);font-weight:400}
+.cond-h .caret{color:var(--ink-3);transition:transform .35s var(--ease)}
+.cond.open .caret{transform:rotate(180deg)}
+.cond-b{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ease)}
+.cond-b>div{overflow:hidden}
+.cond.open .cond-b{grid-template-rows:1fr}
+.proof{margin:0 26px 24px 80px;border-radius:14px;background:var(--bg);padding:18px 20px}
+.proof-h{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.proof-h .label{color:var(--ink-2)}
+.proof dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:9px 18px;margin:0;font-size:13.5px}
+.proof dt{color:var(--ink-3)}
+.proof dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.proof .note{margin:14px 0 0;font-size:12.5px;color:var(--ink-3)}
+.sigs{display:flex;flex-wrap:wrap;gap:6px}
+.sig{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;border-radius:999px;padding:3px 10px;background:var(--paper);border:1px solid var(--line)}
+.sig .ph{font-size:13px}
+.sig.ok .ph{color:var(--accent)}
+.sig.wait{color:var(--amber);border-color:var(--amber-line)}
+.meter{display:flex;align-items:center;gap:10px}
+.meter .bar{flex:1;max-width:220px}
+.meter .bar i{background:var(--amber)}
+
+/* 侧栏卡片 */
+.card{padding:24px}
+.card h3{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 18px;font-size:14px;font-weight:500}
+.card .bigv{font-weight:200;font-size:38px;letter-spacing:-.03em;line-height:1.05}
+.card .bigv small{font-size:13px;font-weight:400;letter-spacing:0;color:var(--ink-3);margin-left:6px}
+.kv{display:grid;gap:0;margin:18px 0 0;font-size:13.5px}
+.kv div{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid var(--line)}
+.kv dt{color:var(--ink-3)}
+.kv dd{margin:0;text-align:right}
+.card p.small{margin:16px 0 0;font-size:12.5px;color:var(--ink-3);line-height:1.6}
+.card.dark{background:var(--ink);color:#f2f3f1;border-color:var(--ink)}
+.card.dark .kv div{border-color:rgba(255,255,255,.12)}
+.card.dark .kv dt,.card.dark p.small,.card.dark .bigv small{color:rgba(242,243,241,.56)}
+.card.dark .txlink{color:rgba(242,243,241,.82);border-color:rgba(255,255,255,.24)}
+.card.dark .txlink:hover{color:#fff;border-color:#fff}
+.card.dark .pill.locked{background:rgba(255,255,255,.1);color:#f2f3f1}
+
+/* 概览 */
+.facts{display:grid;grid-template-columns:repeat(2,1fr)}
+.facts>div{padding:22px 26px;border-top:1px solid var(--line)}
+.facts>div:nth-child(-n+2){border-top:0}
+.facts>div:nth-child(2n){border-left:1px solid var(--line)}
+.facts dt{font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.facts dd{margin:0;font-size:15px}
+.wf{display:grid;gap:8px;padding:22px 26px}
+.wf-row{display:grid;grid-template-columns:28px 1fr auto;gap:14px;align-items:center;padding:14px 16px;border-radius:14px;border:1px solid var(--line);font-size:14.5px}
+.wf-row .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:12px;border:1px solid var(--line-2);color:var(--ink-2)}
+.wf-row.first{background:var(--accent-soft);border-color:var(--accent-line)}
+.wf-row.first .n{border-color:var(--accent);color:var(--accent)}
+.wf-row em{font-style:normal;font-size:13.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.rules{list-style:none;margin:0;padding:0}
+.rules li{display:grid;grid-template-columns:24px 1fr;gap:12px;padding:16px 26px;border-top:1px solid var(--line);font-size:14.5px;color:var(--ink-2)}
+.rules li:first-child{border-top:0}
+.rules .ph-light{font-size:18px;color:var(--ink);margin-top:2px}
+.rules b{color:var(--ink);font-weight:500}
+
+/* 还款：覆盖倍数柱状图 */
+.chart{padding:26px 26px 18px}
+.cov{position:relative;height:200px;display:flex;align-items:flex-end;gap:14px;padding:0 128px 0 48px;border-bottom:1px solid var(--line-2)}
+.cov .axis{position:absolute;left:0;font-family:var(--mono);font-size:11px;color:var(--ink-3);transform:translateY(50%)}
+.cov .thr{position:absolute;left:48px;right:0;border-top:1px dashed var(--amber)}
+.cov .thr span{position:absolute;right:0;top:-10px;font-size:12px;line-height:20px;color:var(--amber);background:var(--paper);padding:0 0 0 10px}
+.cov .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative}
+.cov .col i{display:block;width:100%;max-width:28px;border-radius:5px 5px 1px 1px;background:var(--accent);opacity:.75;transition:opacity .2s}
+.cov .col i.low{background:var(--amber)}
+.cov .col:hover i{opacity:1}
+.cov .col b{font-weight:400;font-size:11.5px;margin-bottom:6px;font-variant-numeric:tabular-nums;color:var(--ink-3)}
+.cov-x{display:flex;gap:14px;padding:10px 128px 0 48px}
+.cov-x span{flex:1;text-align:center;font-size:12px;color:var(--ink-3)}
+.chart-note{font-size:12.5px;color:var(--ink-3);margin:14px 0 0}
+.tbl-wrap{padding:22px 26px 10px;overflow-x:auto}
+
+/* 链上记录 */
+.contracts{display:grid;grid-template-columns:repeat(3,1fr)}
+.contracts>div{padding:22px 26px}
+.contracts>div+div{border-left:1px solid var(--line)}
+.contracts dt{font-size:12.5px;color:var(--ink-3);margin-bottom:6px}
+.contracts dd{margin:0}
+.contracts dd small{display:block;font-size:12.5px;color:var(--ink-3);margin-top:6px;font-family:var(--sans)}
+.events{list-style:none;margin:0;padding:0}
+.events li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:14px;align-items:start;padding:16px 26px;border-top:1px solid var(--line)}
+.events li:first-child{border-top:0}
+.events .ph-light{font-size:18px;margin-top:2px}
+.events b{display:block;font-weight:500;font-size:14.5px}
+.events small{display:block;font-size:12.5px;color:var(--ink-3)}
+.events .r{text-align:right}
+.events .r em{display:block;font-style:normal;font-size:14px;font-variant-numeric:tabular-nums;margin-bottom:4px}
+
+/* ---------- 持仓 ---------- */
+.sumrow{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink);border-bottom:1px solid var(--line);margin-bottom:56px}
+.sumrow div{padding:22px 0 24px}
+.sumrow div+div{padding-left:28px;border-left:1px solid var(--line)}
+.sumrow span{display:block;font-size:12.5px;color:var(--ink-3);margin-bottom:6px}
+.sumrow b{font-weight:200;font-size:40px;letter-spacing:-.03em;line-height:1.05}
+.sumrow b small{font-size:13px;font-weight:400;letter-spacing:0;color:var(--ink-3);margin-left:6px}
+.sumrow em{display:block;font-style:normal;font-size:12.5px;color:var(--ink-3);margin-top:6px}
+.pos-name{display:flex;flex-direction:column;align-items:flex-start;text-decoration:none}
+.pos-name b{font-weight:500}
+.pos-name small{font-size:12.5px;color:var(--ink-3)}
+.pos-tbl td{padding:18px 0}
+.tbl tfoot td{border-top:1px solid var(--ink);font-weight:500;padding:14px 0}
+/* 总览图表 */
+.ov-charts{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px;margin-bottom:56px}
+.ov-card{padding:26px 28px 22px;display:flex;flex-direction:column}
+.ov-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:26px}
+.ov-head span{display:block;font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.ov-head b{font-weight:200;font-size:40px;letter-spacing:-.03em;line-height:1.05}
+.ov-head b.sm{font-size:24px;letter-spacing:-.02em}
+.ov-head>div:last-child{text-align:right}
+.ov-head em{display:block;font-style:normal;font-size:12.5px;color:var(--ink-3);margin-top:2px}
+.cf{position:relative;height:150px;display:flex;align-items:flex-end;gap:8px;border-bottom:1px solid var(--line-2)}
+.cf-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end}
+.cf-col i{display:block;width:100%}
+.cf-col .int{border-radius:4px 4px 0 0}
+.cf-col.past .prin{background:var(--accent)}
+.cf-col.past .int{background:#a8c6b7}
+.cf-col.plan .prin{background:#dfe2de}
+.cf-col.plan .int{background:#ebede9}
+.cf-col:hover i{filter:brightness(.94)}
+.cf-today{position:absolute;top:-6px;bottom:0;border-left:1px dashed var(--ink-3);margin-left:-4px}
+.cf-today em{position:absolute;top:-14px;left:6px;font-style:normal;font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+.cf-x{display:flex;gap:8px;padding-top:8px}
+.cf-x span{flex:1;text-align:center;font-size:11.5px;color:var(--ink-3)}
+.ov-card .legend{margin-top:auto;padding-top:14px}
+.alloc{display:flex;gap:3px;height:14px;border-radius:7px;overflow:hidden}
+.alloc i{display:block;height:100%}
+.alloc-l{list-style:none;margin:22px 0 0;padding:0}
+.alloc-l li{display:grid;grid-template-columns:10px minmax(0,1fr) auto 40px;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.alloc-l li>i{width:10px;height:10px;border-radius:3px}
+.alloc-l b{display:block;font-weight:500;font-size:14px}
+.alloc-l small{display:block;font-size:12.5px;color:var(--ink-3)}
+.alloc-l em{font-style:normal;font-size:14px}
+.alloc-l .pc{text-align:right}
+/* 组合金库 */
+.vact{display:flex;gap:10px}
+.pchart{position:relative;height:150px}
+.pchart svg{display:block;width:100%;height:100%;overflow:visible}
+.pchart .pl{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke}
+.pchart .pa{fill:var(--accent-soft);opacity:.7}
+.px{display:flex;justify-content:space-between;padding-top:8px;font-size:11.5px;color:var(--ink-3)}
+.nb{position:relative;width:120px;height:6px;border-radius:3px;background:var(--mist);display:inline-block;vertical-align:middle;margin-left:10px}
+.nb i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ink)}
+.nb s{position:absolute;top:-4px;bottom:-4px;width:0;border-left:1.5px dashed var(--amber)}
+.vgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.vgrid .rules li{padding:13px 22px;font-size:14px}
+.vgrid .card h3{margin-bottom:14px}
+.note-line{font-size:12.5px;color:var(--ink-3);margin:14px 4px 0}
+.acct-bal{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:12px;border-top:1px solid var(--s-line);font-size:12.5px;color:var(--s-3)}
+.acct-bal b{font-weight:500;color:var(--s-ink);font-variant-numeric:tabular-nums}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:#fff;font-size:13.5px;padding:12px 18px;border-radius:12px;transition:opacity .3s,transform .3s var(--ease);z-index:60;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%)}
+/* 铸造 / 存入：一页直接操作 */
+.egrid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;align-items:start}
+.eform{padding:12px 12px 20px}
+.etabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--bg);border-radius:14px;padding:4px;margin-bottom:12px}
+.etabs a{display:flex;align-items:center;justify-content:center;gap:10px;height:42px;border-radius:11px;text-decoration:none;font-size:14.5px;color:var(--ink-3);transition:background-color .2s,color .2s}
+.etabs a:hover{color:var(--ink)}
+.etabs a[aria-current]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(14,15,15,.06),0 0 0 1px var(--line)}
+.eleg{background:var(--bg);border-radius:16px;padding:16px 18px 14px;border:1px solid transparent;transition:border-color .2s,background-color .2s}
+.eleg:focus-within{background:var(--paper);border-color:var(--line-2)}
+.erow{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:var(--ink-3)}
+.erow .lab{font-size:13.5px;color:var(--ink-2)}
+.erow .bal{display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.erow .bal button{border:0;background:var(--mist);color:var(--ink);font-size:11.5px;font-weight:500;letter-spacing:.02em;border-radius:6px;padding:2px 8px;cursor:pointer}
+.erow .bal button:hover{background:var(--line-2)}
+.emain{display:flex;align-items:center;gap:16px;margin:12px 0 2px}
+.tok{flex:none;display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:6px 16px 6px 6px}
+.tok .ic{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:13px;color:#fff}
+.tok .ic .ph{font-size:15px}
+.tok b{font-size:15px;font-weight:600}
+.eamt{flex:1;min-width:0}
+.eamt input,.eamt output{display:block;width:100%;border:0;background:none;text-align:right;font:inherit;font-weight:300;font-size:38px;line-height:1.15;letter-spacing:-.025em;color:var(--ink);outline:none;padding:0;font-variant-numeric:tabular-nums}
+.eamt input::placeholder,.eamt output.zero{color:#c6cac7}
+.esub{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.flipw{display:flex;justify-content:center;height:8px;position:relative;z-index:2}
+.flip{width:40px;height:40px;border-radius:12px;border:4px solid var(--paper);background:var(--mist);display:grid;place-items:center;cursor:pointer;font-size:16px;transform:translateY(-16px);transition:background-color .2s}
+.flip:hover{background:var(--line-2)}
+.flip i{transition:transform .35s var(--ease)}
+.flip:hover i{transform:rotate(180deg)}
+.ego{margin-top:12px;width:100%;height:54px;border-radius:14px;border:0;background:var(--ink);color:#fff;font-size:15.5px;font-weight:500;cursor:pointer;transition:background-color .2s,color .2s}
+.ego:hover{background:#262928}
+.ego[disabled]{background:var(--mist);color:var(--ink-3);cursor:default}
+.ehint{font-size:13px;color:var(--amber);margin:10px 6px 0}
+.ehint:empty{display:none}
+.ehint a{color:inherit}
+.emeta{margin:16px 6px 0;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+.emeta div{display:flex;justify-content:space-between;gap:16px;padding:4px 0}
+.emeta b{font-weight:500;color:var(--ink-2);text-align:right}
+.eside{display:grid;gap:16px}
+.ebal{padding:20px 22px 8px}
+.ebal h3,.etx h3{margin:0 0 6px;font-size:14px;font-weight:500}
+.ebal ul{list-style:none;margin:0;padding:0}
+.ebal li{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+.ebal li:first-child{border-top:0}
+.ebal .ic{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:13px}
+.ebal .ic .ph{font-size:15px}
+.ebal li b{display:block;font-size:14px;font-weight:500}
+.ebal li small{display:block;font-size:12.5px;color:var(--ink-3)}
+.ebal li em{font-style:normal;font-size:17px;font-variant-numeric:tabular-nums;text-align:right}
+.etx{padding:20px 22px}
+.etx p{margin:0;font-size:13.5px;color:var(--ink-3)}
+.etx .wsteps{margin:14px 0 0}
+.enote{margin:16px 2px 0;font-size:12.5px;color:var(--ink-3);max-width:62em}
+.enote a{color:var(--ink-2)}
+/* 持仓：一张持仓表 + 回款图 + 动态 */
+.hold{padding-top:22px}
+.hold-h{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding:0 26px 16px}
+.hold-h span{display:block;font-size:12.5px;color:var(--ink-3);margin-bottom:4px}
+.hold-h b{font-weight:300;font-size:34px;letter-spacing:-.03em;line-height:1.05}
+.hold-leg{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--ink-3)}
+.hold-leg span{display:inline-flex;align-items:center;gap:7px;margin:0}
+.hold-leg i{width:9px;height:9px;border-radius:2px}
+.hold .tbl-wrap{padding-top:18px}
+.hold .tbl td:last-child,.hold .tbl th:last-child{text-align:right}
+.lnk{font-size:13px;color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px;margin-left:12px;transition:color .2s,text-decoration-color .2s}
+.lnk:hover{color:var(--ink);text-decoration-color:var(--ink)}
+.pgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px;margin-top:14px;align-items:start}
+.act .upd a{padding:13px 22px;grid-template-columns:32px minmax(0,1fr) auto 0}
+.act .upd .chev{display:none}
+.act .uic{width:32px;height:32px;font-size:15px}
+.act .ut small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 总览：需要留意 + 动态 */
+.upd{list-style:none;margin:0;padding:0}
+.upd li+li{border-top:1px solid var(--line)}
+.upd a{display:grid;grid-template-columns:36px minmax(0,1fr) auto 18px;gap:16px;align-items:center;padding:16px 26px;text-decoration:none;transition:background-color .2s}
+.upd a:hover{background:var(--paper-2)}
+.upd a:hover .chev{transform:translateX(3px);color:var(--ink)}
+.uic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:var(--bg);color:var(--ink)}
+.uic.money{background:var(--accent-soft);color:var(--accent)}
+.uic.watch{background:var(--amber-soft);color:var(--amber)}
+.uic.new{background:transparent;border:1px dashed var(--line-2)}
+.ut{min-width:0}
+.ut b{display:block;font-weight:500;font-size:14.5px}
+.ut small{display:block;font-size:13px;color:var(--ink-3);margin-top:2px}
+.upd .r{text-align:right;white-space:nowrap}
+.upd .r em{display:block;font-style:normal;font-size:14.5px;font-variant-numeric:tabular-nums;margin-bottom:2px}
+.upd .r small{font-size:12.5px;color:var(--ink-3)}
+.more{display:block;width:100%;height:52px;border:0;border-top:1px solid var(--line);background:none;font-size:13.5px;color:var(--ink-2);cursor:pointer;border-radius:0 0 var(--r-card) var(--r-card);transition:color .2s,background-color .2s}
+.more:hover{color:var(--ink);background:var(--paper-2)}
+
+/* ---------- 公开验证页 ---------- */
+.agg{display:grid;grid-template-columns:repeat(5,1fr)}
+.agg>div{padding:26px 26px 28px}
+.agg>div+div{border-left:1px solid var(--line)}
+.agg span{display:block;font-size:12.5px;color:var(--ink-3);margin-bottom:8px}
+.agg b{font-weight:200;font-size:36px;letter-spacing:-.03em;line-height:1.05}
+.agg em{display:block;font-style:normal;font-size:12.5px;color:var(--ink-3);margin-top:8px}
+.pub-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;margin-top:14px}
+.rent{padding:26px}
+.rent-bars{display:flex;align-items:flex-end;gap:12px;height:170px;border-bottom:1px solid var(--line-2);margin-top:22px}
+.rent-bars .m{flex:1;display:flex;gap:3px;align-items:flex-end;height:100%}
+.rent-bars .m i{flex:1;border-radius:4px 4px 1px 1px}
+.rent-bars .m i.due{background:#dcdfdb}
+.rent-bars .m i.got{background:var(--accent)}
+.rent-x{display:flex;gap:12px;padding-top:8px}
+.rent-x span{flex:1;text-align:center;font-size:12px;color:var(--ink-3)}
+.legend{display:flex;gap:18px;font-size:12.5px;color:var(--ink-3);margin-top:14px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px;vertical-align:-1px}
+.feed-h{display:flex;justify-content:space-between;align-items:center;padding:22px 26px 6px}
+.feed-h h3{margin:0;font-size:14px;font-weight:500}
+
+/* ---------- 抽屉：认购 ---------- */
+.scrim{position:fixed;inset:0;background:rgba(10,11,11,.36);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s var(--ease);z-index:40}
+.drawer{position:fixed;top:12px;right:12px;bottom:12px;width:480px;max-width:calc(100% - 24px);border-radius:24px;background:var(--paper);box-shadow:0 30px 80px -30px rgba(10,11,11,.45);transform:translateX(calc(100% + 24px));visibility:hidden;transition:transform .45s var(--ease),visibility 0s linear .45s;z-index:50;display:flex;flex-direction:column;overflow:hidden}
+body.sub-open .scrim{opacity:1;pointer-events:auto}
+body.sub-open .drawer{transform:none;visibility:visible;transition-delay:0s}
+.drawer-head{display:flex;justify-content:space-between;align-items:flex-start;padding:26px 28px 18px}
+.drawer-head h2{font-family:var(--serif);font-size:22px;font-weight:400;letter-spacing:-.01em;margin:0}
+.drawer-head p{margin:4px 0 0;font-size:13.5px;color:var(--ink-3)}
+.x{flex:none;width:38px;height:38px;border:1px solid var(--line-2);background:none;border-radius:50%;cursor:pointer;font-size:16px;display:grid;place-items:center;transition:border-color .2s}
+.x:hover{border-color:var(--ink)}
+.drawer-body{padding:4px 28px 28px;overflow:auto;flex:1}
+.amt{border:1px solid var(--line-2);border-radius:18px;padding:18px 20px 14px;transition:border-color .2s,box-shadow .2s}
+.amt:focus-within{border-color:var(--ink);box-shadow:0 0 0 4px rgba(14,15,15,.06)}
+.amt.bad{border-color:#a3321f}
+.amt label{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-3)}
+.amt-row{display:flex;align-items:baseline;gap:10px;margin-top:6px}
+.amt input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-weight:200;font-size:40px;letter-spacing:-.03em;color:var(--ink);padding:0;font-variant-numeric:tabular-nums}
+.amt-row span{font-size:14px;color:var(--ink-2)}
+.quick{display:flex;gap:6px;margin-top:12px}
+.quick button{height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line-2);background:none;font-size:12.5px;cursor:pointer;color:var(--ink-2);transition:border-color .2s,color .2s}
+.quick button:hover{border-color:var(--ink);color:var(--ink)}
+.amt-err{font-size:13px;color:#a3321f;margin:8px 4px 0;min-height:1em}
+.est{margin:18px 0 0;font-size:13.5px}
+.est div{display:flex;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line)}
+.est dt{color:var(--ink-3)}
+.est dd{margin:0;font-variant-numeric:tabular-nums}
+.lockbox{display:grid;grid-template-columns:22px 1fr;gap:12px;margin:22px 0 0;padding:16px 18px;border-radius:14px;background:var(--bg);font-size:13.5px;color:var(--ink-2)}
+.lockbox .ph-light{font-size:19px;color:var(--ink);margin-top:1px}
+.ack{display:grid;grid-template-columns:20px 1fr;gap:12px;margin:18px 0 22px;font-size:13.5px;color:var(--ink-2);cursor:pointer}
+.ack input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--ink)}
+.wsteps{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:8px}
+.wsteps li{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;border:1px solid var(--line);font-size:13.5px}
+.wsteps .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-2);color:var(--ink-2)}
+.wsteps li.done .n{background:var(--accent);border-color:var(--accent);color:#fff}
+.wsteps li.busy{border-color:var(--ink)}
+.wsteps em{font-style:normal;font-size:12.5px;color:var(--ink-3)}
+.spin{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line-2);border-top-color:var(--ink);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sent{display:none}
+.drawer.done .sent{display:block}
+.drawer.done .form{display:none}
+.sent .ph-light.big{font-size:40px;color:var(--accent)}
+.sent h3{font-family:var(--serif);font-size:22px;font-weight:400;margin:18px 0 8px}
+.sent p{color:var(--ink-2);margin:0 0 22px;font-size:14.5px}
+
+.foot{max-width:var(--maxw);margin:0 var(--gutter);padding:20px 0 26px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
+.foot p{margin:0}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+@media (max-width:1100px){
+  :root{--gutter:24px}
+  .dbody{grid-template-columns:1fr}
+  .aside{position:static;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .kstats{grid-template-columns:repeat(2,1fr)}
+  .agg{grid-template-columns:repeat(3,1fr)}
+  .agg>div:nth-child(4){padding-left:0;border-left:0}
+  .stages{flex-wrap:wrap}
+  .stage{flex:1 1 45%}
+  .prow,.phead{grid-template-columns:minmax(220px,2fr) 1fr 1.4fr 1fr 24px}
+  .prow>:nth-child(4),.prow>:nth-child(5),.phead>:nth-child(4),.phead>:nth-child(5){display:none}
+  .pub-grid,.ov-charts,.vgrid,.egrid,.pgrid{grid-template-columns:1fr!important}
+  }
+@media (max-width:900px){
+  .side{transform:translateX(-100%);box-shadow:0 30px 80px -30px rgba(10,11,11,.6)}
+  body.side-open .side{transform:none}
+  .side-scrim{display:block;position:fixed;inset:0;z-index:25;background:rgba(10,11,11,.3);opacity:0;pointer-events:none;transition:opacity .3s}
+  body.side-open .side-scrim{opacity:1;pointer-events:auto}
+  .shell{margin-left:0}
+  .mbar{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20;height:60px;padding:0 var(--gutter);background:rgba(244,244,242,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .mbar button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line-2);background:var(--paper);display:grid;place-items:center;font-size:18px;cursor:pointer}
+}
+
+/* ---------- 交易所：顶部导航 + 交易布局 ---------- */
+body.xc .shell{margin:0}
+.xtop{position:sticky;top:0;z-index:30;height:60px;display:flex;align-items:center;gap:32px;padding:0 24px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.xnav{display:flex;gap:24px}
+.xnav a{position:relative;font-size:14px;color:var(--ink-3);text-decoration:none;padding:19px 0;transition:color .2s}
+.xnav a:hover{color:var(--ink)}
+.xnav a[aria-current]{color:var(--ink)}
+.xnav a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--ink)}
+.xright{margin-left:auto;display:flex;align-items:center;gap:10px}
+.xbal{display:flex;align-items:center;gap:8px;height:36px;padding:0 12px 0 6px;border-radius:999px;background:var(--bg);font-size:13.5px}
+.xbal .ic{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:600}
+.xbal b{font-weight:500;font-variant-numeric:tabular-nums}
+.xbal small{color:var(--ink-3);font-size:12px}
+.xwal{display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line-2);font-size:12.5px}
+.xwal .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+#app{padding:40px 24px 64px;max-width:1280px;margin:0 auto}
+body.wide #app{max-width:none;padding:14px 14px 40px}
+.xwrap.narrow{max-width:640px;margin:0 auto}
+.xfoot{margin:0 24px;max-width:none}
+.up{color:var(--accent)} .down{color:#a3321f}
+/* Markets */
+.mtabs{display:flex;gap:6px;margin:28px 0 14px}
+.mtabs button{display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line-2);background:var(--paper);font-size:13.5px;color:var(--ink-2);cursor:pointer}
+.mtabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.mtabs .soon{font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.mtabs button[aria-pressed="true"] .soon{color:rgba(255,255,255,.6)}
+.mlist{overflow:hidden}
+.mrow{display:grid;grid-template-columns:minmax(220px,2fr) .8fr .7fr .8fr .9fr .9fr 90px 80px;gap:16px;align-items:center;padding:14px 24px;border-top:1px solid var(--line);text-decoration:none;font-size:14px;transition:background-color .2s}
+.mrow.mhd{border-top:0;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:12px 24px}
+a.mrow:hover{background:var(--paper-2)}
+.mrow.dim{color:var(--ink-3)}
+.mn b{display:block;font-weight:600;font-size:14.5px}
+.mn small{font-size:12.5px;color:var(--ink-3)}
+.tabs+section.block,.tabs+.block,.dsum+section.block,.mlist+section.block{margin-top:40px}
+.crow{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:16px;align-items:center;padding:16px 24px;border-top:1px solid var(--line)}
+.crow:first-child{border-top:0}
+.crow b{display:block;font-weight:500;font-size:14.5px}
+.crow small{display:block;font-size:12.5px;color:var(--ink-3)}
+.crow .r{text-align:right;display:grid;gap:4px;justify-items:end}
+.cidx.ok{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:13px}
+.msel .lnk{color:var(--ink-3)}
+.mn b em,.msel b em{font-style:normal;font-weight:400;color:var(--ink-3);margin-left:1px}
+.mrow .btn{height:32px;padding:0 14px;font-size:13px;justify-self:end}
+.spark{width:80px;height:24px;display:block}
+.spark polyline{fill:none;stroke:var(--ink-3);stroke-width:1.4;vector-effect:non-scaling-stroke}
+.spark.up polyline{stroke:var(--accent)} .spark.down polyline{stroke:#a3321f}
+.nissue{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.nissue .card h3{gap:10px}
+.nissue .meter .bar{flex:1;max-width:none}
+/* Trade */
+.mhead{display:flex;align-items:center;gap:32px;padding:12px 20px;margin-bottom:12px;overflow-x:auto}
+.mhead>div{white-space:nowrap}
+.mhead span{display:block;font-size:11.5px;color:var(--ink-3)}
+.mhead b{font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
+.msel{display:flex;align-items:center;gap:12px;padding-right:20px;border-right:1px solid var(--line)}
+.msel b{font-size:18px;font-weight:600}
+.msel small{font-size:12.5px;color:var(--ink-3)}
+.msel select{height:30px;border:1px solid var(--line-2);border-radius:8px;background:var(--paper);font:inherit;font-size:12.5px;padding:0 6px}
+.tgrid{display:grid;grid-template-columns:minmax(0,1fr) 280px 300px;gap:12px;align-items:start}
+.tchart,.tbook,.tform{padding:14px 16px}
+.th{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px}
+.th b{font-weight:500}
+.seg.sm button{height:28px;padding:0 10px;font-size:12px}
+.xchart{position:relative;height:300px}
+.xchart svg{width:100%;height:100%;display:block}
+.xchart .pl{fill:none;stroke:var(--ink-2);stroke-width:1.6;vector-effect:non-scaling-stroke}
+.xchart .pl.up{stroke:var(--accent)} .xchart .pl.down{stroke:#a3321f}
+.xchart .pa{fill:var(--accent-soft);opacity:.45}
+.xchart .ref{stroke:var(--amber);stroke-dasharray:4 4;stroke-width:1;vector-effect:non-scaling-stroke}
+.xaxis{position:absolute;right:4px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-3);pointer-events:none;padding:4px 0}
+.reftag{position:absolute;left:6px;transform:translateY(-120%);font-size:11px;color:var(--amber);background:var(--paper);padding:0 4px}
+.about{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}
+.about p{margin:0 0 10px}
+.aboutk{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;font-size:12.5px;color:var(--ink-3)}
+.aboutk b{color:var(--ink);font-weight:500}
+.covs{display:inline-flex;align-items:flex-end;gap:2px;height:16px;vertical-align:-3px;margin:0 4px}
+.covs i{width:5px;background:var(--accent);border-radius:1px;min-height:2px}
+.covs i.low{background:var(--amber)}
+.bkh,.bk,.tr{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12.5px;padding:3px 6px}
+.tr,.bkh.t3{grid-template-columns:1fr 1fr 50px}
+.bkh.t3 span:nth-child(2){text-align:right}
+.bkh{font-size:11px;color:var(--ink-3);padding-bottom:6px}
+.bkh span:last-child,.bk span:last-child,.tr span:nth-child(2){text-align:right}
+.tr span:last-child{text-align:right;font-size:11.5px}
+.bk{position:relative;cursor:pointer;border-radius:4px}
+.bk:hover{background:var(--bg)}
+.bk i{position:absolute;right:0;top:1px;bottom:1px;border-radius:3px;opacity:.14}
+.bk.ask i{background:#a3321f} .bk.bid i{background:var(--accent)}
+.bk.ask span:first-child{color:#a3321f} .bk.bid span:first-child{color:var(--accent)}
+.bk span{position:relative}
+.bkmid{display:flex;justify-content:space-between;align-items:baseline;padding:8px 6px;margin:4px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.bkmid b{font-size:16px;font-weight:500}
+.bkmid span{font-size:11.5px;color:var(--ink-3)}
+.bknote{font-size:11.5px;color:var(--ink-3);margin:8px 6px 0}
+.seg.two{display:grid;grid-template-columns:1fr 1fr;width:100%}
+.seg.two button[data-side="Buy"][aria-pressed="true"]{background:var(--accent);color:#fff}
+.seg.two button[data-side="Sell"][aria-pressed="true"]{background:#a3321f;color:#fff}
+.otabs{display:flex;gap:16px;margin:14px 0 10px;border-bottom:1px solid var(--line)}
+.otabs button{border:0;background:none;padding:0 0 8px;font-size:13px;color:var(--ink-3);cursor:pointer;position:relative}
+.otabs button[aria-current="true"]{color:var(--ink)}
+.otabs button[aria-current="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;background:var(--ink)}
+.fi{margin-bottom:10px}
+.fi label{display:block;font-size:12px;color:var(--ink-3);margin-bottom:4px}
+.fi>div{display:flex;align-items:center;height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 12px;background:var(--paper)}
+.fi>div:focus-within{border-color:var(--ink)}
+.fi input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:14px;font-variant-numeric:tabular-nums}
+.fi span{font-size:12px;color:var(--ink-3)}
+.pcts{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:12px}
+.pcts button{height:28px;border:1px solid var(--line-2);border-radius:8px;background:none;font-size:12px;color:var(--ink-2);cursor:pointer}
+.pcts button:hover{border-color:var(--ink)}
+.okv{margin:0 0 12px;font-size:12.5px}
+.okv div{display:flex;justify-content:space-between;padding:4px 0}
+.okv dt{color:var(--ink-3)} .okv dd{margin:0;font-variant-numeric:tabular-nums}
+.obtn{width:100%;height:44px;border:0;border-radius:10px;color:#fff;font-size:14.5px;font-weight:500;cursor:pointer}
+.obtn.buy{background:var(--accent)} .obtn.sell{background:#a3321f}
+.obtn[disabled]{background:var(--mist);color:var(--ink-3);cursor:default}
+.onote{font-size:11.5px;color:var(--ink-3);margin:10px 0 0;line-height:1.5}
+.tbottom{margin-top:12px;padding:6px 16px 10px}
+.btabs{display:flex;gap:20px;border-bottom:1px solid var(--line)}
+.btabs button{border:0;background:none;padding:10px 0;font-size:13px;color:var(--ink-3);cursor:pointer;position:relative}
+.btabs button[aria-current="true"]{color:var(--ink)}
+.btabs button[aria-current="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;background:var(--ink)}
+.tbl.xt{font-size:13px}
+.tbl.xt td{padding:10px 0}
+.tbl.xt a{text-decoration:none}
+.lnk{border:0;background:none;font:inherit;font-size:13px;color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px;cursor:pointer;padding:0}
+/* Earn / Issue */
+.vnums{display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:6px}
+.vnums span{display:block;font-size:12px;color:var(--ink-3)}
+.vnums b{font-weight:300;font-size:26px;letter-spacing:-.02em}
+.dimc{opacity:.75}
+.nextsteps{margin:0 0 6px;padding-left:18px;font-size:13.5px;color:var(--ink-2);display:grid;gap:5px}
+@media (max-width:1100px){.tgrid{grid-template-columns:1fr 1fr}.tchart{grid-column:1/-1}.mrow{grid-template-columns:minmax(180px,2fr) .8fr .7fr .8fr 80px}.mrow>:nth-child(5),.mrow>:nth-child(6),.mrow>:nth-child(7){display:none}.nissue{grid-template-columns:1fr}.xnav{gap:14px}.xwal{display:none}}
+</style>
+</head>
+<body class="xc">
+
+<header class="xtop">
+  <a class="brand" href="../index.html" title="Back to site"><span class="brand-mark" aria-hidden="true"></span>Loka</a>
+  <nav class="xnav" aria-label="Main">
+    <a href="#/markets" data-nav="markets">Markets</a>
+    <a href="#/trade/CCV" data-nav="trade">Trade</a>
+    <a href="#/earn" data-nav="earn">Earn</a>
+    <a href="#/portfolio" data-nav="portfolio">Portfolio</a>
+    <a href="#/issue" data-nav="issue">Issue</a>
+    <a href="#/transparency" data-nav="transparency">Transparency</a>
+  </nav>
+  <div class="xright">
+    <span class="xbal"><span class="ic">A</span><b id="xBal"></b><small>AIUSD</small></span>
+    <a class="btn btn-primary btn-sm" href="#/deposit">Deposit</a>
+    <span class="xwal"><span class="dot"></span><span class="mono" id="xWal"></span></span>
+  </div>
+</header>
+
+<main id="app" tabindex="-1"></main>
+<footer class="foot xfoot"><p>Design prototype with sample data. Listed assets can lose value; market prices can be below NAV or par. Open to verified investors only.</p></footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ======================= 示例数据 ======================= */
+const ME='0x7a3F09c2b5E1d84A6f2C3e90bB41d7aE5c0c91E';
+let BAL=52380;
+const CATS=[
+  {k:'credit',n:'Compute credit',live:true},
+  {k:'compute',n:'Compute price',live:false,note:'Perpetuals on GPU rental price indexes'},
+  {k:'energy',n:'Energy receivables',live:false,note:'Planned'},
+  {k:'lease',n:'Equipment leases',live:false,note:'Planned'}
+];
+const M=[
+  {sym:'CCV',name:'Compute Credit Vault',cat:'credit',kind:'Vault',price:1.0371,ref:1.0378,refName:'NAV',chg:.0006,vol:412300,yld:.062,yName:'Net APY 30d',size:9389000,sizeName:'NAV',tick:.0001,
+    about:'Backed by the vault that holds 7 compute loans. Every loan went through the same six release conditions.'},
+  {sym:'NH200-1',name:'Nordic H200 Cluster I',cat:'credit',kind:'Loan',price:.9984,ref:1,refName:'Par',chg:-.0011,vol:58200,yld:.112,yName:'Yield to maturity',size:5051000,sizeName:'Outstanding',tick:.0001,loan:{gpu:'256 × NVIDIA H200 SXM',site:'Oslo, Norway',rate:.11,left:'23 months',cov:[1.30,1.30,1.28,1.30,1.21,1.30,1.30],cond:6}},
+  {sym:'AUS-H100',name:'Austin H100 Fleet',cat:'credit',kind:'Loan',price:1.0012,ref:1,refName:'Par',chg:.0004,vol:31500,yld:.103,yName:'Yield to maturity',size:3789000,sizeName:'Outstanding',tick:.0001,loan:{gpu:'384 × NVIDIA H100 SXM',site:'Austin, Texas, US',rate:.105,left:'22 months',cov:[1.29,1.29,1.26,1.29,1.29,1.22,1.29,1.29],cond:6}},
+  {sym:'SG-H200',name:'Singapore H200 Block',cat:'credit',kind:'Loan',price:.9971,ref:1,refName:'Par',chg:-.0009,vol:12800,yld:.114,yName:'Yield to maturity',size:4605000,sizeName:'Outstanding',tick:.0001,loan:{gpu:'192 × NVIDIA H200 SXM',site:'Singapore',rate:.11,left:'28 months',cov:[1.28,1.28],cond:6}},
+  {sym:'REY-B200',name:'Reykjavik B200 Pod',cat:'credit',kind:'Loan',price:1.0005,ref:1,refName:'Par',chg:0,vol:4100,yld:.118,yName:'Yield to maturity',size:2038000,sizeName:'Outstanding',tick:.0001,loan:{gpu:'64 × NVIDIA B200',site:'Reykjavik, Iceland',rate:.12,left:'20 months',cov:[1.24,1.24,1.21,1.24],cond:6}},
+  {sym:'OSA-H100',name:'Osaka H100 Rack',cat:'credit',kind:'Loan',price:.9940,ref:1,refName:'Par',chg:0,vol:0,yld:.121,yName:'Yield to maturity',size:1296000,sizeName:'Outstanding',tick:.0001,loan:{gpu:'128 × NVIDIA H100 SXM',site:'Osaka, Japan',rate:.115,left:'19 months',cov:[1.23,1.23,1.20,1.23,1.23],cond:6}},
+  {sym:'H100-PERP',name:'H100 rental price',cat:'compute',kind:'Perpetual',soon:true,index:2.14,unit:'$/GPU-hour'},
+  {sym:'B200-PERP',name:'B200 rental price',cat:'compute',kind:'Perpetual',soon:true,index:3.86,unit:'$/GPU-hour'}
+];
+const NEW=[
+  {name:'Frankfurt H100 Portfolio',gpu:'512 × NVIDIA H100 SXM',amt:7200000,sub:.62,rate:.105,term:28,closes:'2026-10-31',state:'Subscribing'},
+  {name:'Dallas B200 Expansion',gpu:'128 × NVIDIA B200',amt:4000000,sub:1,rate:.115,term:24,closes:'2026-11-30',state:'Verifying · 4/6 conditions'}
+];
+const POS=[{sym:'CCV',qty:237271,avg:1.0115},{sym:'NH200-1',qty:395265,avg:1.0000}];
+const PENDING=[{name:'Dallas B200 Expansion',amt:750000,state:'In escrow · 4/6 conditions',until:'2026-11-30'}];
+let ORDERS=[{id:1,sym:'NH200-1',side:'Buy',type:'Limit',px:.9950,qty:50000,t:'Oct 9, 09:12'}];
+const VAULTS=[
+  {k:'CCV',name:'Compute Credit Vault',what:'Lends to compute loans through their escrows. Returns come from rent.',apy:.062,nav:9389000,mine:246240,lock:'Monthly withdrawals, queued',risk:'Loan losses; escrow and cash earn nothing'},
+  {k:'LQV',name:'Liquidity Vault',what:'Quotes buy and sell orders on the CCV and loan markets. Returns come from spreads and fees.',apy:.041,nav:2100000,mine:0,lock:'4-day lock after deposit',risk:'Holds inventory; can lose when prices move'}
+];
+
+/* ======================= 工具 ======================= */
+const $=(s,el=document)=>el.querySelector(s);
+function hx(seed,len=64){let h=2166136261,out='',i=0;while(out.length<len){for(const c of seed+'|'+(i++)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}out+=(h>>>0).toString(16).padStart(8,'0')}return '0x'+out.slice(0,len)}
+const short=h=>h.slice(0,6)+'…'+h.slice(-4);
+const usd=(n,d=0)=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const usdM=n=>n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1e3?'$'+Math.round(n/1e3)+'K':usd(n);
+const pct=(n,d=1)=>(n*100).toFixed(d)+'%';
+const px=n=>n.toFixed(4);
+const num=(n,d=0)=>n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtD=s=>new Date(s+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const bySym=s=>M.find(m=>m.sym===s);
+const sgn=n=>n>0?'up':n<0?'down':'';
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>el.classList.remove('show'),2600)}
+function rnd(seed){let h=2166136261;for(const c of seed){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return ()=>{h^=h<<13;h^=h>>>17;h^=h<<5;return ((h>>>0)%10000)/10000}}
+
+/* ======================= 路由 ======================= */
+const app=$('#app');
+function route(){
+  const h=location.hash.replace(/^#\/?/,'')||'markets', [page,id]=h.split('/');
+  document.querySelectorAll('[data-nav]').forEach(a=>a.removeAttribute('aria-current'));
+  const cur=document.querySelector(`[data-nav="${page}"]`); if(cur) cur.setAttribute('aria-current','page');
+  document.body.classList.toggle('wide',page==='trade');
+  if(page==='asset'){renderAsset(id,h.split('/')[2]);$('#xBal').textContent=num(BAL);app.classList.remove('fade');void app.offsetWidth;app.classList.add('fade');return}
+  ({trade:()=>renderTrade(bySym(id)&&!bySym(id).soon?bySym(id):M[0]),earn:renderEarn,portfolio:renderPortfolio,issue:renderIssue,transparency:renderPublic,deposit:renderDeposit}[page]||renderMarkets)();
+  $('#xBal').textContent=num(BAL);
+  app.classList.remove('fade'); void app.offsetWidth; app.classList.add('fade');
+}
+addEventListener('hashchange',()=>{route();scrollTo({top:0})});
+
+/* ======================= Markets ======================= */
+let cat='credit';
+function spark(m){
+  const r=rnd(m.sym), n=24, pts=[]; let v=0; for(let i=0;i<n;i++){v+=(r()-.5)+(m.chg>0?.08:m.chg<0?-.08:0);pts.push(v)}
+  const lo=Math.min(...pts),hi=Math.max(...pts)||1;
+  return `<svg class="spark ${sgn(m.chg)}" viewBox="0 0 80 24" preserveAspectRatio="none"><polyline points="${pts.map((p,i)=>`${(i/(n-1)*80).toFixed(1)},${(22-(p-lo)/((hi-lo)||1)*20).toFixed(1)}`).join(' ')}"/></svg>`;
+}
+function renderMarkets(){
+  const live=M.filter(m=>!m.soon), vol=live.reduce((s,m)=>s+m.vol,0), list=M.filter(m=>m.cat===cat), c=CATS.find(x=>x.k===cat);
+  app.innerHTML=`
+  <div class="xwrap">
+    <div class="dsum" style="margin-top:0"><div class="kstats">
+      <div><span>24h volume</span><b class="num">${usdM(vol)}</b><em>${live.length} live markets</em></div>
+      <div><span>Assets listed</span><b class="num">${usdM(live.reduce((s,m)=>s+m.size,0))}</b><em>Vault NAV and loans outstanding</em></div>
+      <div><span>Vault deposits</span><b class="num">${usdM(VAULTS.reduce((s,v)=>s+v.nav,0))}</b><em>Credit and liquidity vaults</em></div>
+      <div><span>New issues</span><b class="num">${NEW.length}</b><em>Primary subscriptions</em></div>
+    </div></div>
+    <div class="mtabs">${CATS.map(x=>`<button type="button" data-cat="${x.k}" aria-pressed="${x.k===cat}">${x.n}${x.live?'':`<span class="soon">${x.k==='compute'?'Soon':'Planned'}</span>`}</button>`).join('')}</div>
+    ${list.length?`<div class="panel mlist">
+      <div class="mrow mhd"><span>Market</span><span>Price</span><span>24h</span><span>${cat==='credit'?'Yield':'Index'}</span><span>24h volume</span><span>Size</span><span></span><span></span></div>
+      ${list.map(m=>m.soon?`<div class="mrow dim"><span class="mn"><b>${m.sym}</b><small>${m.name}</small></span><span>—</span><span>—</span><span class="num">${usd(m.index,2)} <small>${m.unit}</small></span><span>—</span><span>—</span><span></span><span><span class="pill plain locked">Soon</span></span></div>`
+      :`<a class="mrow" href="#/asset/${m.sym}" title="${m.name} details"><span class="mn"><b>${m.sym}<em>/AIUSD</em></b><small>${m.name}</small></span>
+        <span class="num">${px(m.price)}</span><span class="num ${sgn(m.chg)}">${m.chg>0?'+':''}${pct(m.chg/m.price,2)}</span>
+        <span class="num">${pct(m.yld)}</span><span class="num">${m.vol?usdM(m.vol):'<small class="muted">No trades</small>'}</span><span class="num">${usdM(m.size)}</span>
+        <span>${spark(m)}</span><span class="btn btn-ghost btn-sm" role="link" tabindex="0" data-trade="${m.sym}">Trade</span></a>`).join('')}
+    </div>`:`<div class="panel empty"><p style="margin:0 0 6px;color:var(--ink)">${c.n}</p><p style="margin:0">${c.note}. Listing templates for this asset class are being designed.</p></div>`}
+    ${cat==='credit'?`<section class="block">
+      <div class="sec-t"><h2>New issues</h2><p>Primary subscriptions. A market opens after funds are released.</p></div>
+      <div class="nissue">${NEW.map(n=>`<div class="panel card">
+        <h3>${n.name}<span class="pill ${n.sub<1?'open':'verifying'}">${n.state}</span></h3>
+        <p class="small" style="margin:0 0 14px">${n.gpu}</p>
+        <div class="meter"><span class="num">${pct(n.sub,0)} of ${usdM(n.amt)}</span><div class="bar"><i style="width:${n.sub*100}%"></i></div></div>
+        <dl class="kv"><div><dt>Rate</dt><dd>${pct(n.rate)} fixed · ${n.term} months</dd></div><div><dt>${n.sub<1?'Closes':'Release deadline'}</dt><dd>${fmtD(n.closes)}</dd></div></dl>
+        ${n.sub<1?`<button class="btn btn-primary btn-sm" style="margin-top:16px" type="button" onclick="toast('Subscription opens in the primary market (demo)')">Subscribe</button>`:''}
+      </div>`).join('')}</div>
+    </section>`:''}
+  </div>`;
+  app.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{cat=b.dataset.cat;renderMarkets()});
+  app.querySelectorAll('[data-trade]').forEach(b=>{const go=e=>{e.preventDefault();e.stopPropagation();location.hash='#/trade/'+b.dataset.trade};b.onclick=go;b.onkeydown=e=>{if(e.key==='Enter')go(e)}});
+}
+
+/* ======================= Trade ======================= */
+let side='Buy', otype='Limit', btab='pos';
+function series(m){const r=rnd(m.sym+'s'), n=60, out=[]; let v=m.price-(m.chg*8); for(let i=0;i<n;i++){v+= (r()-.5)*m.price*.0016 + (m.price-v)*.06; out.push(v)} out[n-1]=m.price; return out}
+function chart(m){
+  const s=series(m), lo=Math.min(...s), hi=Math.max(...s), W=800, H=260, y=v=>H-8-(v-lo)/((hi-lo)||1)*(H-24);
+  const line=s.map((v,i)=>`${(i/(s.length-1)*W).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const refY=m.ref>=lo&&m.ref<=hi?y(m.ref):null;
+  return `<div class="xchart"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polygon class="pa" points="0,${H} ${line} ${W},${H}"/><polyline class="pl ${sgn(m.chg)}" points="${line}"/>${refY!=null?`<line x1="0" x2="${W}" y1="${refY}" y2="${refY}" class="ref"/>`:''}</svg>
+    <div class="xaxis"><span>${px(hi)}</span><span>${px(lo)}</span></div>${refY!=null?`<span class="reftag" style="top:${refY/H*100}%">${m.refName} ${px(m.ref)}</span>`:''}</div>`;
+}
+function book(m){
+  const r=rnd(m.sym+'b'), t=m.tick*(m.vol?2:6), asks=[], bids=[];
+  for(let i=6;i>=1;i--) asks.push([m.price+t*i, Math.round((r()*40000+5000)*(m.vol?1:.3))]);
+  for(let i=1;i<=6;i++) bids.push([m.price-t*i, Math.round((r()*40000+5000)*(m.vol?1:.3))]);
+  const mx=Math.max(...asks.map(a=>a[1]),...bids.map(b=>b[1]));
+  const row=(p,q,c)=>`<div class="bk ${c}" data-px="${px(p)}"><i style="width:${q/mx*100}%"></i><span class="num">${px(p)}</span><span class="num">${num(q)}</span></div>`;
+  return `<div class="bkh"><span>Price</span><span>Size</span></div>${asks.map(a=>row(a[0],a[1],'ask')).join('')}<div class="bkmid"><b class="num ${sgn(m.chg)}">${px(m.price)}</b><span>Spread ${px(t*2)}</span></div>${bids.map(b=>row(b[0],b[1],'bid')).join('')}<p class="bknote">Liquidity Vault quotes both sides.</p>`;
+}
+function trades(m){
+  if(!m.vol) return `<p class="muted" style="font-size:12.5px;margin:8px 0">No trades in the last 24 hours.</p>`;
+  const r=rnd(m.sym+'t'); return `<div class="bkh t3"><span>Price</span><span>Size</span><span>Time</span></div>`+Array.from({length:8},(_,i)=>{const up=r()>.5;return `<div class="tr"><span class="num ${up?'up':'down'}">${px(m.price+(r()-.5)*m.tick*4)}</span><span class="num">${num(Math.round(r()*20000+1000))}</span><span class="muted">${String(9-Math.floor(i/3)).padStart(2,'0')}:${String(59-i*6).padStart(2,'0')}</span></div>`}).join('');
+}
+function posRows(filter){
+  const ps=POS.filter(p=>!filter||p.sym===filter);
+  if(!ps.length) return `<p class="muted" style="font-size:13px;margin:14px 0">No position in this market.</p>`;
+  return `<table class="tbl xt"><thead><tr><th>Market</th><th>Size</th><th>Avg price</th><th>Mark</th><th>Value</th><th>Unrealized</th><th>Yield</th></tr></thead><tbody>${ps.map(p=>{const m=bySym(p.sym),v=p.qty*m.price,u=p.qty*(m.price-p.avg);return `<tr><td><a href="#/trade/${p.sym}"><b>${p.sym}</b></a></td><td>${num(p.qty)} <small class="muted">${p.sym}</small></td><td>${px(p.avg)}</td><td>${px(m.price)}</td><td>${usd(Math.round(v))}</td><td class="${sgn(u)}">${u>=0?'+'+usd(Math.round(u)):'−'+usd(Math.round(-u))}</td><td>${pct(m.yld)}</td></tr>`}).join('')}</tbody></table>`;
+}
+function orderRows(filter){
+  const os=ORDERS.filter(o=>!filter||o.sym===filter);
+  if(!os.length) return `<p class="muted" style="font-size:13px;margin:14px 0">No open orders.</p>`;
+  return `<table class="tbl xt"><thead><tr><th>Market</th><th>Side</th><th>Type</th><th>Price</th><th>Size</th><th>Placed</th><th></th></tr></thead><tbody>${os.map(o=>`<tr><td><b>${o.sym}</b></td><td class="${o.side==='Buy'?'up':'down'}">${o.side}</td><td>${o.type}</td><td>${px(o.px)}</td><td>${num(o.qty)} <small class="muted">${o.sym}</small></td><td>${o.t}</td><td><button class="lnk" type="button" data-cancel="${o.id}">Cancel</button></td></tr>`).join('')}</tbody></table>`;
+}
+function renderTrade(m){
+  const pos=POS.find(p=>p.sym===m.sym);
+  app.innerHTML=`
+  <div class="mhead panel">
+    <div class="msel"><b>${m.sym}<em>/AIUSD</em></b><a class="lnk" href="#/asset/${m.sym}" style="font-size:12.5px">${m.name}</a>
+      <select id="mPick" aria-label="Switch market">${M.filter(x=>!x.soon).map(x=>`<option value="${x.sym}" ${x.sym===m.sym?'selected':''}>${x.sym}/AIUSD</option>`).join('')}</select></div>
+    <div><span>Price</span><b class="num ${sgn(m.chg)}">${px(m.price)}</b></div>
+    <div><span>24h</span><b class="num ${sgn(m.chg)}">${m.chg>0?'+':''}${pct(m.chg/m.price,2)}</b></div>
+    <div><span>${m.refName}</span><b class="num">${px(m.ref)}</b></div>
+    <div><span>${m.yName}</span><b class="num">${pct(m.yld)}</b></div>
+    <div><span>24h volume</span><b class="num">${m.vol?usdM(m.vol):'—'}</b></div>
+    <div><span>${m.sizeName}</span><b class="num">${usdM(m.size)}</b></div>
+  </div>
+  <div class="tgrid">
+    <div class="panel tchart">
+      <div class="th"><span class="seg sm"><button aria-pressed="false">1D</button><button aria-pressed="false">1W</button><button aria-pressed="true">1M</button><button aria-pressed="false">All</button></span><span class="muted" style="font-size:12.5px">${m.sym}/AIUSD</span></div>
+      ${chart(m)}
+      <div class="about">
+        <p>${m.about||`Backed by one compute loan: ${m.loan.gpu}, ${m.loan.site}. Repaid monthly from rent; ${m.loan.left} left at ${pct(m.loan.rate)}.`}</p>
+        ${m.loan?`<div class="aboutk"><span>Release conditions <b class="pos">${m.loan.cond}/6 recorded</b></span><span>Coverage by month <span class="covs">${m.loan.cov.map(c=>`<i class="${c<1.25?'low':''}" style="height:${(c-1)/.4*100}%" title="${c.toFixed(2)}×"></i>`).join('')}</span> <b>${m.loan.cov.at(-1).toFixed(2)}×</b></span><span>Cure trigger <b>1.15×</b></span><a class="lnk" href="#/asset/${m.sym}">Asset details</a></div>`
+          :`<div class="aboutk"><span>Holdings <b>7 loans</b></span><span>Largest <b>14.8% of NAV</b></span><span>Earning · escrow · cash <b>61% · 28% · 11%</b></span><a class="lnk" href="#/asset/CCV">Vault details</a></div>`}
+      </div>
+    </div>
+    <div class="panel tbook"><div class="th"><b>Order book</b></div>${book(m)}<div class="th" style="margin-top:14px"><b>Trades</b></div>${trades(m)}</div>
+    <div class="panel tform">
+      <div class="seg two"><button type="button" data-side="Buy" aria-pressed="${side==='Buy'}">Buy</button><button type="button" data-side="Sell" aria-pressed="${side==='Sell'}">Sell</button></div>
+      <div class="otabs">${['Limit','Market'].map(t=>`<button type="button" data-ot="${t}" aria-current="${t===otype}">${t}</button>`).join('')}</div>
+      <div class="fi" ${otype==='Market'?'hidden':''}><label for="oPx">Price</label><div><input id="oPx" inputmode="decimal" value="${px(side==='Buy'?m.price-m.tick:m.price+m.tick)}"><span>AIUSD</span></div></div>
+      <div class="fi"><label for="oQty">Size</label><div><input id="oQty" inputmode="numeric" placeholder="0"><span>${m.sym}</span></div></div>
+      <div class="pcts">${[.25,.5,.75,1].map(p=>`<button type="button" data-p="${p}">${p*100}%</button>`).join('')}</div>
+      <dl class="okv"><div><dt>Order value</dt><dd id="oVal">—</dd></div><div><dt>Fee 0.05%</dt><dd id="oFee">—</dd></div><div><dt>${side==='Buy'?'Available':'Position'}</dt><dd>${side==='Buy'?num(BAL)+' AIUSD':num(pos?pos.qty:0)+' '+m.sym}</dd></div></dl>
+      <button class="obtn ${side==='Buy'?'buy':'sell'}" id="oGo" type="button" disabled>${side} ${m.sym}</button>
+      <p class="onote">Settles in AIUSD on-chain. ${m.kind==='Loan'?`Holding ${m.sym} pays you its share of each monthly repayment, from the next payment date.`:`${m.sym} carries the vault’s returns and losses.`}</p>
+    </div>
+  </div>
+  <div class="panel tbottom">
+    <div class="btabs">${[['pos','Positions'],['ord',`Open orders (${ORDERS.length})`]].map(([k,t])=>`<button type="button" data-bt="${k}" aria-current="${k===btab}">${t}</button>`).join('')}</div>
+    <div id="bBody">${btab==='pos'?posRows():orderRows()}</div>
+  </div>`;
+  $('#mPick').onchange=e=>location.hash='#/trade/'+e.target.value;
+  app.querySelectorAll('[data-side]').forEach(b=>b.onclick=()=>{side=b.dataset.side;renderTrade(m)});
+  app.querySelectorAll('[data-ot]').forEach(b=>b.onclick=()=>{otype=b.dataset.ot;renderTrade(m)});
+  app.querySelectorAll('[data-bt]').forEach(b=>b.onclick=()=>{btab=b.dataset.bt;renderTrade(m)});
+  app.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{ORDERS=ORDERS.filter(o=>o.id!=b.dataset.cancel);toast('Order cancelled');renderTrade(m)});
+  app.querySelectorAll('.bk').forEach(r=>r.onclick=()=>{const i=$('#oPx');if(i){i.value=r.dataset.px;calc()}});
+  const q=$('#oQty'), p=$('#oPx'), go=$('#oGo');
+  const price=()=>otype==='Market'?m.price:Number(p.value)||0, qty=()=>Number(q.value.replace(/[^0-9]/g,''))||0;
+  function calc(){const v=price()*qty(), f=v*.0005; $('#oVal').textContent=v?usd(v,2):'—'; $('#oFee').textContent=v?usd(f,2):'—';
+    const ok = qty()>0 && (side==='Buy' ? v+f<=BAL : qty()<=(pos?pos.qty:0)); go.disabled=!ok; go.textContent = qty()&&!ok ? (side==='Buy'?'Not enough AIUSD':'More than your position') : `${side} ${m.sym}`;}
+  q.addEventListener('input',()=>{const n=q.value.replace(/[^0-9]/g,'');q.value=n?num(Number(n)):'';calc()}); if(p) p.addEventListener('input',calc);
+  app.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const f=Number(b.dataset.p); const n=side==='Buy'?Math.floor(BAL*f/(price()*1.0005)):Math.floor((pos?pos.qty:0)*f); q.value=num(n); calc()});
+  go.onclick=()=>{
+    const n=qty(), pr=price(), v=n*pr, f=v*.0005;
+    if(otype==='Limit'){ORDERS.push({id:Date.now(),sym:m.sym,side,type:'Limit',px:pr,qty:n,t:'Oct 9, now'});btab='ord';toast(`${side} order placed: ${num(n)} ${m.sym} at ${px(pr)} AIUSD`)}
+    else{ if(side==='Buy'){BAL-=v+f; const ps=POS.find(x=>x.sym===m.sym); if(ps){ps.avg=(ps.avg*ps.qty+pr*n)/(ps.qty+n);ps.qty+=n}else POS.push({sym:m.sym,qty:n,avg:pr})}
+          else{BAL+=v-f; const ps=POS.find(x=>x.sym===m.sym); ps.qty-=n; if(!ps.qty) POS.splice(POS.indexOf(ps),1)}
+          btab='pos'; toast(`${side === 'Buy'?'Bought':'Sold'} ${num(n)} ${m.sym} at ${px(pr)}`)}
+    route();
+  };
+  calc();
+}
+
+/* ======================= Earn ======================= */
+function renderEarn(){
+  app.innerHTML=`<div class="xwrap">
+    <div class="page-head"><div><h1>Earn</h1><p>Two vaults, two sources of return. AIUSD itself pays nothing; returns come from what the vault does with it.</p></div></div>
+    <div class="vgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">${VAULTS.map(v=>`<div class="panel card vcard">
+      <h3>${v.name}<span class="mono muted" style="font-size:12px">${v.k}</span></h3>
+      <p class="small" style="margin:0 0 18px">${v.what}</p>
+      <div class="vnums"><div><span>Net APY, 30 days</span><b class="num">${pct(v.apy)}</b></div><div><span>Vault size</span><b class="num">${usdM(v.nav)}</b></div><div><span>Yours</span><b class="num">${v.mine?usd(v.mine):'—'}</b></div></div>
+      <dl class="kv"><div><dt>Withdrawals</dt><dd>${v.lock}</dd></div><div><dt>Main risk</dt><dd>${v.risk}</dd></div></dl>
+      <div class="tacts"><button class="btn btn-primary btn-sm" type="button" onclick="toast('Deposit into ${v.name} (demo)')">Deposit</button>${v.mine?`<button class="btn btn-ghost btn-sm" type="button" onclick="toast('Withdrawal requested (demo)')">Withdraw</button>`:''}${v.k==='CCV'?'<a class="btn btn-ghost btn-sm" href="#/trade/CCV">Trade CCV</a>':''}</div>
+    </div>`).join('')}</div>
+    <p class="enote">The Liquidity Vault is what keeps the order books quoted. CCV and LQV are not stablecoins and can lose value.</p>
+  </div>`;
+}
+
+/* ======================= Portfolio ======================= */
+function renderPortfolio(){
+  const pv=POS.reduce((s,p)=>s+p.qty*bySym(p.sym).price,0), un=POS.reduce((s,p)=>s+p.qty*(bySym(p.sym).price-p.avg),0), pend=PENDING.reduce((s,p)=>s+p.amt,0);
+  app.innerHTML=`<div class="xwrap">
+    <div class="page-head"><div><h1>Portfolio</h1><p>One account in AIUSD across every market. <span class="mono">${short(ME)}</span></p></div><div class="vact"><a class="btn btn-ghost btn-sm" href="#/deposit">Withdraw</a><a class="btn btn-primary btn-sm" href="#/deposit">Deposit</a></div></div>
+    <div class="dsum" style="margin-top:0"><div class="kstats">
+      <div><span>Total equity</span><b class="num">${usd(Math.round(pv+BAL+pend))}</b><em>Positions, cash and escrow</em></div>
+      <div><span>Positions</span><b class="num">${usd(Math.round(pv))}</b><em class="${sgn(un)}">${un>=0?'+'+usd(Math.round(un)):'−'+usd(Math.round(-un))} unrealized</em></div>
+      <div><span>AIUSD available</span><b class="num">${num(BAL)}</b><em>No yield · redeem 1:1</em></div>
+      <div><span>In escrow</span><b class="num">${usd(pend)}</b><em>New issues waiting for release</em></div>
+    </div></div>
+    <section class="block"><div class="sec-t"><h2>Positions</h2></div><div class="panel tbl-wrap">${posRows()}</div></section>
+    <section class="block"><div class="sec-t"><h2>Open orders</h2></div><div class="panel tbl-wrap">${orderRows()}</div></section>
+    <section class="block"><div class="sec-t"><h2>Subscriptions in escrow</h2></div><div class="panel tbl-wrap"><table class="tbl xt"><thead><tr><th>Issue</th><th>Amount</th><th>Status</th><th>Release deadline</th></tr></thead><tbody>${PENDING.map(p=>`<tr><td><b>${p.name}</b></td><td>${usd(p.amt)}</td><td><span class="pill verifying">${p.state}</span></td><td>${fmtD(p.until)}</td></tr>`).join('')}</tbody></table></div></section>
+  </div>`;
+  app.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{ORDERS=ORDERS.filter(o=>o.id!=b.dataset.cancel);toast('Order cancelled');renderPortfolio()});
+}
+
+/* ======================= Issue ======================= */
+function renderIssue(){
+  app.innerHTML=`<div class="xwrap">
+    <div class="page-head"><div><h1>Issue</h1><p>List a cash-flow asset. Each asset class has its own verification template; funds only reach the issuer after every condition is recorded on-chain.</p></div><a class="btn btn-primary btn-sm" href="issuer/index.html#/apply">Apply to list</a></div>
+    <div class="vgrid">
+      <div class="panel card">
+        <h3>Compute credit <span class="pill repaying">Live</span></h3>
+        <p class="small" style="margin:0 0 14px">Loans against GPUs that are installed and rented out under an offtake contract.</p>
+        <ol class="nextsteps"><li>Fully subscribed</li><li>SPV formed, equipment pledged</li><li>Lien filed</li><li>Rent routed to collection contract</li><li>Equipment verified online</li><li>Loan ≤ 80% of appraisal</li></ol>
+        <dl class="kv"><div><dt>Issuer first loss</dt><dd>20% equity in the equipment</dd></div><div><dt>Offtake</dt><dd>At least 24 months</dd></div></dl>
+        <div class="tacts"><a class="btn btn-ghost btn-sm" href="issuer/index.html#/loans">Open issuer console</a></div>
+      </div>
+      <div class="panel card dimc">
+        <h3>Energy receivables <span class="pill plain locked">Template in design</span></h3>
+        <p class="small" style="margin:0">Payments owed under power purchase agreements. Conditions would cover metering data, offtaker signature and payment routing.</p>
+      </div>
+      <div class="panel card dimc">
+        <h3>Equipment leases <span class="pill plain locked">Template in design</span></h3>
+        <p class="small" style="margin:0">Lease payments on other productive equipment. Same pattern: off-chain steps, each recorded on-chain before release.</p>
+      </div>
+    </div>
+    <section class="block"><div class="sec-t"><h2>Listing rules</h2></div><div class="panel"><ul class="rules">
+      <li><i class="ph-light ph-shield-check"></i><span><b>Listed by the platform for now.</b> External issuers will be able to list once they post a bond or take first loss, and can be cut off if they break the template’s rules.</span></li>
+      <li><i class="ph-light ph-seal-check"></i><span><b>Same proof standard for every asset.</b> Each off-chain step is signed by a named party and its hash recorded on-chain.</span></li>
+      <li><i class="ph-light ph-coins"></i><span><b>Settled in AIUSD.</b> Subscriptions, repayments and trades all use the same unit.</span></li>
+    </ul></div></section>
+  </div>`;
+}
+
+/* ======================= 资产详情 =======================
+   #/asset/<代号>。贷款：概览 · 放款条件 · 还款 · 链上记录；CCV：金库持有的贷款和规则。数据和投资人端示例一致。 */
+const LOANS={
+  'NH200-1':{amount:6400000,appraisal:8200000,term:30,rate:.11,rent:318000,buyer:'AI inference platform',offtake:32,released:'2026-03-04',firstPay:'2026-04-05',
+    got:[318000,318000,312400,318000,296400,318000,318000],up:[99.2,99.5,98.1,99.6,95.8,99.4,99.7],cd:['2026-02-16','2026-02-03','2026-02-10','2026-02-24','2026-03-02','2026-01-28'],filing:'NO-LR-2026-0048213',vault:1700000},
+  'AUS-H100':{amount:5000000,appraisal:6400000,term:30,rate:.105,rent:245000,buyer:'Inference platform',offtake:30,released:'2026-01-20',firstPay:'2026-02-20',
+    got:[245000,245000,240100,245000,245000,232800,245000,245000],up:[99.4,99.6,98.3,99.5,99.7,96.1,99.3,99.6],cd:['2026-01-06','2025-12-23','2025-12-30','2026-01-10','2026-01-18','2025-12-16'],filing:'TX-UCC-26-0102215',vault:1800000},
+  'SG-H200':{amount:4800000,appraisal:6200000,term:30,rate:.11,rent:236000,buyer:'Cloud GPU reseller',offtake:31,released:'2026-06-30',firstPay:'2026-07-30',
+    got:[236000,236000],up:[99.4,99.6],cd:['2026-06-16','2026-06-02','2026-06-09','2026-06-20','2026-06-28','2026-05-26'],filing:'SG-ACRA-26-88310',vault:1450000},
+  'REY-B200':{amount:2400000,appraisal:3100000,term:24,rate:.12,rent:140000,buyer:'Model training lab',offtake:25,released:'2026-05-12',firstPay:'2026-06-12',
+    got:[140000,140000,137200,140000],up:[99.4,99.6,98.3,99.5],cd:['2026-04-28','2026-04-14','2026-04-21','2026-05-02','2026-05-10','2026-04-07'],filing:'IS-VED-2026-4471',vault:1200000},
+  'OSA-H100':{amount:1600000,appraisal:2100000,term:24,rate:.115,rent:92000,buyer:'Inference platform',offtake:24,released:'2026-04-15',firstPay:'2026-05-15',
+    got:[92000,92000,90200,92000,92000],up:[99.4,99.6,98.3,99.5,99.7],cd:['2026-04-01','2026-03-18','2026-03-25','2026-04-05','2026-04-13','2026-03-11'],filing:'JP-MOJ-2026-551902',vault:800000}
+};
+const COND=[['Fully subscribed','Escrow contract, automatically'],['SPV formed, equipment pledged','Corporate services provider · operator'],['Lien filed','Law firm'],['Rent routed to collection contract','Buyer · operator · platform'],['Equipment verified online','Monitoring nodes'],['Loan ≤ 80% of appraisal','Appraiser']];
+const pmt=l=>{const r=l.rate/12;return l.amount*r/(1-Math.pow(1+r,-l.term))};
+const bal=(l,k)=>{const r=l.rate/12,p=pmt(l);let b=l.amount;for(let i=0;i<k;i++)b-=p-b*r;return b};
+const mon=(s,i,o)=>{const d=new Date(s+'T00:00:00');d.setMonth(d.getMonth()+i);return o?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`:d.toLocaleDateString('en-US',{month:'short',year:'numeric'})};
+const txl=seed=>`<a class="txlink" href="#" onclick="return false" title="${hx(seed)}">${short(hx(seed))}<i class="ph-light ph-arrow-up-right"></i></a>`;
+let aTab='overview';
+function renderAsset(sym,tab){
+  const m=bySym(sym); if(!m||m.soon) return renderMarkets();
+  if(sym==='CCV') return renderVaultAsset(m);
+  const l=LOANS[sym], k=l.got.length, p=pmt(l); aTab=['overview','conditions','repayments','onchain'].includes(tab)?tab:'overview';
+  const tabs=[['overview','Overview'],['conditions','Release conditions','6/6'],['repayments','Repayments'],['onchain','On-chain record']];
+  const body={
+    overview:()=>`<section class="block"><div class="panel"><dl class="facts">
+        <div><dt>GPUs</dt><dd>${m.loan.gpu}</dd></div><div><dt>Location</dt><dd>${m.loan.site}</dd></div>
+        <div><dt>Appraised value</dt><dd class="num">${usd(l.appraisal)} · third-party report</dd></div><div><dt>Loan as share of appraisal</dt><dd class="num">${pct(l.amount/l.appraisal)} (limit 80%)</dd></div>
+        <div><dt>Offtake buyer</dt><dd>${l.buyer}</dd></div><div><dt>Offtake remaining</dt><dd>${l.offtake} months at signing (minimum 24)</dd></div>
+        <div><dt>Monthly rent</dt><dd class="num">${usd(l.rent)}</dd></div><div><dt>Funded by</dt><dd>Vault ${usdM(l.vault)} · direct ${usdM(l.amount-l.vault)}</dd></div>
+      </dl></div></section>
+      <section class="block"><div class="sec-t"><h2>Where the rent goes</h2><p>Each month, in this order</p></div><div class="panel"><div class="wf">
+        <div class="wf-row first"><span class="n">1</span><span>${sym} holders: principal and interest</span><em>${usd(Math.round(p))}</em></div>
+        <div class="wf-row"><span class="n">2</span><span>Service fee</span><em>${usd(Math.round(l.rent*.02))}</em></div>
+        <div class="wf-row"><span class="n">3</span><span>Operator: the remainder</span><em>${usd(Math.round(l.rent-p-l.rent*.02))}</em></div>
+      </div></div></section>
+      <section class="block"><div class="sec-t"><h2>Protections</h2></div><div class="panel"><ul class="rules">
+        <li><i class="ph-light ph-stack"></i><span><b>Operator takes first loss.</b> The loan is capped at 80% of appraised value.</span></li>
+        <li><i class="ph-light ph-vault"></i><span><b>3-month reserve.</b> About ${usd(Math.round(p*3))} sits in the collection contract.</span></li>
+        <li><i class="ph-light ph-gauge"></i><span><b>Coverage check every month.</b> Below 1.15×, a 30-day cure period starts.</span></li>
+        <li><i class="ph-light ph-gavel"></i><span><b>Enforcement.</b> If the cure fails, the lien is enforced and proceeds repay holders first.</span></li>
+      </ul></div></section>`,
+    conditions:()=>`<section class="block"><div class="panel">
+      ${COND.map(([t,by],i)=>`<div class="crow"><span class="cidx ok"><i class="ph ph-check"></i></span><span><b>${t}</b><small>Signed by ${by}${i===2?` · filing ${l.filing}`:''}${i===5?` · ${usd(l.appraisal)} appraisal`:''}</small></span><span class="r"><small>${fmtD(l.cd[i])}</small>${txl(sym+'c'+i)}</span></div>`).join('')}
+      <p class="note-line" style="margin:0;padding:14px 24px 18px">Each step happened off-chain and was signed by the party shown; only hashes, numbers and signatures are on-chain. Original documents stay with the signer and the platform, and the hash shows they have not been altered.</p>
+    </div></section>`,
+    repayments:()=>{const rows=l.got.map((g,i)=>({mon:mon(l.firstPay,i),g,u:l.up[i],c:g/p}));const mx=1.6;
+      return `<section class="block"><div class="sec-t"><h2>Coverage by month</h2><p>Rent received ÷ payment due</p></div><div class="panel chart">
+        <div class="cov"><span class="axis" style="bottom:100%">1.6×</span><span class="axis" style="bottom:${1/mx*100}%">1.0×</span><span class="axis" style="bottom:0">0</span>
+        <div class="thr" style="bottom:${1.15/mx*100}%"><span>1.15× cure trigger</span></div>
+        ${rows.map(r=>`<div class="col"><b>${r.c.toFixed(2)}×</b><i class="${r.c<1.25?'low':''}" style="height:${r.c/mx*100}%"></i></div>`).join('')}</div>
+        <div class="cov-x">${rows.map(r=>`<span>${r.mon.split(' ')[0]}</span>`).join('')}</div></div></section>
+      <section class="block"><div class="sec-t"><h2>Monthly disclosure</h2></div><div class="panel tbl-wrap"><table class="tbl xt">
+        <thead><tr><th>Month</th><th>Rent due</th><th>Received</th><th>Uptime</th><th>To holders</th><th>Coverage</th><th>Tx</th></tr></thead>
+        <tbody>${rows.slice().reverse().map((r,j)=>`<tr><td>${r.mon}</td><td>${usd(l.rent)}</td><td>${usd(r.g)}</td><td>${r.u.toFixed(1)}%</td><td>${usd(Math.round(p))}</td><td class="${r.c<1.25?'neg':''}">${r.c.toFixed(2)}×</td><td>${txl(sym+'p'+j)}</td></tr>`).join('')}</tbody></table></div></section>`},
+    onchain:()=>`<section class="block"><div class="sec-t"><h2>Contracts</h2></div><div class="panel"><dl class="contracts">
+        <div><dt>${sym} token</dt><dd>${txl(sym+'tok')}<small>Transferable; traded as ${sym}/AIUSD</small></dd></div>
+        <div><dt>Escrow contract</dt><dd>${txl(sym+'esc')}<small>Released ${fmtD(l.released)}</small></dd></div>
+        <div><dt>Collection contract</dt><dd>${txl(sym+'col')}<small>Receives rent; pays in order</small></dd></div></dl></div></section>
+      <section class="block"><div class="sec-t"><h2>Activity</h2></div><div class="panel"><ul class="events">
+        ${l.got.map((g,i)=>({d:mon(l.firstPay,i,1),ic:'ph-arrow-down-left',t:`Rent received · ${mon(l.firstPay,i).split(' ')[0]}`,s:`${usd(Math.round(p))} paid to holders first`,a:usd(g),seed:sym+'p'+i})).reverse()
+          .concat([{d:l.released,ic:'ph-arrow-square-out',t:'Released to borrower SPV',s:'All six conditions met',a:usd(l.amount),seed:sym+'rel'}])
+          .concat(COND.map(([t],i)=>({d:l.cd[i],ic:'ph-seal-check',t:`Condition ${i+1} recorded`,s:t,seed:sym+'c'+i})).sort((a,b)=>b.d.localeCompare(a.d)))
+          .map(e=>`<li><i class="ph-light ${e.ic}"></i><span><b>${e.t}</b><small>${e.s}</small></span><span class="r">${e.a?`<em>${e.a}</em>`:''}<small>${fmtD(e.d)}</small>${txl(e.seed)}</span></li>`).join('')}
+      </ul></div></section>`
+  }[aTab]();
+  app.innerHTML=`<div class="xwrap">
+    <div class="crumb"><a href="#/markets">Markets</a><i class="ph-light ph-caret-right"></i><span>${sym}</span></div>
+    <div class="dhead"><div><div class="dtitle"><h1>${m.name}</h1><span class="pill repaying">Repaying</span></div>
+      <div class="dmeta"><span><i class="ph-light ph-cpu"></i>${m.loan.gpu}</span><span><i class="ph-light ph-map-pin"></i>${m.loan.site}</span><span><i class="ph-light ph-handshake"></i>Offtake: ${l.buyer}</span></div></div>
+      <div class="dact"><a class="btn btn-primary btn-sm" href="#/trade/${sym}">Trade ${sym}</a><small>${sym}/AIUSD ${px(m.price)} · ${pct(m.yld)} yield</small></div></div>
+    <div class="dsum"><div class="kstats">
+      <div><span>Loan amount</span><b class="num">${usdM(l.amount)}</b><em>${pct(l.amount/l.appraisal,0)} of ${usdM(l.appraisal)} appraisal</em></div>
+      <div><span>Rate</span><b class="num">${pct(l.rate)}</b><em>Fixed</em></div>
+      <div><span>Outstanding</span><b class="num">${usdM(bal(l,k))}</b><em>${k} of ${l.term} payments made</em></div>
+      <div><span>Paid to holders</span><b class="num">${usdM(p)}<small>/ month</small></b><em>Last month ${(l.got.at(-1)/p).toFixed(2)}× covered</em></div>
+    </div></div>
+    <nav class="tabs" aria-label="Asset sections">${tabs.map(([t,n,c])=>`<a href="#/asset/${sym}/${t}" ${t===aTab?'aria-current="page"':''}>${n}${c?`<span class="count">${c}</span>`:''}</a>`).join('')}</nav>
+    ${body}
+  </div>`;
+}
+function renderVaultAsset(m){
+  const rows=Object.entries(LOANS).map(([s,l])=>({s,m:bySym(s),v:l.vault*bal(l,l.got.length)/l.amount,c:l.got.at(-1)/pmt(l)}))
+    .concat([{s:'Dallas B200 Expansion',v:1400000,esc:'In escrow · 4/6'},{s:'Frankfurt H100 Portfolio',v:1200000,esc:'Subscribing'}]);
+  const nav=m.size;
+  app.innerHTML=`<div class="xwrap">
+    <div class="crumb"><a href="#/markets">Markets</a><i class="ph-light ph-caret-right"></i><span>CCV</span></div>
+    <div class="dhead"><div><div class="dtitle"><h1>${m.name}</h1><span class="pill repaying">Earning</span></div>
+      <div class="dmeta"><span><i class="ph-light ph-stack"></i>7 compute loans</span><span><i class="ph-light ph-calendar"></i>Withdrawals monthly, queued</span></div></div>
+      <div class="dact"><a class="btn btn-primary btn-sm" href="#/trade/CCV">Trade CCV</a><small>CCV/AIUSD ${px(m.price)} · NAV ${px(m.ref)}</small></div></div>
+    <div class="dsum"><div class="kstats">
+      <div><span>NAV per CCV</span><b class="num">${px(m.ref)}</b><em>Market ${px(m.price)}</em></div>
+      <div><span>Net APY, 30 days</span><b class="num">${pct(m.yld)}</b><em>After 10% fee on interest</em></div>
+      <div><span>Vault size</span><b class="num">${usdM(nav)}</b><em>Earning 61% · escrow 28% · cash 11%</em></div>
+      <div><span>Largest loan</span><b class="num">14.8%</b><em>Limit 15% of NAV</em></div>
+    </div></div>
+    <section class="block"><div class="sec-t"><h2>Holdings</h2><p>Each loan went through the same six release conditions</p></div><div class="panel tbl-wrap"><table class="tbl xt">
+      <thead><tr><th>Loan</th><th>Status</th><th>Value</th><th>Share of vault</th><th>Last coverage</th><th></th></tr></thead>
+      <tbody>${rows.map(r=>`<tr><td>${r.m?`<a href="#/asset/${r.s}"><b>${r.s}</b></a> <small class="muted">${r.m.name}</small>`:`<b>${r.s}</b>`}</td><td>${r.esc?`<span class="pill verifying">${r.esc}</span>`:'<span class="pill repaying">Repaying</span>'}</td><td>${usd(Math.round(r.v))}</td><td>${pct(r.v/nav)}</td><td>${r.c?r.c.toFixed(2)+'×':'—'}</td><td>${r.m?`<a class="lnk" href="#/asset/${r.s}">Details</a>`:''}</td></tr>`).join('')}</tbody>
+    </table></div></section>
+    <section class="block"><div class="sec-t"><h2>Rules in the vault contract</h2></div><div class="panel"><ul class="rules">
+      <li><i class="ph-light ph-git-branch"></i><span>Subscribes to every listed loan that meets the criteria, up to <b>50% of each loan</b></span></li>
+      <li><i class="ph-light ph-chart-pie-slice"></i><span>One loan ≤ <b>15%</b> of NAV; one borrower ≤ <b>25%</b>; one buyer ≤ <b>30%</b></span></li>
+      <li><i class="ph-light ph-coins"></i><span>Cash buffer around <b>10%</b>; deposits beyond the loan pipeline wait in a queue</span></li>
+      <li><i class="ph-light ph-scales"></i><span>NAV counts unpaid principal; loans below 1.15× stop accruing; defaults are written down</span></li>
+    </ul></div></section>
+  </div>`;
+}
+
+/* ======================= Transparency ======================= */
+function renderPublic(){
+  const live=M.filter(m=>!m.soon), loans=live.filter(m=>m.loan);
+  app.innerHTML=`<div class="xwrap">
+    <div class="page-head"><div><h1>Transparency</h1><p>Read from the contracts. Anyone can check these against the chain.</p></div><span class="muted" style="font-size:13px">As of Oct 9, 2026 · sample data</span></div>
+    <div class="panel agg">
+      <div><span>Loans outstanding</span><b class="num">${usdM(loans.reduce((s,m)=>s+m.size,0))}</b><em>${loans.length} loans repaying</em></div>
+      <div><span>In escrow</span><b class="num">$8.46M</b><em>2 new issues</em></div>
+      <div><span>Vault deposits</span><b class="num">${usdM(VAULTS.reduce((s,v)=>s+v.nav,0))}</b><em>Credit and liquidity</em></div>
+      <div><span>AIUSD supply</span><b class="num">13.41M</b><em>Reserves 100.05%</em></div>
+      <div><span>Overdue</span><b class="num">$0</b><em>No cure period open</em></div>
+    </div>
+    <section class="block"><div class="sec-t"><h2>By market</h2></div><div class="panel tbl-wrap"><table class="tbl xt"><thead><tr><th>Market</th><th>Kind</th><th>Size</th><th>Last coverage</th><th>Conditions</th><th>24h volume</th></tr></thead><tbody>
+      ${live.map(m=>`<tr><td><a href="#/asset/${m.sym}"><b>${m.sym}</b></a> <small class="muted">${m.name}</small></td><td>${m.kind}</td><td>${usdM(m.size)}</td><td>${m.loan?m.loan.cov.at(-1).toFixed(2)+'×':'—'}</td><td>${m.loan?m.loan.cond+'/6':'7 loans · all 6/6'}</td><td>${m.vol?usdM(m.vol):'—'}</td></tr>`).join('')}
+    </tbody></table></div></section>
+  </div>`;
+}
+
+/* ======================= Deposit ======================= */
+let dDir='mint';
+function renderDeposit(){
+  const mint=dDir==='mint';
+  app.innerHTML=`<div class="xwrap narrow">
+    <div class="page-head"><div><h1>${mint?'Deposit':'Withdraw'}</h1><p>${mint?'USDC is minted 1:1 into AIUSD, the account currency for every market.':'AIUSD is redeemed 1:1 to USDC.'}</p></div></div>
+    <div class="panel eform">
+      <div class="eleg"><div class="erow"><span class="lab">You send</span><span class="bal">Balance ${mint?'120,000':num(BAL)}</span></div>
+        <div class="emain"><div class="tok"><span class="ic" style="background:${mint?'#2775ca':'var(--ink)'}">${mint?'$':'A'}</span><b>${mint?'USDC':'AIUSD'}</b></div><div class="eamt"><input id="dIn" inputmode="numeric" placeholder="0"></div></div></div>
+      <div class="flipw"><button class="flip" type="button" id="dFlip" aria-label="Switch direction"><i class="ph ph-arrows-down-up"></i></button></div>
+      <div class="eleg"><div class="erow"><span class="lab">You receive</span><span class="bal">Balance ${mint?num(BAL):'120,000'}</span></div>
+        <div class="emain"><div class="tok"><span class="ic" style="background:${mint?'var(--ink)':'#2775ca'}">${mint?'A':'$'}</span><b>${mint?'AIUSD':'USDC'}</b></div><div class="eamt"><output id="dOut" class="zero">0</output></div></div></div>
+      <button class="ego" id="dGo" type="button" disabled>Enter an amount</button>
+      <div class="emeta"><div><span>Rate</span><b>1 : 1</b></div><div><span>Fee</span><b>Free</b></div><div><span>Yield on AIUSD</span><b>None</b></div></div>
+    </div>
+  </div>`;
+  const i=$('#dIn'),o=$('#dOut'),g=$('#dGo');
+  i.addEventListener('input',()=>{const n=Number(i.value.replace(/[^0-9]/g,''))||0;i.value=n?num(n):'';o.textContent=n?num(n):'0';o.classList.toggle('zero',!n);const ok=n&&(mint||n<=BAL);g.disabled=!ok;g.textContent=!n?'Enter an amount':ok?(mint?'Mint AIUSD':'Redeem to USDC'):'More than your balance'});
+  $('#dFlip').onclick=()=>{dDir=mint?'redeem':'mint';renderDeposit()};
+  g.onclick=()=>{const n=Number(i.value.replace(/[^0-9]/g,''));BAL+=mint?n:-n;toast(mint?`Minted ${num(n)} AIUSD`:`Redeemed ${num(n)} AIUSD to USDC`);route()};
+}
+
+$('#xWal').textContent=short(ME);
+route();
+</script>
+</body>
+</html>

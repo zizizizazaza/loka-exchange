@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loka · Versions</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f4f2;--paper:#fff;--line:rgba(14,15,15,.09);--ink:#0e0f0f;--ink-2:#4a4f4d;--ink-3:#848986;--accent:#3d6f5b;--accent-soft:#e3ece7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Geist,system-ui,sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+main{max-width:880px;margin:0 auto;padding:72px 24px}
+h1{font-family:Newsreader,Georgia,serif;font-weight:400;font-size:40px;letter-spacing:-.02em;margin:0 0 8px}
+p.lead{color:var(--ink-2);margin:0 0 40px}
+.v{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:28px;margin-bottom:14px}
+.v h2{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-size:18px;font-weight:500}
+.v h2 span{font-size:12px;font-weight:500;border-radius:999px;padding:2px 10px;background:var(--bg);color:var(--ink-3)}
+.v h2 span.cur{background:var(--accent-soft);color:var(--accent)}
+.v p{margin:0 0 18px;color:var(--ink-2)}
+.v ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.v a{display:inline-flex;align-items:center;height:38px;padding:0 16px;border-radius:999px;border:1px solid rgba(14,15,15,.16);color:var(--ink);text-decoration:none;font-size:14px}
+.v a:hover{border-color:var(--ink)}
+.v a.pri{background:var(--ink);border-color:var(--ink);color:#fff}
+small{display:block;margin-top:28px;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Loka</h1>
+  <p class="lead">Design prototypes. All data is sample data.</p>
+  <section class="v">
+    <h2>v2 · Exchange <span class="cur">Current</span></h2>
+    <p>Landing page for the exchange, the exchange app (markets, trade, earn, portfolio, issue, transparency) and the issuer console.</p>
+    <ul><li><a class="pri" href="v2-exchange/index.html">Landing page</a></li><li><a href="v2-exchange/app/index.html#/markets">Exchange app</a></li><li><a href="v2-exchange/app/issuer/index.html#/loans">Issuer console</a></li></ul>
+  </section>
+  <section class="v">
+    <h2>v1 · Compute financing <span>Previous</span></h2>
+    <p>Landing page for compute equipment financing, the investor app and the borrower console.</p>
+    <ul><li><a class="pri" href="v1-lending/index.html">Landing page</a></li><li><a href="v1-lending/app/investor/index.html#/portfolio">Investor app</a></li><li><a href="v1-lending/app/borrower/index.html#/loans">Borrower console</a></li></ul>
+  </section>
+  <small>Each page is a single static HTML file. Open index.html directly or serve the folder with any static server.</small>
+</main>
+</body>
+</html>
