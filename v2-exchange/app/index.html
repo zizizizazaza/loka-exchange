@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@200;300;400;500;600&family=Geist+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 /* 交易所版本原型（决策见 docs-internal/交易所-决策说明-v0.1.md）。基础样式沿用投资人端，下面「交易所」一段是新增的。
    顶部导航：Markets（市场首页）· Asset（#/asset/<代号>，资产详情）· Trade（单个市场的交易页）· Earn（两个金库）· Portfolio（统一账户）· Issue（发行方入口）· Transparency · Deposit（铸造/赎回）。数据全部是虚构示例。 */
@@ -568,6 +569,162 @@ body.xc .shell{margin:0}
 #app{padding:40px 24px 64px;max-width:1280px;margin:0 auto}
 body.wide #app{max-width:none;padding:14px 14px 40px}
 .xwrap.narrow{max-width:640px;margin:0 auto}
+/* ---------- 详情页 v2：深色页头、精确数字条、细线分区 ---------- */
+.ad2 .ad-band{background:var(--ink);color:#f2f3f1;border-radius:var(--r-card);padding:26px 36px 34px}
+.ad2 .ad-band .crumb{color:rgba(242,243,241,.5);margin-bottom:26px}
+.ad2 .ad-band .crumb a:hover{color:#fff}
+.ad2 .ad-band .ad-head{padding:0;align-items:flex-end}
+.ad2 .ad-band .ad-eye{color:rgba(242,243,241,.55)}
+.ad2 .ad-band h1{color:#fff;font-size:48px;margin-bottom:16px}
+.ad2 .ad-band .dmeta{color:rgba(242,243,241,.78)}
+.ad2 .ad-band .dmeta .ph-light{color:rgba(242,243,241,.5)}
+.ad2 .ad-band .ad-asof small{color:rgba(242,243,241,.5)}
+.ad2 .ad-band .pill.repaying{background:rgba(159,209,185,.12);border-color:rgba(159,209,185,.3);color:#9fd1b9}
+.ad-strip{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr 1fr;margin-top:22px;border-top:1px solid var(--ink);border-bottom:1px solid var(--line-2)}
+.ad-strip>div{padding:20px 22px 18px}
+.ad-strip>div:first-child{padding-left:0}
+.ad-strip>div+div{border-left:1px solid var(--line)}
+.ad-strip span{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.ad-strip b{display:block;font-weight:300;font-size:26px;letter-spacing:-.02em;margin:10px 0 4px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.ad-strip .y b{font-family:var(--serif);font-weight:400;font-size:46px;line-height:1;margin:8px 0 8px;color:var(--accent)}
+.ad-strip em{font-style:normal;font-size:12px;color:var(--ink-3)}
+.ad-lc{border-bottom:1px solid var(--line)}
+.ad2 .ad-life{padding:24px 0 20px;border-bottom:0}
+.ad2 .alloc-leg .r{margin-left:auto;color:var(--ink-3)}
+.ad2 .ad-body{margin-top:0}
+.ad2 .ad-main .tabs{margin-top:34px}
+.ad2 .ad-side{top:84px;margin-top:34px}
+.ad2 .ad-terms,.ad2 .ad-docs{background:none;border:0;border-radius:0;border-top:1px solid var(--ink);padding:16px 0 0}
+.ad2 .ad-side h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
+.ad2 .ad-side{gap:28px}
+.ad2 .sec-t{border-top:1px solid var(--ink);padding-top:16px;margin-bottom:18px}
+.ad2 .tabs+.block .sec-t,.ad2 .tabs+section.block .sec-t{border-top:0;padding-top:0}
+.ad2 .ad-main .panel{border-radius:16px}
+.ad2 .ad-main .block>.panel{background:none;border:0;border-radius:0}
+.ad2 .ad-main .ad-pad{padding:6px 0 0}
+.ad2 .ltv{padding-top:20px}
+.ad2 .crow{padding-left:0;padding-right:0}
+.ad2 .ad-main .note-line{padding-left:0!important;padding-right:0!important}
+.ad2 .ad-main .tbl-wrap{padding:0}
+.ad2 .contracts{padding:0}
+.ad-about{margin:0 0 22px;font-size:15px;line-height:1.75;color:var(--ink-2);max-width:46em}
+.ad-tbl{margin-top:18px}
+.ad-tbl h4{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:0 0 4px;padding-bottom:8px;border-bottom:1px solid var(--line-2)}
+.ad-tbl h4 span{letter-spacing:.04em;text-transform:none;font-family:var(--sans,inherit);font-size:11.5px}
+.ad-tbl dl{margin:0}
+.ad-tbl dl div{display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ad-tbl dt{color:var(--ink-3)}
+.ad-tbl dd{margin:0;color:var(--ink);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ad-tbl .mono{font-family:var(--mono);font-size:12.5px}
+@media (max-width:1100px){.ad-strip{grid-template-columns:1fr 1fr}.ad-strip>div:first-child{grid-column:1/-1;padding-left:0}.ad-strip>div:nth-child(2),.ad-strip>div:nth-child(4){padding-left:0;border-left:0}.ad2 .ad-band{padding:22px 22px 26px}.ad2 .ad-band h1{font-size:36px}.ad-tbl dl div{grid-template-columns:140px 1fr}}
+
+/* ---------- 资产详情：条款书式布局 ---------- */
+.ad .crumb{margin-bottom:22px}
+.ad-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;padding-bottom:28px}
+.ad-eye{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px}
+.ad-head h1{font-family:var(--serif);font-weight:400;font-size:44px;line-height:1.05;letter-spacing:-.025em;margin:0 0 14px}
+.ad-asof{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.ad-asof small{font-size:12px;color:var(--ink-3)}
+.ad-hero{display:grid;grid-template-columns:minmax(220px,.9fr) minmax(0,1.6fr);grid-template-rows:auto auto}
+.ad-y{grid-row:1/3;padding:30px 32px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}
+.ad-y span{font-size:12.5px;color:var(--ink-3)}
+.ad-y b{font-family:var(--serif);font-weight:400;font-size:72px;line-height:1;letter-spacing:-.03em;margin:10px 0 14px;color:var(--ink)}
+.ad-y em{font-style:normal;font-size:13px;color:var(--ink-2);line-height:1.5}
+.ad-life{padding:26px 30px 22px;border-bottom:1px solid var(--line)}
+.lf-bar{position:relative;height:3px;border-radius:3px;background:var(--line);margin:4px 10% 0 10%}
+.lf-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--accent)}
+.ad-life ol{list-style:none;margin:-9px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,1fr)}
+.ad-life li{position:relative;text-align:center;padding-top:22px}
+.ad-life li::before{content:"";position:absolute;top:2px;left:50%;width:11px;height:11px;margin-left:-6px;border-radius:50%;background:var(--paper);border:1.5px solid var(--line-2)}
+.ad-life li.done::before{background:var(--accent);border-color:var(--accent)}
+.ad-life li.now::before{background:var(--paper);border:3px solid var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.ad-life li b{display:block;font-weight:500;font-size:12.5px;color:var(--ink)}
+.ad-life li small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.ad-life li:not(.done):not(.now) b{color:var(--ink-3);font-weight:400}
+.ad-k{display:grid;grid-template-columns:repeat(4,1fr)}
+.ad-k div{padding:18px 22px}
+.ad-k div+div{border-left:1px solid var(--line)}
+.ad-k span{display:block;font-size:12px;color:var(--ink-3);margin-bottom:4px}
+.ad-k b{font-weight:300;font-size:24px;letter-spacing:-.02em}
+.ad-k em{display:block;font-style:normal;font-size:12px;color:var(--ink-3);margin-top:2px}
+.ad-body{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;align-items:start;margin-top:8px}
+.ad-main .tabs{margin-top:28px}
+.ad-side{position:sticky;top:84px;display:grid;gap:14px;margin-top:28px}
+.ad-terms,.ad-docs{padding:22px 24px}
+.ad-side h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:0 0 12px}
+.ad-terms dl{margin:0}
+.ad-terms dl div{display:grid;grid-template-columns:92px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:13px;line-height:1.5}
+.ad-terms dt{color:var(--ink-3)}
+.ad-terms dd{margin:0;color:var(--ink)}
+.ad-terms .mono{font-family:var(--mono);font-size:12px}
+.ad-cta{margin-top:16px}
+.ad-cta .btn{width:100%;justify-content:center}
+.doc{width:100%;display:grid;grid-template-columns:22px 1fr 18px;gap:12px;align-items:center;padding:11px 0;border:0;border-top:1px solid var(--line);background:none;text-align:left;cursor:pointer;color:var(--ink)}
+.doc:hover b{text-decoration:underline;text-underline-offset:3px}
+.doc i{font-size:18px;color:var(--ink-3)}
+.doc b{display:block;font-weight:500;font-size:13.5px}
+.doc small{display:block;font-size:11.5px;color:var(--ink-3)}
+.ad-note{margin:14px 0 0;font-size:12.5px;line-height:1.6;color:var(--ink-3)}
+.ad-pad{padding:24px 26px}
+.ltv-bar{position:relative;height:40px;border-radius:10px;background:repeating-linear-gradient(135deg,#efe7da 0 6px,#f6f0e6 6px 12px)}
+.ltv-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:10px 0 0 10px;background:var(--accent);display:flex;align-items:center;padding-left:14px}
+.ltv-bar i span{color:#fff;font-size:13px;font-weight:500}
+.ltv-bar b{position:absolute;top:-8px;bottom:-8px;width:0;border-left:1.5px dashed var(--ink-2)}
+.ltv-bar b span{position:absolute;top:-20px;left:-30px;width:60px;text-align:center;font-weight:400;font-size:11.5px;color:var(--ink-2)}
+.ltv-leg{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:16px;font-size:13px;color:var(--ink-2)}
+.ltv-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+.ltv-leg .k1{background:var(--accent)} .ltv-leg .k2{background:#e6dccb}
+.ltv-leg .r{margin-left:auto;color:var(--ink-3)}
+.cflow{display:flex;gap:3px;height:16px}
+.cflow i{border-radius:5px}
+.cflow .c1{background:var(--accent)} .cflow .c2{background:#c9b48f} .cflow .c3{background:#e6dccb}
+.cf-leg{display:grid;grid-template-columns:repeat(3,1fr);margin-top:18px}
+.cf-leg div{display:grid;grid-template-columns:26px 1fr;column-gap:10px;padding-right:16px}
+.cf-leg .n{grid-row:1/3;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:11px;border:1px solid var(--line-2);color:var(--ink-2)}
+.cf-leg div:first-child .n{border-color:var(--accent);color:var(--accent)}
+.cf-leg b{display:block;font-weight:500;font-size:14px}
+.cf-leg small{display:block;font-size:12px;color:var(--ink-3)}
+.cf-leg em{grid-column:2;font-style:normal;font-size:20px;font-weight:300;letter-spacing:-.01em;margin-top:6px;font-variant-numeric:tabular-nums}
+.prot{list-style:none;margin:0;padding:0;counter-reset:pr;border-top:1px solid var(--line)}
+.prot li{display:grid;grid-template-columns:56px 220px minmax(0,1fr);gap:16px;padding:20px 0;border-bottom:1px solid var(--line);counter-increment:pr;font-size:14px;line-height:1.6}
+.prot li::before{content:counter(pr,decimal-leading-zero);font-family:var(--serif);font-size:26px;line-height:1;color:var(--accent)}
+.prot b{font-weight:500;color:var(--ink)}
+.prot span{color:var(--ink-2)}
+.alloc{display:flex;gap:3px;height:18px;margin-top:6px}
+.alloc i{border-radius:5px}
+.alloc .a1,.alloc-leg .a1{background:var(--accent)} .alloc .a2,.alloc-leg .a2{background:#c9b48f} .alloc .a3,.alloc-leg .a3{background:#e6dccb}
+.alloc-leg{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--ink-2)}
+.alloc-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+.shr{display:inline-block;width:56px;height:5px;border-radius:5px;background:var(--line);margin-right:10px;vertical-align:2px;overflow:hidden}
+.shr i{display:block;height:100%;background:var(--accent)}
+td.warn{color:var(--amber)}
+@media (max-width:1100px){.ad-body{grid-template-columns:1fr}.ad-side{position:static;grid-template-columns:1fr 1fr}.ad-hero{grid-template-columns:1fr}.ad-y{grid-row:auto;border-right:0;border-bottom:1px solid var(--line)}.prot li{grid-template-columns:44px 1fr}.prot li span{grid-column:2}}
+@media (max-width:720px){.ad-side{grid-template-columns:1fr}.ad-k{grid-template-columns:1fr 1fr}.ad-k div:nth-child(3){border-left:0}.ad-head{flex-direction:column;align-items:flex-start}.ad-asof{align-items:flex-start}.ad-head h1{font-size:34px}.cf-leg{grid-template-columns:1fr;gap:12px}.ad-life ol{font-size:11px}}
+
+.dtop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:-8px 0 16px}
+.dtop .seg button i{font-size:14px;vertical-align:-2px;margin-right:2px}
+.kyb{display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:12px;border-radius:14px;background:var(--accent-soft);font-size:13.5px;color:var(--ink-2)}
+.kyb i{color:var(--accent);font-size:18px}
+.kyb .muted{margin-left:auto;font-size:12px}
+.bankbox{padding:22px 24px 20px}
+.bk-h{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.bk-h b{font-weight:500;font-size:15px}
+.bk-sub{margin:8px 0 16px;font-size:13.5px;color:var(--ink-3);line-height:1.6}
+.bk-dl{margin:0;border-top:1px solid var(--line)}
+.bk-dl div{display:grid;grid-template-columns:140px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.bk-dl dt{color:var(--ink-3)}
+.bk-dl dd{margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bk-dl dd.mono{font-family:var(--mono);font-size:13.5px}
+.cp{border:1px solid var(--line-2);background:var(--paper);border-radius:999px;font:inherit;font-family:var(--sans,inherit);font-size:11.5px;padding:2px 10px;color:var(--ink-2);cursor:pointer}
+.cp:hover{border-color:var(--ink)}
+.bk-rules{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
+.bk-rules li{display:flex;gap:8px;font-size:13px;color:var(--ink-2);line-height:1.5}
+.bk-rules i{color:var(--accent);margin-top:3px}
+.bk-recent{margin-top:12px;padding:16px 24px 10px}
+.bk-row{display:grid;grid-template-columns:1fr auto auto;gap:20px;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px}
+.bk-recent .bk-h{padding-bottom:8px}
+.flip{pointer-events:none}
+
 .xfoot{margin:0 24px;max-width:none}
 .up{color:var(--accent)} .down{color:#a3321f}
 /* Markets */
@@ -577,7 +734,7 @@ body.wide #app{max-width:none;padding:14px 14px 40px}
 .mtabs .soon{font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .mtabs button[aria-pressed="true"] .soon{color:rgba(255,255,255,.6)}
 .mlist{overflow:hidden}
-.mrow{display:grid;grid-template-columns:minmax(220px,2fr) .8fr .7fr .8fr .9fr .9fr 90px 80px;gap:16px;align-items:center;padding:14px 24px;border-top:1px solid var(--line);text-decoration:none;font-size:14px;transition:background-color .2s}
+.mrow{display:grid;grid-template-columns:minmax(240px,2.2fr) .9fr .8fr .8fr .8fr .6fr 1fr 32px;gap:16px;align-items:center;padding:14px 24px;border-top:1px solid var(--line);text-decoration:none;font-size:14px;transition:background-color .2s}
 .mrow.mhd{border-top:0;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:12px 24px}
 a.mrow:hover{background:var(--paper-2)}
 .mrow.dim{color:var(--ink-3)}
@@ -593,6 +750,11 @@ a.mrow:hover{background:var(--paper-2)}
 .msel .lnk{color:var(--ink-3)}
 .mn b em,.msel b em{font-style:normal;font-weight:400;color:var(--ink-3);margin-left:1px}
 .mrow .btn{height:32px;padding:0 14px;font-size:13px;justify-self:end}
+.mrow .yl{font-weight:500;font-size:15px}
+.mrow .num small{display:block;font-size:11.5px;color:var(--ink-3);font-weight:400}
+.mrow .go{justify-self:end;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--ink-3);transition:background-color .2s,color .2s}
+.mrow:hover .go{background:var(--mist);color:var(--ink)}
+.mrow .neg{color:var(--amber)}
 .spark{width:80px;height:24px;display:block}
 .spark polyline{fill:none;stroke:var(--ink-3);stroke-width:1.4;vector-effect:non-scaling-stroke}
 .spark.up polyline{stroke:var(--accent)} .spark.down polyline{stroke:#a3321f}
@@ -602,25 +764,60 @@ a.mrow:hover{background:var(--paper-2)}
 /* Trade */
 .mhead{display:flex;align-items:center;gap:32px;padding:12px 20px;margin-bottom:12px;overflow-x:auto}
 .mhead>div{white-space:nowrap}
+.mdet{margin-left:auto;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;height:32px;padding:0 12px 0 14px;border:1px solid var(--line-2);border-radius:999px;font-size:12.5px;color:var(--ink-2);text-decoration:none;transition:background-color .2s,color .2s}
+.mdet:hover{background:var(--mist);color:var(--ink)}
 .mhead span{display:block;font-size:11.5px;color:var(--ink-3)}
 .mhead b{font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
 .msel{display:flex;align-items:center;gap:12px;padding-right:20px;border-right:1px solid var(--line)}
-.msel b{font-size:18px;font-weight:600}
+.mpbtn b{font-size:18px;font-weight:600}
 .msel small{font-size:12.5px;color:var(--ink-3)}
-.msel select{height:30px;border:1px solid var(--line-2);border-radius:8px;background:var(--paper);font:inherit;font-size:12.5px;padding:0 6px}
-.tgrid{display:grid;grid-template-columns:minmax(0,1fr) 280px 300px;gap:12px;align-items:start}
+.mpbtn{display:inline-flex;align-items:center;gap:8px;height:38px;margin-left:-10px;padding:0 10px;border:0;border-radius:10px;background:none;font:inherit;color:var(--ink);cursor:pointer;transition:background-color .2s}
+.mpbtn:hover,.mpbtn[aria-expanded="true"]{background:var(--mist)}
+.mpbtn i{font-size:14px;color:var(--ink-3);transition:transform .2s}
+.mpbtn[aria-expanded="true"] i{transform:rotate(180deg)}
+.mpop{position:fixed;z-index:40;width:380px;padding:6px;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(14,15,15,.10),0 2px 6px rgba(14,15,15,.05)}
+.mph,.mpop a{display:grid;grid-template-columns:minmax(0,1fr) 72px 64px;gap:12px;align-items:center}
+.mph{padding:6px 10px 8px;font-size:11.5px;color:var(--ink-3)}
+.mph span+span,.mpop a span+span{text-align:right}
+.mpop a{padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--ink);font-size:13px;outline:none}
+.mpop a:hover,.mpop a:focus-visible{background:var(--bg)}
+.mpop a[aria-selected="true"]{background:var(--mist)}
+.mpop a span{display:block;font-size:13px;color:var(--ink)}
+.mpop a span.up{color:var(--accent)} .mpop a span.down{color:#a3321f}
+.mpop a b{display:block;font-weight:500;font-size:13px}
+.mpop a small{display:block;font-size:11.5px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tgrid{display:grid;grid-template-columns:minmax(0,1fr) 280px 300px;gap:12px;align-items:stretch}
+.tgrid>.panel{min-height:0;overflow:auto}
+.tgrid>.tchart{overflow:hidden}
+.ptabs{margin:-4px 0 10px}
+.ptabs button{font-weight:500}
 .tchart,.tbook,.tform{padding:14px 16px}
 .th{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:13px}
 .th b{font-weight:500}
 .seg.sm button{height:28px;padding:0 10px;font-size:12px}
-.xchart{position:relative;height:300px}
-.xchart svg{width:100%;height:100%;display:block}
-.xchart .pl{fill:none;stroke:var(--ink-2);stroke-width:1.6;vector-effect:non-scaling-stroke}
-.xchart .pl.up{stroke:var(--accent)} .xchart .pl.down{stroke:#a3321f}
-.xchart .pa{fill:var(--accent-soft);opacity:.45}
-.xchart .ref{stroke:var(--amber);stroke-dasharray:4 4;stroke-width:1;vector-effect:non-scaling-stroke}
-.xaxis{position:absolute;right:4px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-3);pointer-events:none;padding:4px 0}
-.reftag{position:absolute;left:6px;transform:translateY(-120%);font-size:11px;color:var(--amber);background:var(--paper);padding:0 4px}
+.kc{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 66px;user-select:none}
+.kplot{position:relative;min-width:0}
+.kplot svg{width:100%;display:block;cursor:crosshair}
+.kplot svg line{vector-effect:non-scaling-stroke}
+.kplot .g{stroke:var(--line);stroke-width:1}
+.kplot .w{stroke-width:1}
+.kplot .u{fill:var(--accent);stroke:var(--accent)} .kplot .d{fill:#a3321f;stroke:#a3321f}
+.kplot .vu{fill:var(--accent);opacity:.32} .kplot .vd{fill:#a3321f;opacity:.32}
+.kplot .lp{stroke-dasharray:2 3;stroke-width:1}
+.kplot .rf{stroke:var(--amber);stroke-dasharray:5 4;stroke-width:1}
+.kplot .ch{stroke:var(--ink-3);stroke-dasharray:3 3;stroke-width:1;opacity:0}
+.kplot.on .ch{opacity:1}
+.kleg{position:absolute;left:4px;top:2px;display:flex;flex-wrap:wrap;gap:4px 12px;font-family:var(--mono);font-size:11.5px;color:var(--ink-3);pointer-events:none;background:color-mix(in srgb,var(--paper) 82%,transparent);padding:2px 4px;border-radius:4px}
+.kleg b{font-weight:500;color:var(--ink-2)} .kleg b.up{color:var(--accent)} .kleg b.down{color:#a3321f}
+.kreft{position:absolute;right:6px;transform:translateY(-120%);font-size:11px;color:var(--amber);background:var(--paper);padding:0 4px;pointer-events:none}
+.kx{position:relative;height:22px;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.kx span{position:absolute;top:5px;transform:translateX(-50%);white-space:nowrap}
+.ky{position:relative;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.ky span{position:absolute;left:8px;transform:translateY(-50%)}
+.ky .tag{left:2px;right:0;padding:1px 5px;border-radius:3px;color:#fff;font-weight:500}
+.ky .tag.up{background:var(--accent)} .ky .tag.down{background:#a3321f} .ky .tag.hv{background:var(--ink);display:none}
+.kc.on .ky .tag.hv{display:block}
+.kfoot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-3);margin-top:2px}
 .about{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-2)}
 .about p{margin:0 0 10px}
 .aboutk{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;font-size:12.5px;color:var(--ink-3)}
@@ -667,7 +864,13 @@ a.mrow:hover{background:var(--paper-2)}
 .obtn.buy{background:var(--accent)} .obtn.sell{background:#a3321f}
 .obtn[disabled]{background:var(--mist);color:var(--ink-3);cursor:default}
 .onote{font-size:11.5px;color:var(--ink-3);margin:10px 0 0;line-height:1.5}
-.tbottom{margin-top:12px;padding:6px 16px 10px}
+.tbottom{margin-top:12px;padding:2px 20px 6px}
+.tbottom .btabs{gap:24px}
+.tbottom .btabs button{padding:14px 0 12px;font-size:13.5px}
+.tbottom .tbl th{font-family:inherit;font-size:12px;letter-spacing:0;text-transform:none;padding:14px 0 10px}
+.tbottom .tbl td{padding:13px 0}
+.tbottom .tbl tr:last-child td{padding-bottom:12px}
+.tbottom>#bBody>p{margin:18px 0 14px}
 .btabs{display:flex;gap:20px;border-bottom:1px solid var(--line)}
 .btabs button{border:0;background:none;padding:10px 0;font-size:13px;color:var(--ink-3);cursor:pointer;position:relative}
 .btabs button[aria-current="true"]{color:var(--ink)}
@@ -677,12 +880,305 @@ a.mrow:hover{background:var(--paper-2)}
 .tbl.xt a{text-decoration:none}
 .lnk{border:0;background:none;font:inherit;font-size:13px;color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px;cursor:pointer;padding:0}
 /* Earn / Issue */
+.tacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .vnums{display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:6px}
 .vnums span{display:block;font-size:12px;color:var(--ink-3)}
 .vnums b{font-weight:300;font-size:26px;letter-spacing:-.02em}
 .dimc{opacity:.75}
 .nextsteps{margin:0 0 6px;padding-left:18px;font-size:13.5px;color:var(--ink-2);display:grid;gap:5px}
 @media (max-width:1100px){.tgrid{grid-template-columns:1fr 1fr}.tchart{grid-column:1/-1}.mrow{grid-template-columns:minmax(180px,2fr) .8fr .7fr .8fr 80px}.mrow>:nth-child(5),.mrow>:nth-child(6),.mrow>:nth-child(7){display:none}.nissue{grid-template-columns:1fr}.xnav{gap:14px}.xwal{display:none}}
+/* ---------- 详情页 v3：少线条，深色页头内含 3D 和关键数字 ---------- */
+.ad2 .ad-band{display:grid;grid-template-columns:minmax(0,1fr) 420px;grid-template-areas:"l r" "k k";column-gap:32px;padding:26px 36px 0;overflow:hidden}
+.ab-l{grid-area:l;padding-bottom:28px}
+.ab-l h1{font-family:var(--serif);font-weight:400;font-size:48px;line-height:1.05;letter-spacing:-.025em;margin:0 0 16px;color:#fff}
+.ab-l .ad-eye{margin-bottom:14px}
+.ab-r{grid-area:r;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;margin-top:-6px}
+.srv3d{width:420px;height:250px;cursor:grab;touch-action:pan-y}
+.srv3d.grab{cursor:grabbing}
+.srv3d canvas{display:block}
+.ab-r small{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:rgba(242,243,241,.42);margin:-4px 0 18px}
+.ab-st{display:flex;align-items:center;gap:14px;margin-top:22px}
+.ab-st small{font-size:12px;color:rgba(242,243,241,.5)}
+.ab-k{grid-area:k;display:grid;grid-template-columns:1.25fr 1fr 1fr 1fr 1fr;margin:0 -36px;padding:22px 36px 26px;background:rgba(255,255,255,.04)}
+.ab-k span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(242,243,241,.5)}
+.ab-k b{display:block;font-weight:300;font-size:24px;letter-spacing:-.02em;margin:9px 0 3px;color:#fff;font-variant-numeric:tabular-nums}
+.ab-k .y b{font-family:var(--serif);font-weight:400;font-size:42px;line-height:1;margin:6px 0 6px;color:#9fd1b9}
+.ab-k em{font-style:normal;font-size:12px;color:rgba(242,243,241,.5)}
+.ad-lc{border-bottom:0}
+.ad2 .ad-life{padding:30px 0 6px}
+.ad2 .sec-t{border-top:0;padding-top:0}
+.ad2 .block+.block{margin-top:52px}
+.ad-tbl h4{border-bottom:0;padding-bottom:4px}
+.ad-tbl dl div{border-bottom:0;padding:9px 0}
+.ad-tbl{background:var(--paper);border-radius:16px;padding:18px 22px 10px}
+.ad-tbl+.ad-tbl{margin-top:12px}
+.prot{border-top:0}
+.prot li{border-bottom:0;padding:14px 0}
+.ad2 .ad-terms,.ad2 .ad-docs{background:var(--paper);border:0;border-radius:16px;padding:20px 22px}
+.ad2 .ad-terms dl div{border-top:0;padding:8px 0}
+.ad2 .doc{border-top:0;padding:9px 0}
+.ad2 .ad-main .tabs{border-bottom-color:transparent;box-shadow:inset 0 -1px 0 var(--line)}
+@media (max-width:1100px){.ad2 .ad-band{grid-template-columns:1fr;grid-template-areas:"l" "r" "k"}.ab-r{margin-top:0}.srv3d{width:100%;max-width:420px}.ab-k{grid-template-columns:1fr 1fr}.ab-k .y{grid-column:1/-1}}
+
+
+/* 还款进度：每月一格 */
+.ad-prog{margin-top:18px;padding:20px 24px 16px;border-radius:16px;background:var(--paper)}
+.ad-prog .ad-life{padding:0}
+.pg-h{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:14px}
+.pg-h b{display:block;font-weight:500;font-size:15px}
+.pg-h span{display:block;font-size:12.5px;color:var(--ink-3);margin-top:3px}
+.pg-r{text-align:right}
+.pg-r b{font-weight:300;font-size:20px;letter-spacing:-.01em}
+.pg-t{display:flex;gap:3px;height:22px}
+.pg-t i{flex:1;border-radius:3px;background:var(--mist)}
+.pg-t i.pd{background:var(--accent)}
+.pg-t i.lo{background:#c99a4a}
+.pg-t i.nx{background:var(--paper);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.pg-t i:hover{filter:brightness(.92)}
+.pg-x{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:11.5px;color:var(--ink-3)}
+.pg-x .lg{display:flex;align-items:center;gap:6px}
+.pg-x .lg em{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--mist);margin-left:10px}
+.pg-x .lg em.pd{background:var(--accent)} .pg-x .lg em.lo{background:#c99a4a} .pg-x .lg em.nx{background:var(--paper);box-shadow:inset 0 0 0 1.5px var(--accent)}
+@media (max-width:720px){.pg-h{flex-direction:column;align-items:flex-start}.pg-r{text-align:left}.pg-x .lg{display:none}}
+
+/* 3D 展台：浅色卡片，像产品照 */
+.ab-r{align-self:stretch;justify-content:center;margin:0 0 24px;border-radius:18px;background:#e8e7e2 radial-gradient(rgba(14,15,15,.07) 1px,transparent 1.2px) 0 0/14px 14px;position:relative}
+.srv3d{width:100%;height:300px;margin-bottom:18px}
+.ab-r small{position:absolute;left:16px;right:16px;bottom:12px;margin:0;text-align:center;color:rgba(14,15,15,.42)}
+
+/* 去全大写；进度卡精简；面包屑在黑框外 */
+.ad2>.crumb{margin:0 0 16px}
+.ad-eye,.ad2 .ad-band .ad-eye{font-family:inherit;font-size:13px;letter-spacing:0;text-transform:none;color:rgba(242,243,241,.6);margin-bottom:12px}
+.ab-k span{font-family:inherit;font-size:12.5px;letter-spacing:0;text-transform:none;color:rgba(242,243,241,.55)}
+.ad-tbl h4{font-family:inherit;font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink)}
+.ad2 .ad-side h3{font-family:var(--serif);font-size:18px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--ink);margin:0 0 8px}
+.pg-h{align-items:baseline}
+.pg-h>b{font-weight:500;font-size:15px}
+.pg-h .pg-r{font-size:13px;color:var(--ink-3)}
+.pg-h .pg-r b{display:inline;font-weight:400;font-size:15px;color:var(--ink)}
+.pg-x .lg{opacity:0;transition:opacity .2s}
+.ad-prog:hover .pg-x .lg{opacity:1}
+
+/* 页头左右分栏：右侧浅色展台贴边，不再框中套框 */
+.ad2 .ad-band{grid-template-columns:minmax(0,1fr) 440px;grid-template-areas:"l r" "k r";column-gap:0;padding:0}
+.ad2 .ad-band .ab-l{padding:30px 40px 26px}
+.ad2 .ab-r{grid-area:r;margin:0;border-radius:0;align-self:stretch;min-height:100%;display:flex;flex-direction:column;justify-content:center}
+.ad2 .srv3d{height:340px;margin:0}
+.ad2 .ab-k{margin:0;padding:22px 40px 26px;grid-template-columns:1.3fr 1fr 1fr 1fr 1fr;column-gap:16px}
+.ad2 .ab-k b{font-size:22px}
+.ad2 .ab-k .y b{font-size:38px}
+@media (max-width:1100px){.ad2 .ad-band{grid-template-columns:1fr;grid-template-areas:"l" "r" "k"}.ad2 .srv3d{height:280px}.ad2 .ab-k{grid-template-columns:1fr 1fr}}
+.ad-tabbody.tfade{animation:tfade .25s ease-out}
+@keyframes tfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.ad-tabbody.tfade{animation:none}}
+.ad-tabbody{padding-top:40px}
+.ad-tabbody>.block:first-child{margin-top:0}
+
+/* 概览下半部分：两张并排卡片 + 2x2 保护措施 */
+.ov2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ovc{background:var(--paper);border-radius:16px;padding:20px 22px 18px;display:flex;flex-direction:column}
+.ovc-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+.ovc-h h3{margin:0;font-family:var(--serif);font-weight:400;font-size:19px}
+.ovc-h span{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.ltv2{position:relative;display:flex;height:34px;border-radius:9px;overflow:hidden;background:repeating-linear-gradient(135deg,#efe7da 0 6px,#f6f0e6 6px 12px)}
+.ltv2 i{display:flex;align-items:center;padding-left:12px;background:var(--accent);flex:none}
+.ltv2 i b{color:#fff;font-weight:500;font-size:12.5px;white-space:nowrap}
+.ltv2 em{flex:1;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-style:normal}
+.ltv2 em b{font-weight:500;font-size:12px;color:#8a7350;white-space:nowrap}
+.ltv2 u{position:absolute;top:0;bottom:0;border-left:1.5px dashed rgba(14,15,15,.45)}
+.ltv2-x{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--ink-3)}
+.ltv2-x span:last-child{padding-right:calc(20% - 28px)}
+.ovc .cflow{height:12px}
+.cf2{margin:14px 0 0}
+.cf2 div{display:grid;grid-template-columns:1fr auto 44px;gap:12px;align-items:center;padding:6px 0;font-size:13.5px}
+.cf2 dt{display:flex;align-items:center;gap:8px;color:var(--ink-2)}
+.cf2 dt i{width:8px;height:8px;border-radius:2px}
+.cf2 dt i.c1{background:var(--accent)} .cf2 dt i.c2{background:#c9b48f} .cf2 dt i.c3{background:#e6dccb}
+.cf2 dd{margin:0;text-align:right;color:var(--ink)}
+.cf2 dd.pc{color:var(--ink-3);font-size:12.5px}
+.ovc-n{margin:auto 0 0;padding-top:14px;font-size:12.5px;line-height:1.55;color:var(--ink-3)}
+.prot2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.prot2 div{background:var(--paper);border-radius:16px;padding:18px 22px}
+.prot2 b{display:block;font-weight:500;font-size:14.5px;margin-bottom:4px}
+.prot2 span{font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+@media (max-width:900px){.ov2,.prot2{grid-template-columns:1fr}}
+.ltv2.sm{height:12px;border-radius:4px}
+.ltv2.sm i{padding:0}
+.ltv2.sm u{top:-4px;bottom:-4px}
+.cf2 dt i.eq{background:repeating-linear-gradient(135deg,#d9c9ae 0 2px,#efe7da 2px 4px)}
+.cf2 dt i.lim{background:none;border-left:1.5px dashed rgba(14,15,15,.45);border-radius:0;width:6px}
+
+/* 去掉右侧栏：条款、文件并入概览 */
+.ad2 .ad-body{grid-template-columns:minmax(0,1fr)}
+.kt dl{display:grid;grid-template-columns:1fr 1fr;column-gap:40px}
+.kt dl div{grid-template-columns:150px 1fr}
+.docs2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.docs2 .doc{background:var(--paper);border-radius:14px;padding:14px 18px;border:0}
+.ab-cta{margin-left:auto}
+.ab-cta .btn{background:#f2f3f1;color:var(--ink)}
+@media (max-width:900px){.kt dl,.docs2{grid-template-columns:1fr}}
+.ad2 .ad-main>.block:first-child{margin-top:44px!important}
+.ad2 .ad-main>.block:first-child .tbl-wrap{background:var(--paper);border-radius:16px;padding:6px 22px 4px}
+.ad2 .ad-main>.block:first-child .tbl.xt td{border-top:0}
+.ad2 .tbl th{font-family:inherit;text-transform:none;letter-spacing:0;font-size:12.5px;color:var(--ink-3)}
+.ad2 .ad-about{max-width:none}
+/* ---------- 访问分层：公开 / 已登录 / 审核中 / 已认证 ---------- */
+.lockv{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-3);white-space:nowrap}
+.lockv i{font-size:13px}
+button.lockv{background:none;border:0;padding:0;font:inherit;font-size:13px;cursor:pointer}
+button.lockv:hover{color:var(--ink)}
+.kstats b.lockb,.ab-k b.lockb{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:15px;font-weight:400;letter-spacing:0;color:var(--ink-3);height:32px}
+.ad2 .ab-k b.lockb,.ad2 .ab-k .y b.lockb{font-family:var(--sans);font-size:15px;color:rgba(242,243,241,.62);height:38px;margin:6px 0 6px}
+.ab-k em button{background:none;border:0;padding:0;font:inherit;color:#9fd1b9;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.kstats em button{background:none;border:0;padding:0;font:inherit;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.xpend{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:999px;background:var(--amber-soft);color:var(--amber);font-size:13px}
+.xpend::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+/* 锁住的条款块 */
+.gatebox{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:28px;padding:28px 32px;border-radius:var(--r-card);background:var(--paper);border:1px solid var(--line);margin-top:28px}
+.gatebox h4{margin:0 0 6px;font-family:var(--serif);font-weight:400;font-size:22px;letter-spacing:-.01em}
+.gatebox p{margin:0;color:var(--ink-2);font-size:14px;max-width:62ch}
+.gatebox ul{display:flex;flex-wrap:wrap;gap:8px 18px;margin:14px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink-3)}
+.gatebox li{display:inline-flex;align-items:center;gap:6px}
+@media (max-width:720px){.gatebox{grid-template-columns:1fr;padding:24px}}
+.doc.locked{opacity:.72}
+/* 认证弹窗 */
+dialog.gate{width:min(680px,calc(100vw - 32px));border:0;border-radius:24px;padding:0;background:var(--paper);color:var(--ink);box-shadow:0 30px 80px rgba(14,15,15,.22)}
+dialog.gate::backdrop{background:rgba(14,15,15,.42)}
+.gate-h{padding:28px 32px 6px;display:flex;justify-content:space-between;gap:16px}
+.gate-h h3{margin:0;font-family:var(--serif);font-weight:400;font-size:26px;letter-spacing:-.01em;line-height:1.2}
+.gate-h p{margin:8px 0 0;color:var(--ink-2);font-size:14px}
+.gate-x{flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--line-2);background:none;cursor:pointer;color:var(--ink-2)}
+.gate-x:hover{color:var(--ink);border-color:var(--ink)}
+.gate-o{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;padding:22px 32px 30px}
+.gate-o>div{padding:22px;border-radius:18px;border:1px solid var(--line);display:flex;flex-direction:column}
+.gate-o>div:first-child{background:var(--paper-2)}
+.gate-o b{font-size:15px;font-weight:500}
+.gate-o p{margin:6px 0 14px;font-size:13.5px;color:var(--ink-2)}
+.gate-o ol{margin:0 0 18px;padding-left:18px;font-size:13px;color:var(--ink-2);line-height:1.75}
+.gate-o .btn{margin-top:auto;justify-content:center}
+.gate-o label{font-size:12.5px;color:var(--ink-3);margin-bottom:6px}
+.gate-o input{height:40px;border:1px solid var(--line-2);border-radius:12px;padding:0 12px;font:inherit;font-size:14px;margin-bottom:12px;background:var(--paper)}
+.gate-o input:focus{outline:2px solid var(--accent);outline-offset:1px}
+@media (max-width:640px){.gate-o{grid-template-columns:1fr;padding:18px 20px 24px}.gate-h{padding:24px 20px 4px}}
+/* 认证进度页（Portfolio / Deposit 未认证时） */
+.onb{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;align-items:start}
+.onb-steps{padding:8px 0}
+.onb-steps li{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:16px;align-items:start;padding:18px 28px;list-style:none}
+.onb-steps li+li{border-top:1px solid var(--line)}
+.onb-steps ol{margin:0;padding:0}
+.onb-i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12.5px;border:1px solid var(--line-2);color:var(--ink-3);font-variant-numeric:tabular-nums}
+.onb-steps .done .onb-i{background:var(--accent);border-color:var(--accent);color:#fff}
+.onb-steps .now .onb-i{border-color:var(--ink);color:var(--ink)}
+.onb-steps b{display:block;font-weight:500;font-size:14.5px}
+.onb-steps small{display:block;color:var(--ink-3);font-size:13px;margin-top:2px}
+.onb-steps .todo b{color:var(--ink-3)}
+.onb-steps .r{align-self:center}
+.onb-side{padding:24px 26px}
+.onb-side h3{margin:0 0 12px;font-size:14.5px;font-weight:500}
+.onb-side ul{margin:0;padding:0;list-style:none;font-size:13.5px;color:var(--ink-2)}
+.onb-side li{display:flex;gap:10px;align-items:baseline;padding:5px 0}
+.onb-side li i{color:var(--accent);flex:none}
+.onb-side li.no i{color:var(--ink-3)}
+.onb-side hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.onb-side p{margin:0;font-size:13px;color:var(--ink-3)}
+.onb-side p button{background:none;border:0;padding:0;font:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+@media (max-width:900px){.onb{grid-template-columns:1fr}}
+/* Markets：募资中卡片 */
+.ni h3 a{color:inherit;text-decoration:none}
+.ni h3 a:hover{text-decoration:underline;text-underline-offset:3px}
+.ni-act{display:flex;gap:10px;margin-top:18px}
+.mk-raise{margin-top:40px}
+.mk-raise+.mk-funded{margin-top:48px}
+.pill.raising{color:#f2f3f1;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22)}
+/* 募资中详情：进度 + 认购框 */
+.ad-prog.ip{display:grid;grid-template-columns:minmax(0,1fr) 400px;padding:0;overflow:hidden}
+.ip-l{padding:26px 28px 24px}
+.ip-r{border-left:1px solid var(--line);background:var(--paper-2)}
+.ip-bar{display:flex;height:10px;border-radius:999px;background:var(--mist);overflow:hidden}
+.ip-bar i{display:block;height:100%}
+.ip-bar .v{background:#7fa894}.ip-bar .d{background:var(--accent)}
+.ip-leg{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:12px;font-size:12.5px;color:var(--ink-3)}
+.ip-leg span{display:inline-flex;align-items:center;gap:7px}
+.ip-leg b{font-weight:500;color:var(--ink)}
+.ip-leg em{width:8px;height:8px;border-radius:2px;background:var(--mist)}
+.ip-leg em.v{background:#7fa894}.ip-leg em.d{background:var(--accent)}
+.ip-steps{list-style:none;margin:30px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,1fr)}
+.ip-steps li{position:relative;padding-top:18px;padding-right:10px}
+.ip-steps li::before{content:"";position:absolute;top:4px;left:0;right:0;height:1px;background:var(--line-2)}
+.ip-steps li:last-child::before{right:auto;width:0}
+.ip-steps i{position:absolute;top:0;left:0;width:9px;height:9px;border-radius:50%;background:var(--paper);border:1px solid var(--line-2)}
+.ip-steps .done i{background:var(--accent);border-color:var(--accent)}
+.ip-steps .done::before{background:var(--accent)}
+.ip-steps .now i{background:var(--paper);border:2px solid var(--ink);width:11px;height:11px;top:-1px}
+.ip-steps b{display:block;font-weight:500;font-size:13px;line-height:1.35}
+.ip-steps small{display:block;font-size:12px;color:var(--ink-3);margin-top:3px}
+.ip-steps .todo b{color:var(--ink-3)}
+.inv{padding:24px 26px 22px;display:flex;flex-direction:column}
+.ip-l{display:flex;flex-direction:column}
+.ip-facts{list-style:none;margin:auto 0 0;padding:26px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;border-top:1px solid var(--line)}
+.ip-steps+.ip-facts{margin-top:auto}
+.ip-steps{margin-bottom:30px}
+.ip-facts li{display:flex;gap:10px;font-size:12.5px;color:var(--ink-3);line-height:1.5}
+.ip-facts i{font-size:18px;color:var(--accent);flex:none;margin-top:1px}
+.ip-facts b{display:block;font-weight:500;font-size:13.5px;color:var(--ink);margin-bottom:3px}
+@media (max-width:1000px){.ip-facts{grid-template-columns:1fr}}
+.inv-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:14px}
+.inv-h>b{font-family:var(--serif);font-weight:400;font-size:22px;letter-spacing:-.01em}
+.inv-h span{font-size:12.5px;color:var(--ink-3)}
+.inv-h span b{font-weight:500;color:var(--ink)}
+.inv-p{margin:0 0 16px;font-size:13.5px;color:var(--ink-2)}
+.inv-lock .btn,.inv-lock .xpend{align-self:flex-start}
+.inv-mine{display:flex;align-items:baseline;gap:10px;padding:12px 14px;margin-bottom:14px;border-radius:12px;background:var(--accent-soft);font-size:13px;color:var(--accent)}
+.inv-mine b{font-weight:500;font-size:15px;color:var(--ink)}
+.inv-mine small{margin-left:auto;color:var(--ink-3);font-size:12px}
+.inv-mine button{margin-left:auto;background:none;border:0;padding:0;font:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.inv-in{display:flex;align-items:center;height:52px;padding:0 16px;border:1px solid var(--line-2);border-radius:14px;background:var(--paper)}
+.inv-in:focus-within{border-color:var(--ink)}
+.inv-in input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:20px;font-weight:300;letter-spacing:-.01em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.inv-in input::placeholder{color:var(--ink-3);font-size:15px;font-weight:400;letter-spacing:0}
+.inv-in span{font-size:13px;color:var(--ink-3)}
+.inv-q{display:flex;gap:6px;margin:10px 0 16px}
+.inv-q button{flex:1;height:30px;border-radius:999px;border:1px solid var(--line-2);background:var(--paper);font:inherit;font-size:12.5px;color:var(--ink-2);cursor:pointer}
+.inv-q button:hover{border-color:var(--ink);color:var(--ink)}
+.inv-dl{margin:0 0 14px}
+.inv-dl div{display:flex;justify-content:space-between;gap:16px;padding:7px 0;font-size:13px}
+.inv-dl div+div{border-top:1px solid var(--line)}
+.inv-dl dt{color:var(--ink-3)}
+.inv-dl dd{margin:0;text-align:right;color:var(--ink)}
+.inv-ck{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink-2);margin-bottom:14px;cursor:pointer}
+.inv-ck input{margin:3px 0 0;accent-color:var(--accent)}
+.inv-go{width:100%;height:46px;padding:0 20px;justify-content:center}
+.inv-go:disabled{background:var(--mist);color:var(--ink-3);cursor:not-allowed}
+.inv-n{margin:12px 0 0;font-size:12px;color:var(--ink-3)}
+dialog.invd{width:min(440px,calc(100vw - 32px));position:relative}
+dialog.invd .gate-x{position:absolute;top:18px;right:18px}
+dialog.invd .inv{padding:28px 28px 24px}
+dialog.invd .inv-h{padding-right:44px;flex-direction:column;gap:4px}
+@media (max-width:1000px){.ad-prog.ip{grid-template-columns:1fr}.ip-r{border-left:0;border-top:1px solid var(--line)}.ip-steps{grid-template-columns:1fr;gap:14px}.ip-steps li{padding:0 0 0 22px}.ip-steps li::before{display:none}}
+/* Issue：给算力运营方 */
+.is-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:56px;align-items:start;margin-top:56px}
+.is-steps{list-style:none;margin:0;padding:0;position:relative}
+.is-steps li{position:relative;display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:18px;padding:0 0 28px}
+.is-steps li:not(:last-child)::before{content:"";position:absolute;left:15px;top:34px;bottom:4px;width:1px;background:var(--line-2)}
+.is-n{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line-2);background:var(--paper);font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.is-steps b{display:block;font-weight:500;font-size:15px;margin-top:5px}
+.is-steps p{margin:4px 0 0;font-size:13.5px;color:var(--ink-2);max-width:56ch}
+.is-steps small{font-size:12.5px;color:var(--ink-3);margin-top:7px;white-space:nowrap}
+.is-prep{padding:26px 28px;position:sticky;top:96px}
+.is-prep h3{margin:0 0 14px;font-family:var(--serif);font-weight:400;font-size:22px;letter-spacing:-.01em}
+.is-prep ul{list-style:none;margin:0 0 18px;padding:0}
+.is-prep li{display:flex;gap:10px;align-items:baseline;padding:9px 0;font-size:13.5px;color:var(--ink)}
+.is-prep li+li{border-top:1px solid var(--line)}
+.is-prep li i{color:var(--accent);flex:none}
+.is-prep p{margin:0 0 18px;font-size:12.5px;color:var(--ink-3)}
+.is-prep .btn{width:100%;justify-content:center}
+@media (max-width:960px){.is-grid{grid-template-columns:1fr;gap:40px}.is-prep{position:static}}
+/* 原型用：切换查看身份 */
+.demo-sw{position:fixed;left:16px;bottom:16px;z-index:55;display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;background:var(--ink);color:#f2f3f1;font-size:12px;box-shadow:0 10px 30px rgba(14,15,15,.25)}
+.demo-sw span{padding:0 10px 0 12px;color:rgba(242,243,241,.55)}
+.demo-sw button{height:28px;padding:0 12px;border-radius:999px;border:0;background:none;color:rgba(242,243,241,.8);font:inherit;cursor:pointer}
+.demo-sw button[aria-pressed="true"]{background:#f2f3f1;color:var(--ink)}
+@media (max-width:640px){.demo-sw span{display:none}.demo-sw button{padding:0 9px}}
 </style>
 </head>
 <body class="xc">
@@ -697,21 +1193,23 @@ a.mrow:hover{background:var(--paper-2)}
     <a href="#/issue" data-nav="issue">Issue</a>
     <a href="#/transparency" data-nav="transparency">Transparency</a>
   </nav>
-  <div class="xright">
-    <span class="xbal"><span class="ic">A</span><b id="xBal"></b><small>AIUSD</small></span>
-    <a class="btn btn-primary btn-sm" href="#/deposit">Deposit</a>
-    <span class="xwal"><span class="dot"></span><span class="mono" id="xWal"></span></span>
-  </div>
+  <div class="xright" id="xRight"></div>
 </header>
 
 <main id="app" tabindex="-1"></main>
 <footer class="foot xfoot"><p>Design prototype with sample data. Listed assets can lose value; market prices can be below NAV or par. Open to verified investors only.</p></footer>
 <div class="toast" id="toast" role="status"></div>
+<dialog class="gate" id="gate" aria-labelledby="gateT"></dialog>
+<dialog class="gate invd" id="invd" aria-labelledby="invT"></dialog>
+<div class="demo-sw" role="group" aria-label="Prototype: view as">
+  <span>Prototype · view as</span>
+  <button type="button" data-as="public">Public</button><button type="button" data-as="unverified">Signed in</button><button type="button" data-as="pending">In review</button><button type="button" data-as="verified">Verified</button>
+</div>
 
 <script>
 /* ======================= 示例数据 ======================= */
 const ME='0x7a3F09c2b5E1d84A6f2C3e90bB41d7aE5c0c91E';
-let BAL=52380;
+let BAL=352380;
 const CATS=[
   {k:'credit',n:'Compute credit',live:true},
   {k:'compute',n:'Compute price',live:false,note:'Perpetuals on GPU rental price indexes'},
@@ -729,12 +1227,17 @@ const M=[
   {sym:'H100-PERP',name:'H100 rental price',cat:'compute',kind:'Perpetual',soon:true,index:2.14,unit:'$/GPU-hour'},
   {sym:'B200-PERP',name:'B200 rental price',cat:'compute',kind:'Perpetual',soon:true,index:3.86,unit:'$/GPU-hour'}
 ];
+// 募资中的项目：sub 是已认购比例，cd 是 6 条放款条件的签署日期（null 为未签），mine 是当前账户的认购额
 const NEW=[
-  {name:'Frankfurt H100 Portfolio',gpu:'512 × NVIDIA H100 SXM',amt:7200000,sub:.62,rate:.105,term:28,closes:'2026-10-31',state:'Subscribing'},
-  {name:'Dallas B200 Expansion',gpu:'128 × NVIDIA B200',amt:4000000,sub:1,rate:.115,term:24,closes:'2026-11-30',state:'Verifying · 4/6 conditions'}
+  {sym:'FRA-H100',name:'Frankfurt H100 Portfolio',gpu:'512 × NVIDIA H100 SXM',site:'Frankfurt, Germany',buyer:'Enterprise AI platform',offtake:30,amt:7200000,appraisal:9300000,rent:352000,sub:.62,rate:.105,term:28,
+    opened:'2026-10-01',closes:'2026-10-31',full:null,deadline:'2026-12-15',cd:[null,'2026-10-06',null,null,null,'2026-09-28'],mine:0},
+  {sym:'DAL-B200',name:'Dallas B200 Expansion',gpu:'128 × NVIDIA B200',site:'Dallas, Texas, US',buyer:'Model training lab',offtake:26,amt:4000000,appraisal:5200000,rent:224000,sub:1,rate:.115,term:24,
+    opened:'2026-09-08',closes:'2026-09-30',full:'2026-09-26',deadline:'2026-11-30',cd:['2026-09-26','2026-09-15','2026-10-02',null,null,'2026-09-05'],mine:750000}
 ];
+const isOpen=n=>n.sub<1;
+const nDone=n=>n.cd.filter(Boolean).length;
+const nState=n=>isOpen(n)?'Subscribing':`Verifying · ${nDone(n)}/6 conditions`;
 const POS=[{sym:'CCV',qty:237271,avg:1.0115},{sym:'NH200-1',qty:395265,avg:1.0000}];
-const PENDING=[{name:'Dallas B200 Expansion',amt:750000,state:'In escrow · 4/6 conditions',until:'2026-11-30'}];
 let ORDERS=[{id:1,sym:'NH200-1',side:'Buy',type:'Limit',px:.9950,qty:50000,t:'Oct 9, 09:12'}];
 const VAULTS=[
   {k:'CCV',name:'Compute Credit Vault',what:'Lends to compute loans through their escrows. Returns come from rent.',apy:.062,nav:9389000,mine:246240,lock:'Monthly withdrawals, queued',risk:'Loan losses; escrow and cash earn nothing'},
@@ -759,13 +1262,15 @@ function rnd(seed){let h=2166136261;for(const c of seed){h^=c.charCodeAt(0);h=Ma
 /* ======================= 路由 ======================= */
 const app=$('#app');
 function route(){
+  renderHead();
   const h=location.hash.replace(/^#\/?/,'')||'markets', [page,id]=h.split('/');
   document.querySelectorAll('[data-nav]').forEach(a=>a.removeAttribute('aria-current'));
   const cur=document.querySelector(`[data-nav="${page}"]`); if(cur) cur.setAttribute('aria-current','page');
   document.body.classList.toggle('wide',page==='trade');
-  if(page==='asset'){renderAsset(id,h.split('/')[2]);$('#xBal').textContent=num(BAL);app.classList.remove('fade');void app.offsetWidth;app.classList.add('fade');return}
+  if(page==='asset'){renderAsset(id,h.split('/')[2]);requestAnimationFrame(mountServers);app.classList.remove('fade');void app.offsetWidth;app.classList.add('fade');return}
+  if(HIDE.has(page)){location.replace(page==='trade'?'#/asset/'+(bySym(id)?id:'CCV'):'#/markets');return}
+  if(!OK()&&(page==='portfolio'||page==='deposit')){renderOnboard(page);app.classList.remove('fade');void app.offsetWidth;app.classList.add('fade');return}
   ({trade:()=>renderTrade(bySym(id)&&!bySym(id).soon?bySym(id):M[0]),earn:renderEarn,portfolio:renderPortfolio,issue:renderIssue,transparency:renderPublic,deposit:renderDeposit}[page]||renderMarkets)();
-  $('#xBal').textContent=num(BAL);
   app.classList.remove('fade'); void app.offsetWidth; app.classList.add('fade');
 }
 addEventListener('hashchange',()=>{route();scrollTo({top:0})});
@@ -778,48 +1283,130 @@ function spark(m){
   return `<svg class="spark ${sgn(m.chg)}" viewBox="0 0 80 24" preserveAspectRatio="none"><polyline points="${pts.map((p,i)=>`${(i/(n-1)*80).toFixed(1)},${(22-(p-lo)/((hi-lo)||1)*20).toFixed(1)}`).join(' ')}"/></svg>`;
 }
 function renderMarkets(){
-  const live=M.filter(m=>!m.soon), vol=live.reduce((s,m)=>s+m.vol,0), list=M.filter(m=>m.cat===cat), c=CATS.find(x=>x.k===cat);
+  const live=M.filter(m=>!m.soon), list=M.filter(m=>m.cat===cat&&(VAULT||m.sym!=='CCV')), c=CATS.find(x=>x.k===cat);
+  const ls=live.filter(m=>LOANS[m.sym]).map(m=>{const l=LOANS[m.sym],k=l.got.length;return {m,l,out:bal(l,k),left:l.term-k,cov:l.got.at(-1)/pmt(l),ltv:l.amount/l.appraisal}});
+  const vw=ls.reduce((a,x)=>a+x.l.vault,0), ccv={cov:ls.reduce((a,x)=>a+x.l.vault*x.cov,0)/vw, ltv:ls.reduce((a,x)=>a+x.l.vault*x.ltv,0)/vw};
+  const info=m=>{const x=ls.find(y=>y.m===m); return x?{term:`${x.left} mo`,cov:x.cov,ltv:pct(x.ltv,0),st:'<span class="pill repaying">Repaying</span>'}:{term:'Open-ended',cov:ccv.cov,ltv:pct(ccv.ltv,0),st:`<span class="pill plain">Holds ${ls.length} loans</span>`}};
   app.innerHTML=`
   <div class="xwrap">
     <div class="dsum" style="margin-top:0"><div class="kstats">
-      <div><span>24h volume</span><b class="num">${usdM(vol)}</b><em>${live.length} live markets</em></div>
-      <div><span>Assets listed</span><b class="num">${usdM(live.reduce((s,m)=>s+m.size,0))}</b><em>Vault NAV and loans outstanding</em></div>
-      <div><span>Vault deposits</span><b class="num">${usdM(VAULTS.reduce((s,v)=>s+v.nav,0))}</b><em>Credit and liquidity vaults</em></div>
-      <div><span>New issues</span><b class="num">${NEW.length}</b><em>Primary subscriptions</em></div>
+      <div><span>Loans outstanding</span><b class="num">${usdM(ls.reduce((a,x)=>a+x.out,0))}</b><em>${ls.length} loans repaying</em></div>
+      ${OK()?`<div><span>Weighted yield</span><b class="num">${pct(ls.reduce((a,x)=>a+x.out*x.m.yld,0)/ls.reduce((a,x)=>a+x.out,0))}</b><em>By principal outstanding</em></div>`:`<div><span>Weighted yield</span><b class="lockb"><i class="ph ph-lock-simple"></i>Verified investors</b><em><button type="button" data-gate>See who can invest</button></em></div>`}
+      <div><span>Coverage, last month</span><b class="num">${(ls.reduce((a,x)=>a+x.out*x.cov,0)/ls.reduce((a,x)=>a+x.out,0)).toFixed(2)}×</b><em>Weighted · cure trigger 1.15×</em></div>
+      <div><span>Raising</span><b class="num">${NEW.length}</b><em>${usdM(NEW.reduce((a,n)=>a+n.amt*(1-n.sub),0))} left to subscribe</em></div>
     </div></div>
-    <div class="mtabs">${CATS.map(x=>`<button type="button" data-cat="${x.k}" aria-pressed="${x.k===cat}">${x.n}${x.live?'':`<span class="soon">${x.k==='compute'?'Soon':'Planned'}</span>`}</button>`).join('')}</div>
-    ${list.length?`<div class="panel mlist">
-      <div class="mrow mhd"><span>Market</span><span>Price</span><span>24h</span><span>${cat==='credit'?'Yield':'Index'}</span><span>24h volume</span><span>Size</span><span></span><span></span></div>
-      ${list.map(m=>m.soon?`<div class="mrow dim"><span class="mn"><b>${m.sym}</b><small>${m.name}</small></span><span>—</span><span>—</span><span class="num">${usd(m.index,2)} <small>${m.unit}</small></span><span>—</span><span>—</span><span></span><span><span class="pill plain locked">Soon</span></span></div>`
-      :`<a class="mrow" href="#/asset/${m.sym}" title="${m.name} details"><span class="mn"><b>${m.sym}<em>/AIUSD</em></b><small>${m.name}</small></span>
-        <span class="num">${px(m.price)}</span><span class="num ${sgn(m.chg)}">${m.chg>0?'+':''}${pct(m.chg/m.price,2)}</span>
-        <span class="num">${pct(m.yld)}</span><span class="num">${m.vol?usdM(m.vol):'<small class="muted">No trades</small>'}</span><span class="num">${usdM(m.size)}</span>
-        <span>${spark(m)}</span><span class="btn btn-ghost btn-sm" role="link" tabindex="0" data-trade="${m.sym}">Trade</span></a>`).join('')}
-    </div>`:`<div class="panel empty"><p style="margin:0 0 6px;color:var(--ink)">${c.n}</p><p style="margin:0">${c.note}. Listing templates for this asset class are being designed.</p></div>`}
-    ${cat==='credit'?`<section class="block">
-      <div class="sec-t"><h2>New issues</h2><p>Primary subscriptions. A market opens after funds are released.</p></div>
-      <div class="nissue">${NEW.map(n=>`<div class="panel card">
-        <h3>${n.name}<span class="pill ${n.sub<1?'open':'verifying'}">${n.state}</span></h3>
-        <p class="small" style="margin:0 0 14px">${n.gpu}</p>
+    ${cat==='credit'?`<section class="block mk-raise">
+      <div class="sec-t"><h2>Open for subscription</h2></div>
+      <div class="nissue">${NEW.map(n=>{const o=isOpen(n);return `<div class="panel card ni">
+        <h3><a href="#/asset/${n.sym}">${n.name}</a><span class="pill ${o?'open':'verifying'}">${nState(n)}</span></h3>
+        <p class="small" style="margin:0 0 14px">${n.gpu} · ${n.site}</p>
         <div class="meter"><span class="num">${pct(n.sub,0)} of ${usdM(n.amt)}</span><div class="bar"><i style="width:${n.sub*100}%"></i></div></div>
-        <dl class="kv"><div><dt>Rate</dt><dd>${pct(n.rate)} fixed · ${n.term} months</dd></div><div><dt>${n.sub<1?'Closes':'Release deadline'}</dt><dd>${fmtD(n.closes)}</dd></div></dl>
-        ${n.sub<1?`<button class="btn btn-primary btn-sm" style="margin-top:16px" type="button" onclick="toast('Subscription opens in the primary market (demo)')">Subscribe</button>`:''}
-      </div>`).join('')}</div>
+        <dl class="kv">${OK()?`<div><dt>Rate</dt><dd>${pct(n.rate)} fixed · ${n.term} months</dd></div>`:`<div><dt>Term</dt><dd>${n.term} months</dd></div><div><dt>Rate</dt><dd>${lockv()}</dd></div>`}
+          <div><dt>${o?'Closes':'Release deadline'}</dt><dd>${fmtD(o?n.closes:n.deadline)}</dd></div>
+          ${OK()&&n.mine?`<div><dt>Your subscription</dt><dd class="num">${usd(n.mine)} · in escrow</dd></div>`:''}</dl>
+        <div class="ni-act">${o?(OK()?`<a class="btn btn-primary btn-sm" href="#/asset/${n.sym}/subscribe">Subscribe</a>`:`<button class="btn btn-primary btn-sm" type="button" data-gate>Subscribe</button>`):''}<a class="btn btn-ghost btn-sm" href="#/asset/${n.sym}">${o?'Details':'View progress'}</a></div>
+      </div>`}).join('')}</div>
     </section>`:''}
+    <section class="block mk-funded">
+    ${cat==='credit'?`<div class="sec-t"><h2>Funded</h2></div>`:''}
+    ${list.length?`<div class="panel mlist">
+      <div class="mrow mhd"><span>Asset</span><span>${cat==='credit'?(OK()?'Yield':'Yield · verified'):'Index'}</span><span>Size</span><span>Term left</span><span>Coverage</span><span>LTV</span><span>Status</span><span></span></div>
+      ${list.map(m=>m.soon?`<div class="mrow dim"><span class="mn"><b>${m.sym}</b><small>${m.name}</small></span><span class="num">${usd(m.index,2)} <small>${m.unit}</small></span><span>—</span><span>—</span><span>—</span><span>—</span><span><span class="pill plain locked">Soon</span></span><span></span></div>`
+      :(()=>{const f=info(m);return `<a class="mrow" href="#/asset/${m.sym}" title="${m.name} details"><span class="mn"><b>${m.sym}</b><small>${m.name}</small></span>
+        ${OK()?`<span class="num"><b class="yl">${pct(m.yld)}</b><small>${m.loan?'to maturity':'net APY'}</small></span>`:`<span class="lockv" title="Shown to verified investors"><i class="ph ph-lock-simple"></i></span>`}<span class="num">${usdM(m.size)}</span><span class="num">${f.term}</span>
+        <span class="num ${f.cov<1.25?'neg':''}">${f.cov.toFixed(2)}×</span><span class="num">${f.ltv}</span><span>${f.st}</span>
+        ${TRADING?`<span class="btn btn-ghost btn-sm" role="link" tabindex="0" data-trade="${m.sym}">Trade</span>`:`<span class="go"><i class="ph ph-arrow-right"></i></span>`}</a>`})()).join('')}
+    </div>`:`<div class="panel empty"><p style="margin:0 0 6px;color:var(--ink)">${c.n}</p><p style="margin:0">${c.note}. Listing templates for this asset class are being designed.</p></div>`}
+    </section>
   </div>`;
   app.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{cat=b.dataset.cat;renderMarkets()});
+  bindGate();
   app.querySelectorAll('[data-trade]').forEach(b=>{const go=e=>{e.preventDefault();e.stopPropagation();location.hash='#/trade/'+b.dataset.trade};b.onclick=go;b.onkeydown=e=>{if(e.key==='Enter')go(e)}});
 }
 
 /* ======================= Trade ======================= */
-let side='Buy', otype='Limit', btab='pos';
-function series(m){const r=rnd(m.sym+'s'), n=60, out=[]; let v=m.price-(m.chg*8); for(let i=0;i<n;i++){v+= (r()-.5)*m.price*.0016 + (m.price-v)*.06; out.push(v)} out[n-1]=m.price; return out}
+// 第一阶段隐藏的页面：导航和入口都不显示，代码保留；从这个列表里删掉即恢复
+const HIDE=new Set(['trade','earn','transparency']);
+const TRADING=!HIDE.has('trade');
+// 组合金库 CCV 第一阶段先不上：列表、详情、持仓、募集进度里的 CCV 份额都不显示；改成 true 即恢复
+const VAULT=false;
+if(!VAULT){const i=POS.findIndex(p=>p.sym==='CCV'); if(i>=0) POS.splice(i,1)}
+let side='Buy', otype='Limit', btab='pos', ptab='book';
+const TF={'15m':15,'1h':60,'4h':240,'1D':1440}; let ktf='1h', KH=340;
+// 示意K线：确定性随机游走，向参考价（NAV/面值）回归，最后一根收盘=现价；成交量按 24h 成交额摊到每根
+function candles(m,tf){
+  const r=rnd(m.sym+tf), n=72, mins=TF[tf], sig=m.price*.00042*Math.sqrt(mins/60), q=v=>Math.round(v/m.tick)*m.tick;
+  const perDay=1440/mins, liq=m.vol>0, w=[]; let v=m.ref;
+  for(let i=0;i<=n;i++){w.push(v); v+=(r()-.5)*2*sig+(m.ref-v)*.04}
+  const shift=m.price-w[n]; const cl=w.map(x=>q(x+shift));
+  const out=[], end=Math.floor(Date.now()/(mins*6e4))*mins*6e4;
+  let prev=cl[0];
+  for(let i=0;i<n;i++){
+    const traded=liq||r()<.12, o=liq?cl[i]:prev, c=traded?cl[i+1]:o; prev=c;
+    const h=q(Math.max(o,c)+(traded?r()*sig*.7:0)), l=q(Math.min(o,c)-(traded?r()*sig*.7:0));
+    const vol=liq?m.vol/perDay*(.35+r()*1.3+Math.abs(c-o)/sig*.6):traded?Math.round(2000+r()*18000):0;
+    out.push({t:end-(n-1-i)*mins*6e4,o,h,l,c,v:vol});
+  }
+  const dl=m.price-out[n-1].c; out.forEach(k=>{for(const f of ['o','h','l','c']) k[f]=q(k[f]+dl)}); out[n-1].c=m.price;
+  return out;
+}
+const kv=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n)+'';
+function ktime(t,tf,full){const d=new Date(t), mo=d.toLocaleString('en-US',{month:'short'}), hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  return full?(tf==='1D'?`${mo} ${d.getDate()}, ${d.getFullYear()}`:`${mo} ${d.getDate()} ${hm}`):(tf==='1D'||tf==='4h'&&hm==='00:00'?`${mo} ${d.getDate()}`:hm)}
 function chart(m){
-  const s=series(m), lo=Math.min(...s), hi=Math.max(...s), W=800, H=260, y=v=>H-8-(v-lo)/((hi-lo)||1)*(H-24);
-  const line=s.map((v,i)=>`${(i/(s.length-1)*W).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
-  const refY=m.ref>=lo&&m.ref<=hi?y(m.ref):null;
-  return `<div class="xchart"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polygon class="pa" points="0,${H} ${line} ${W},${H}"/><polyline class="pl ${sgn(m.chg)}" points="${line}"/>${refY!=null?`<line x1="0" x2="${W}" y1="${refY}" y2="${refY}" class="ref"/>`:''}</svg>
-    <div class="xaxis"><span>${px(hi)}</span><span>${px(lo)}</span></div>${refY!=null?`<span class="reftag" style="top:${refY/H*100}%">${m.refName} ${px(m.ref)}</span>`:''}</div>`;
+  const C=candles(m,ktf), n=C.length, W=800, H=KH, PH=H-88, VT=H-68, VB=H-4, slot=W/n, bw=slot*.64;
+  let lo=Math.min(...C.map(c=>c.l)), hi=Math.max(...C.map(c=>c.h)); const rg=(hi-lo)||m.tick*10;
+  const showRef=m.ref>=lo-rg*.6&&m.ref<=hi+rg*.6; if(showRef){lo=Math.min(lo,m.ref);hi=Math.max(hi,m.ref)}
+  const pad=((hi-lo)||m.tick*10)*.1; lo-=pad; hi+=pad;
+  const y=v=>12+(hi-v)/(hi-lo)*(PH-12), vmax=Math.max(...C.map(c=>c.v),1), vy=v=>VB-v/vmax*(VB-VT);
+  const raw=(hi-lo)/5, mag=10**Math.floor(Math.log10(raw)), step=[1,2,2.5,5,10].map(k=>k*mag).find(k=>k>=raw), ticks=[];
+  for(let t=Math.ceil(lo/step)*step;t<=hi;t+=step) ticks.push(t);
+  const last=C[n-1], ld=last.c>=last.o?'up':'down';
+  const bars=C.map((c,i)=>{const x=i*slot+slot/2, k=c.c>=c.o?'u':'d', top=y(Math.max(c.o,c.c)), bh=Math.max(1,Math.abs(y(c.o)-y(c.c)));
+    return `<line class="w ${k}" x1="${x}" x2="${x}" y1="${y(c.h)}" y2="${y(c.l)}"/><rect class="${k}" x="${x-bw/2}" y="${top}" width="${bw}" height="${bh}"/>${c.v?`<rect class="v${k}" x="${x-bw/2}" y="${vy(c.v)}" width="${bw}" height="${VB-vy(c.v)}"/>`:''}`}).join('');
+  const xi=[8,23,38,53,68];
+  chart.st={C,m,W,PH,slot,lo,hi};
+  return `<div class="kc" id="kchart">
+    <div class="kplot"><svg viewBox="0 0 ${W} ${H}" style="height:${H}px" preserveAspectRatio="none" aria-label="${m.sym}/AIUSD candlestick chart, ${ktf} interval">
+      ${ticks.map(t=>`<line class="g" x1="0" x2="${W}" y1="${y(t)}" y2="${y(t)}"/>`).join('')}<line class="g" x1="0" x2="${W}" y1="${VT-8}" y2="${VT-8}"/>
+      ${showRef?`<line class="rf" x1="0" x2="${W}" y1="${y(m.ref)}" y2="${y(m.ref)}"/>`:''}
+      ${bars}
+      <line class="lp ${ld==='up'?'u':'d'}" x1="0" x2="${W}" y1="${y(last.c)}" y2="${y(last.c)}"/>
+      <line class="ch" id="kvx" x1="0" x2="0" y1="0" y2="${H}"/><line class="ch" id="khy" x1="0" x2="${W}" y1="0" y2="0"/>
+    </svg>
+    <div class="kleg" id="kleg"></div>
+    ${showRef?`<span class="kreft" style="top:${y(m.ref)}px">${m.refName} ${px(m.ref)}</span>`:''}
+    <div class="kx">${xi.map(i=>`<span style="left:${(i+.5)/n*100}%">${ktime(C[i].t,ktf)}</span>`).join('')}</div></div>
+    <div class="ky" style="height:${H}px">${ticks.filter(t=>Math.abs(y(t)-y(last.c))>14).map(t=>`<span style="top:${y(t)}px">${px(t)}</span>`).join('')}
+      <span class="tag ${ld}" style="top:${y(last.c)}px">${px(last.c)}</span><span class="tag hv" id="khv"></span>
+      <span style="top:${(VT+VB)/2}px">Vol</span></div>
+  </div>`;
+}
+function kleg(i){
+  const {C,m}=chart.st, c=C[i], p=i?C[i-1].c:c.o, d=c.c-p, k=d>0?'up':d<0?'down':'';
+  $('#kleg').innerHTML=`<span>${ktime(c.t,ktf,1)}</span><span>O <b class="${k}">${px(c.o)}</b></span><span>H <b class="${k}">${px(c.h)}</b></span><span>L <b class="${k}">${px(c.l)}</b></span><span>C <b class="${k}">${px(c.c)}</b></span><span><b class="${k}">${d>0?'+':''}${pct(d/p,2)}</b></span><span>Vol <b>${c.v?kv(c.v):'0'}</b></span>`;
+}
+function fitTrade(m){
+  const g=$('.tgrid'), pn=$('.tchart'); if(!g||!pn) return;
+  const redraw=()=>{$('#kchart').outerHTML=chart(m); wireChart(m)};
+  if(innerWidth<=1100){g.style.height=''; if(KH!==340){KH=340; redraw()} return}
+  const bt=$('.tbottom .btabs'), th=$('.tbottom thead'), r1=$('.tbottom tbody tr'), peek=12+2+(bt?bt.offsetHeight:44)+(th?th.offsetHeight:0)+(r1?r1.offsetHeight:56)+8;
+  g.style.height=Math.max(520,Math.floor(innerHeight-(g.getBoundingClientRect().top+scrollY)-peek))+'px';
+  for(let k=0;k<2;k++){
+    const bottom=pn.getBoundingClientRect().bottom-parseFloat(getComputedStyle(pn).paddingBottom), used=pn.lastElementChild.getBoundingClientRect().bottom;
+    const h=Math.max(220,Math.min(900,Math.floor(KH+bottom-used))); if(Math.abs(h-KH)<=2) break; KH=h; redraw();
+  }
+}
+addEventListener('resize',()=>{clearTimeout(fitTrade._t); fitTrade._t=setTimeout(()=>{if($('#kchart')&&chart.st) fitTrade(chart.st.m)},150)});
+function wireChart(m){
+  const kc=$('#kchart'), plot=kc.querySelector('.kplot'), svg=plot.querySelector('svg'); kleg(chart.st.C.length-1);
+  svg.onmousemove=e=>{const {C,W,PH,slot,lo,hi}=chart.st, b=svg.getBoundingClientRect(), fx=(e.clientX-b.left)/b.width, py=e.clientY-b.top;
+    const i=Math.max(0,Math.min(C.length-1,Math.floor(fx*C.length))), x=i*slot+slot/2;
+    $('#kvx').setAttribute('x1',x); $('#kvx').setAttribute('x2',x); $('#khy').setAttribute('y1',py); $('#khy').setAttribute('y2',py);
+    const hv=$('#khv'); if(py>=12&&py<=PH){hv.style.top=py+'px'; hv.textContent=px(hi-(py-12)/(PH-12)*(hi-lo)); hv.style.visibility='visible'} else hv.style.visibility='hidden';
+    plot.classList.add('on'); kc.classList.add('on'); kleg(i)};
+  svg.onmouseleave=()=>{plot.classList.remove('on'); kc.classList.remove('on'); kleg(chart.st.C.length-1)};
+  document.querySelectorAll('[data-tf]').forEach(b=>b.onclick=()=>{ktf=b.dataset.tf; document.querySelectorAll('[data-tf]').forEach(x=>x.setAttribute('aria-pressed',x===b)); $('#kchart').outerHTML=chart(m); wireChart(m)});
 }
 function book(m){
   const r=rnd(m.sym+'b'), t=m.tick*(m.vol?2:6), asks=[], bids=[];
@@ -836,7 +1423,7 @@ function trades(m){
 function posRows(filter){
   const ps=POS.filter(p=>!filter||p.sym===filter);
   if(!ps.length) return `<p class="muted" style="font-size:13px;margin:14px 0">No position in this market.</p>`;
-  return `<table class="tbl xt"><thead><tr><th>Market</th><th>Size</th><th>Avg price</th><th>Mark</th><th>Value</th><th>Unrealized</th><th>Yield</th></tr></thead><tbody>${ps.map(p=>{const m=bySym(p.sym),v=p.qty*m.price,u=p.qty*(m.price-p.avg);return `<tr><td><a href="#/trade/${p.sym}"><b>${p.sym}</b></a></td><td>${num(p.qty)} <small class="muted">${p.sym}</small></td><td>${px(p.avg)}</td><td>${px(m.price)}</td><td>${usd(Math.round(v))}</td><td class="${sgn(u)}">${u>=0?'+'+usd(Math.round(u)):'−'+usd(Math.round(-u))}</td><td>${pct(m.yld)}</td></tr>`}).join('')}</tbody></table>`;
+  return `<table class="tbl xt"><thead><tr><th>Market</th><th>Size</th><th>Avg price</th><th>Mark</th><th>Value</th><th>Unrealized</th><th>Yield</th></tr></thead><tbody>${ps.map(p=>{const m=bySym(p.sym),v=p.qty*m.price,u=p.qty*(m.price-p.avg);return `<tr><td><a href="#/${TRADING?'trade':'asset'}/${p.sym}"><b>${p.sym}</b></a></td><td>${num(p.qty)} <small class="muted">${p.sym}</small></td><td>${px(p.avg)}</td><td>${px(m.price)}</td><td>${usd(Math.round(v))}</td><td class="${sgn(u)}">${u>=0?'+'+usd(Math.round(u)):'−'+usd(Math.round(-u))}</td><td>${pct(m.yld)}</td></tr>`}).join('')}</tbody></table>`;
 }
 function orderRows(filter){
   const os=ORDERS.filter(o=>!filter||o.sym===filter);
@@ -847,26 +1434,27 @@ function renderTrade(m){
   const pos=POS.find(p=>p.sym===m.sym);
   app.innerHTML=`
   <div class="mhead panel">
-    <div class="msel"><b>${m.sym}<em>/AIUSD</em></b><a class="lnk" href="#/asset/${m.sym}" style="font-size:12.5px">${m.name}</a>
-      <select id="mPick" aria-label="Switch market">${M.filter(x=>!x.soon).map(x=>`<option value="${x.sym}" ${x.sym===m.sym?'selected':''}>${x.sym}/AIUSD</option>`).join('')}</select></div>
+    <div class="msel"><button type="button" class="mpbtn" id="mPickBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Switch market"><b>${m.sym}<em>/AIUSD</em></b><i class="ph-light ph-caret-down" aria-hidden="true"></i></button>
+      <div class="mpop" id="mPop" role="listbox" aria-label="Markets" hidden><div class="mph"><span>Market</span><span>Price</span><span>24h</span></div>${M.filter(x=>!x.soon).map(x=>`<a role="option" href="#/trade/${x.sym}" aria-selected="${x.sym===m.sym}"><span><b>${x.sym}</b><small>${x.name}</small></span><span class="num">${px(x.price)}</span><span class="num ${sgn(x.chg)}">${x.chg>0?'+':''}${pct(x.chg/x.price,2)}</span></a>`).join('')}</div></div>
     <div><span>Price</span><b class="num ${sgn(m.chg)}">${px(m.price)}</b></div>
     <div><span>24h</span><b class="num ${sgn(m.chg)}">${m.chg>0?'+':''}${pct(m.chg/m.price,2)}</b></div>
     <div><span>${m.refName}</span><b class="num">${px(m.ref)}</b></div>
     <div><span>${m.yName}</span><b class="num">${pct(m.yld)}</b></div>
     <div><span>24h volume</span><b class="num">${m.vol?usdM(m.vol):'—'}</b></div>
     <div><span>${m.sizeName}</span><b class="num">${usdM(m.size)}</b></div>
+    <a class="mdet" href="#/asset/${m.sym}">${m.kind==='Vault'?'Vault':'Loan'} details<i class="ph-light ph-caret-right" aria-hidden="true"></i></a>
   </div>
   <div class="tgrid">
     <div class="panel tchart">
-      <div class="th"><span class="seg sm"><button aria-pressed="false">1D</button><button aria-pressed="false">1W</button><button aria-pressed="true">1M</button><button aria-pressed="false">All</button></span><span class="muted" style="font-size:12.5px">${m.sym}/AIUSD</span></div>
+      <div class="th"><span class="seg sm" role="group" aria-label="Candle interval">${Object.keys(TF).map(k=>`<button type="button" data-tf="${k}" aria-pressed="${k===ktf}">${k}</button>`).join('')}</span><span class="muted" style="font-size:12.5px">${m.sym}/AIUSD · Sample data</span></div>
       ${chart(m)}
       <div class="about">
         <p>${m.about||`Backed by one compute loan: ${m.loan.gpu}, ${m.loan.site}. Repaid monthly from rent; ${m.loan.left} left at ${pct(m.loan.rate)}.`}</p>
-        ${m.loan?`<div class="aboutk"><span>Release conditions <b class="pos">${m.loan.cond}/6 recorded</b></span><span>Coverage by month <span class="covs">${m.loan.cov.map(c=>`<i class="${c<1.25?'low':''}" style="height:${(c-1)/.4*100}%" title="${c.toFixed(2)}×"></i>`).join('')}</span> <b>${m.loan.cov.at(-1).toFixed(2)}×</b></span><span>Cure trigger <b>1.15×</b></span><a class="lnk" href="#/asset/${m.sym}">Asset details</a></div>`
-          :`<div class="aboutk"><span>Holdings <b>7 loans</b></span><span>Largest <b>14.8% of NAV</b></span><span>Earning · escrow · cash <b>61% · 28% · 11%</b></span><a class="lnk" href="#/asset/CCV">Vault details</a></div>`}
+        ${m.loan?`<div class="aboutk"><span>Release conditions <b class="pos">${m.loan.cond}/6 recorded</b></span><span>Coverage by month <span class="covs">${m.loan.cov.map(c=>`<i class="${c<1.25?'low':''}" style="height:${(c-1)/.4*100}%" title="${c.toFixed(2)}×"></i>`).join('')}</span> <b>${m.loan.cov.at(-1).toFixed(2)}×</b></span><span>Cure trigger <b>1.15×</b></span></div>`
+          :`<div class="aboutk"><span>Holdings <b>7 loans</b></span><span>Largest <b>14.8% of NAV</b></span><span>Earning · escrow · cash <b>61% · 28% · 11%</b></span></div>`}
       </div>
     </div>
-    <div class="panel tbook"><div class="th"><b>Order book</b></div>${book(m)}<div class="th" style="margin-top:14px"><b>Trades</b></div>${trades(m)}</div>
+    <div class="panel tbook"><div class="btabs ptabs">${[['book','Order book'],['trades','Trades']].map(([k,t])=>`<button type="button" data-pt="${k}" aria-current="${k===ptab}">${t}</button>`).join('')}</div><div data-pv="book" ${ptab==='book'?'':'hidden'}>${book(m)}</div><div data-pv="trades" ${ptab==='trades'?'':'hidden'}>${trades(m)}</div></div>
     <div class="panel tform">
       <div class="seg two"><button type="button" data-side="Buy" aria-pressed="${side==='Buy'}">Buy</button><button type="button" data-side="Sell" aria-pressed="${side==='Sell'}">Sell</button></div>
       <div class="otabs">${['Limit','Market'].map(t=>`<button type="button" data-ot="${t}" aria-current="${t===otype}">${t}</button>`).join('')}</div>
@@ -882,7 +1470,13 @@ function renderTrade(m){
     <div class="btabs">${[['pos','Positions'],['ord',`Open orders (${ORDERS.length})`]].map(([k,t])=>`<button type="button" data-bt="${k}" aria-current="${k===btab}">${t}</button>`).join('')}</div>
     <div id="bBody">${btab==='pos'?posRows():orderRows()}</div>
   </div>`;
-  $('#mPick').onchange=e=>location.hash='#/trade/'+e.target.value;
+  const mb=$('#mPickBtn'), mp=$('#mPop'), mclose=()=>{mp.hidden=true; mb.setAttribute('aria-expanded','false')};
+  mb.onclick=e=>{e.stopPropagation(); if(!mp.hidden) return mclose(); const r=mb.getBoundingClientRect(); mp.style.left=r.left+'px'; mp.style.top=(r.bottom+8)+'px'; mp.hidden=false; mb.setAttribute('aria-expanded','true'); (mp.querySelector('[aria-selected="true"]')||mp.querySelector('a')).focus()};
+  mp.onclick=e=>{e.stopPropagation(); if(e.target.closest('a')) mclose()};
+  mp.onkeydown=e=>{const as=[...mp.querySelectorAll('a')], i=as.indexOf(document.activeElement); if(e.key==='ArrowDown'){e.preventDefault(); as[Math.min(as.length-1,i+1)].focus()} else if(e.key==='ArrowUp'){e.preventDefault(); as[Math.max(0,i-1)].focus()} else if(e.key==='Escape'){mclose(); mb.focus()}};
+  document.onclick=mclose; window.onscroll=mclose;
+  wireChart(m); fitTrade(m);
+  app.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>{ptab=b.dataset.pt; app.querySelectorAll('[data-pt]').forEach(x=>x.setAttribute('aria-current',x===b)); app.querySelectorAll('[data-pv]').forEach(v=>v.hidden=v.dataset.pv!==ptab)});
   app.querySelectorAll('[data-side]').forEach(b=>b.onclick=()=>{side=b.dataset.side;renderTrade(m)});
   app.querySelectorAll('[data-ot]').forEach(b=>b.onclick=()=>{otype=b.dataset.ot;renderTrade(m)});
   app.querySelectorAll('[data-bt]').forEach(b=>b.onclick=()=>{btab=b.dataset.bt;renderTrade(m)});
@@ -914,7 +1508,7 @@ function renderEarn(){
       <p class="small" style="margin:0 0 18px">${v.what}</p>
       <div class="vnums"><div><span>Net APY, 30 days</span><b class="num">${pct(v.apy)}</b></div><div><span>Vault size</span><b class="num">${usdM(v.nav)}</b></div><div><span>Yours</span><b class="num">${v.mine?usd(v.mine):'—'}</b></div></div>
       <dl class="kv"><div><dt>Withdrawals</dt><dd>${v.lock}</dd></div><div><dt>Main risk</dt><dd>${v.risk}</dd></div></dl>
-      <div class="tacts"><button class="btn btn-primary btn-sm" type="button" onclick="toast('Deposit into ${v.name} (demo)')">Deposit</button>${v.mine?`<button class="btn btn-ghost btn-sm" type="button" onclick="toast('Withdrawal requested (demo)')">Withdraw</button>`:''}${v.k==='CCV'?'<a class="btn btn-ghost btn-sm" href="#/trade/CCV">Trade CCV</a>':''}</div>
+      <div class="tacts"><button class="btn btn-primary btn-sm" type="button" onclick="toast('Deposit into ${v.name} (demo)')">Deposit</button>${v.mine?`<button class="btn btn-ghost btn-sm" type="button" onclick="toast('Withdrawal requested (demo)')">Withdraw</button>`:''}${TRADING&&v.k==='CCV'?'<a class="btn btn-ghost btn-sm" href="#/trade/CCV">Trade CCV</a>':''}</div>
     </div>`).join('')}</div>
     <p class="enote">The Liquidity Vault is what keeps the order books quoted. CCV and LQV are not stablecoins and can lose value.</p>
   </div>`;
@@ -922,7 +1516,7 @@ function renderEarn(){
 
 /* ======================= Portfolio ======================= */
 function renderPortfolio(){
-  const pv=POS.reduce((s,p)=>s+p.qty*bySym(p.sym).price,0), un=POS.reduce((s,p)=>s+p.qty*(bySym(p.sym).price-p.avg),0), pend=PENDING.reduce((s,p)=>s+p.amt,0);
+  const pv=POS.reduce((s,p)=>s+p.qty*bySym(p.sym).price,0), un=POS.reduce((s,p)=>s+p.qty*(bySym(p.sym).price-p.avg),0), pend=NEW.reduce((s,n)=>s+n.mine,0);
   app.innerHTML=`<div class="xwrap">
     <div class="page-head"><div><h1>Portfolio</h1><p>One account in AIUSD across every market. <span class="mono">${short(ME)}</span></p></div><div class="vact"><a class="btn btn-ghost btn-sm" href="#/deposit">Withdraw</a><a class="btn btn-primary btn-sm" href="#/deposit">Deposit</a></div></div>
     <div class="dsum" style="margin-top:0"><div class="kstats">
@@ -932,39 +1526,46 @@ function renderPortfolio(){
       <div><span>In escrow</span><b class="num">${usd(pend)}</b><em>New issues waiting for release</em></div>
     </div></div>
     <section class="block"><div class="sec-t"><h2>Positions</h2></div><div class="panel tbl-wrap">${posRows()}</div></section>
-    <section class="block"><div class="sec-t"><h2>Open orders</h2></div><div class="panel tbl-wrap">${orderRows()}</div></section>
-    <section class="block"><div class="sec-t"><h2>Subscriptions in escrow</h2></div><div class="panel tbl-wrap"><table class="tbl xt"><thead><tr><th>Issue</th><th>Amount</th><th>Status</th><th>Release deadline</th></tr></thead><tbody>${PENDING.map(p=>`<tr><td><b>${p.name}</b></td><td>${usd(p.amt)}</td><td><span class="pill verifying">${p.state}</span></td><td>${fmtD(p.until)}</td></tr>`).join('')}</tbody></table></div></section>
+    ${TRADING?`<section class="block"><div class="sec-t"><h2>Open orders</h2></div><div class="panel tbl-wrap">${orderRows()}</div></section>`:''}
+    <section class="block"><div class="sec-t"><h2>Subscriptions in escrow</h2><p>Released when all six conditions are met; refunded in full if not met by the deadline</p></div><div class="panel tbl-wrap">${NEW.some(n=>n.mine)?`<table class="tbl xt"><thead><tr><th>Issue</th><th>Amount</th><th>Status</th><th>Deadline</th><th></th></tr></thead><tbody>${NEW.filter(n=>n.mine).map(n=>`<tr><td><a href="#/asset/${n.sym}"><b>${n.sym}</b></a> <small class="muted">${n.name}</small></td><td>${usd(n.mine)}</td><td><span class="pill ${isOpen(n)?'open':'verifying'}">${nState(n)}</span></td><td>${isOpen(n)?'Closes '+fmtD(n.closes):'Release by '+fmtD(n.deadline)}</td><td style="text-align:right">${isOpen(n)?`<button class="btn btn-ghost btn-sm" type="button" data-wdi="${n.sym}">Withdraw</button>`:'<span class="muted">Locked until release</span>'}</td></tr>`).join('')}</tbody></table>`:'<p class="muted" style="margin:0;padding:22px 24px">No subscriptions in escrow. <a href="#/markets">See what is open</a></p>'}</div></section>
   </div>`;
   app.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{ORDERS=ORDERS.filter(o=>o.id!=b.dataset.cancel);toast('Order cancelled');renderPortfolio()});
+  app.querySelectorAll('[data-wdi]').forEach(b=>b.onclick=()=>{withdrawSub(NEW.find(n=>n.sym===b.dataset.wdi));route()});
 }
 
 /* ======================= Issue ======================= */
 function renderIssue(){
+  const steps=[
+    ['Apply',`${ACCESS==='public'?'Sign in, then send':'Send'} the asset details and the offtake contract.`,'A few days'],
+    ['Review and appraisal','We review the operator and the buyer; an independent appraiser values the GPUs.','2 to 3 weeks'],
+    ['Listed for subscription','Investors subscribe. Their money waits in an escrow contract.','Up to 30 days'],
+    ['Six conditions signed','SPV and pledge, lien, rent routing, monitoring, appraisal, full subscription. Each is signed and recorded on-chain.','In parallel'],
+    ['Funds released','The loan is paid to the SPV for the equipment. A three-month reserve is set aside.','Same day'],
+    ['Repaid from rent','Each month the buyer pays rent into a controlled account. Holders are paid first, then the service fee; the rest is yours.','Monthly']];
+  // 申请要先登录：材料里有合同和财报，申请进度也要在发行方控制台里看。发行方的企业认证在第 2 步审核时做，不要求先过投资人认证
+  const signed=ACCESS!=='public';
+  const apply=signed?`<a class="btn btn-primary btn-sm" href="issuer/index.html#/apply">Apply to list</a>`:`<button class="btn btn-primary btn-sm" type="button" data-signin>Sign in to apply</button>`;
+  const prep=['Offtake contract with at least 24 months remaining','Equipment list with serial numbers and invoices','Data center or colocation agreement','Company financial statements, last two years','Read-only access for monitoring nodes','Buyer\'s consent to pay rent into a controlled account'];
   app.innerHTML=`<div class="xwrap">
-    <div class="page-head"><div><h1>Issue</h1><p>List a cash-flow asset. Each asset class has its own verification template; funds only reach the issuer after every condition is recorded on-chain.</p></div><a class="btn btn-primary btn-sm" href="issuer/index.html#/apply">Apply to list</a></div>
-    <div class="vgrid">
-      <div class="panel card">
-        <h3>Compute credit <span class="pill repaying">Live</span></h3>
-        <p class="small" style="margin:0 0 14px">Loans against GPUs that are installed and rented out under an offtake contract.</p>
-        <ol class="nextsteps"><li>Fully subscribed</li><li>SPV formed, equipment pledged</li><li>Lien filed</li><li>Rent routed to collection contract</li><li>Equipment verified online</li><li>Loan ≤ 80% of appraisal</li></ol>
-        <dl class="kv"><div><dt>Issuer first loss</dt><dd>20% equity in the equipment</dd></div><div><dt>Offtake</dt><dd>At least 24 months</dd></div></dl>
-        <div class="tacts"><a class="btn btn-ghost btn-sm" href="issuer/index.html#/loans">Open issuer console</a></div>
-      </div>
-      <div class="panel card dimc">
-        <h3>Energy receivables <span class="pill plain locked">Template in design</span></h3>
-        <p class="small" style="margin:0">Payments owed under power purchase agreements. Conditions would cover metering data, offtaker signature and payment routing.</p>
-      </div>
-      <div class="panel card dimc">
-        <h3>Equipment leases <span class="pill plain locked">Template in design</span></h3>
-        <p class="small" style="margin:0">Lease payments on other productive equipment. Same pattern: off-chain steps, each recorded on-chain before release.</p>
-      </div>
+    <div class="page-head"><div><h1>List your GPUs</h1><p>For compute operators with GPUs already installed and rented out. Raise against the rent and keep your equity.</p></div><div class="vact">${signed?'<a class="btn btn-ghost btn-sm" href="issuer/index.html#/loans">Issuer console</a>':''}${apply}</div></div>
+    <div class="dsum" style="margin-top:0"><div class="kstats">
+      <div><span>Offtake remaining</span><b class="num">24 mo+</b><em>Signed with a creditworthy buyer</em></div>
+      <div><span>Loan to value</span><b class="num">Up to 80%</b><em>Of independent appraisal; you keep 20%+</em></div>
+      <div><span>Reserve</span><b class="num">3 months</b><em>Of payments, set aside at release</em></div>
+      <div><span>Coverage floor</span><b class="num">1.15×</b><em>Rent ÷ payment; below it, 30 days to cure</em></div>
+    </div></div>
+    <div class="is-grid">
+      <section><div class="sec-t"><h2>How it works</h2></div>
+        <ol class="is-steps">${steps.map(([t,d,w],i)=>`<li><span class="is-n">${i+1}</span><div><b>${t}</b><p>${d}</p></div><small>${w}</small></li>`).join('')}</ol>
+      </section>
+      <aside class="panel is-prep"><h3>What to prepare</h3>
+        <ul>${prep.map(x=>`<li><i class="ph ph-check"></i>${x}</li>`).join('')}</ul>
+        <p>Timings are samples. Each listing's legal documents set the final terms.</p>
+        ${apply}
+      </aside>
     </div>
-    <section class="block"><div class="sec-t"><h2>Listing rules</h2></div><div class="panel"><ul class="rules">
-      <li><i class="ph-light ph-shield-check"></i><span><b>Listed by the platform for now.</b> External issuers will be able to list once they post a bond or take first loss, and can be cut off if they break the template’s rules.</span></li>
-      <li><i class="ph-light ph-seal-check"></i><span><b>Same proof standard for every asset.</b> Each off-chain step is signed by a named party and its hash recorded on-chain.</span></li>
-      <li><i class="ph-light ph-coins"></i><span><b>Settled in AIUSD.</b> Subscriptions, repayments and trades all use the same unit.</span></li>
-    </ul></div></section>
   </div>`;
+  bindGate();
 }
 
 /* ======================= 资产详情 =======================
@@ -988,28 +1589,68 @@ const mon=(s,i,o)=>{const d=new Date(s+'T00:00:00');d.setMonth(d.getMonth()+i);r
 const txl=seed=>`<a class="txlink" href="#" onclick="return false" title="${hx(seed)}">${short(hx(seed))}<i class="ph-light ph-arrow-up-right"></i></a>`;
 let aTab='overview';
 function renderAsset(sym,tab){
+  const ni=NEW.find(x=>x.sym===sym); if(ni) return renderNewIssue(ni,tab);
   const m=bySym(sym); if(!m||m.soon) return renderMarkets();
-  if(sym==='CCV') return renderVaultAsset(m);
+  if(sym==='CCV'){if(VAULT) return renderVaultAsset(m); location.replace('#/markets'); return}
   const l=LOANS[sym], k=l.got.length, p=pmt(l); aTab=['overview','conditions','repayments','onchain'].includes(tab)?tab:'overview';
   const tabs=[['overview','Overview'],['conditions','Release conditions','6/6'],['repayments','Repayments'],['onchain','On-chain record']];
-  const body={
-    overview:()=>`<section class="block"><div class="panel"><dl class="facts">
-        <div><dt>GPUs</dt><dd>${m.loan.gpu}</dd></div><div><dt>Location</dt><dd>${m.loan.site}</dd></div>
-        <div><dt>Appraised value</dt><dd class="num">${usd(l.appraisal)} · third-party report</dd></div><div><dt>Loan as share of appraisal</dt><dd class="num">${pct(l.amount/l.appraisal)} (limit 80%)</dd></div>
-        <div><dt>Offtake buyer</dt><dd>${l.buyer}</dd></div><div><dt>Offtake remaining</dt><dd>${l.offtake} months at signing (minimum 24)</dd></div>
-        <div><dt>Monthly rent</dt><dd class="num">${usd(l.rent)}</dd></div><div><dt>Funded by</dt><dd>Vault ${usdM(l.vault)} · direct ${usdM(l.amount-l.vault)}</dd></div>
-      </dl></div></section>
-      <section class="block"><div class="sec-t"><h2>Where the rent goes</h2><p>Each month, in this order</p></div><div class="panel"><div class="wf">
-        <div class="wf-row first"><span class="n">1</span><span>${sym} holders: principal and interest</span><em>${usd(Math.round(p))}</em></div>
-        <div class="wf-row"><span class="n">2</span><span>Service fee</span><em>${usd(Math.round(l.rent*.02))}</em></div>
-        <div class="wf-row"><span class="n">3</span><span>Operator: the remainder</span><em>${usd(Math.round(l.rent-p-l.rent*.02))}</em></div>
-      </div></div></section>
-      <section class="block"><div class="sec-t"><h2>Protections</h2></div><div class="panel"><ul class="rules">
-        <li><i class="ph-light ph-stack"></i><span><b>Operator takes first loss.</b> The loan is capped at 80% of appraised value.</span></li>
-        <li><i class="ph-light ph-vault"></i><span><b>3-month reserve.</b> About ${usd(Math.round(p*3))} sits in the collection contract.</span></li>
-        <li><i class="ph-light ph-gauge"></i><span><b>Coverage check every month.</b> Below 1.15×, a 30-day cure period starts.</span></li>
-        <li><i class="ph-light ph-gavel"></i><span><b>Enforcement.</b> If the cure fails, the lien is enforced and proceeds repay holders first.</span></li>
-      </ul></div></section>`,
+  const B={
+    overview:()=>{const fee=Math.round(l.rent*.02), op=Math.round(l.rent-p-fee), ltv=l.amount/l.appraisal;
+      const day=new Date(l.firstPay+'T00:00:00').getDate();
+      return `<section class="block"><div class="sec-t"><h2>About this loan</h2></div>
+        <p class="ad-about">${m.name} is a senior secured loan to a single-purpose company (SPV) that owns ${m.loan.gpu} in ${m.loan.site}. The GPUs are rented to ${(b=>(/^[aeiouAEIOU]/.test(b)?'an ':'a ')+b)(l.buyer.startsWith('AI')?l.buyer:l.buyer[0].toLowerCase()+l.buyer.slice(1))} under a ${l.offtake}-month offtake contract, and the rent repays holders every month through the collection contract. ${sym} is a pro-rata claim on those repayments.</p>
+        ${OK()?`<div class="ad-tbl kt"><h4>Key terms</h4><dl>
+          <div><dt>Instrument</dt><dd>Senior secured loan to a bankruptcy-remote SPV</dd></div>
+          <div><dt>Eligible investors</dt><dd>Verified professional and institutional investors</dd></div>
+          <div><dt>Collateral</dt><dd>${m.loan.gpu}; SPV equity pledged</dd></div>
+          <div><dt>Minimum subscription</dt><dd class="num">$100,000</dd></div>
+          <div><dt>Lien</dt><dd>First priority · <span class="mono">${l.filing}</span></dd></div>
+          <div><dt>Offtake</dt><dd>${l.offtake} months at signing (minimum 24)</dd></div>
+          <div><dt>Principal · rate</dt><dd class="num">${usd(l.amount)} · ${pct(l.rate)} fixed</dd></div>
+          <div><dt>Uptime, last month</dt><dd class="num">${l.up.at(-1).toFixed(1)}% · signed by monitoring nodes</dd></div>
+          <div><dt>Term</dt><dd>${l.term} months · matures ${fmtD(mon(l.firstPay,l.term-1,1))}</dd></div>
+          <div><dt>Reserve</dt><dd>3 months · ${usd(Math.round(p*3))}</dd></div>
+          <div><dt>Payments</dt><dd>Monthly, level · day ${day}</dd></div>
+          <div><dt>Cure</dt><dd>Below 1.15× coverage · 30 days</dd></div>
+          ${VAULT?`<div><dt>Funded by</dt><dd>CCV ${usdM(l.vault)} · direct ${usdM(l.amount-l.vault)}</dd></div>`:''}
+          <div><dt>Settlement</dt><dd>AIUSD; USD through the issuing partner</dd></div>
+        </dl></div>`:gatebox('Key terms',['Rate and yield','Minimum subscription','Term and maturity','Funding split'])}
+        <div class="ad-tbl kt"><h4>Service providers <span>Sample · named at listing</span></h4><dl>
+          <div><dt>Escrow</dt><dd>Escrow contract ${txl(sym+'esc')}</dd></div>
+          <div><dt>Collection</dt><dd>Collection contract ${txl(sym+'col')}</dd></div>
+          <div><dt>Equipment monitoring</dt><dd>Independent monitoring nodes</dd></div>
+          <div><dt>Appraisal</dt><dd>Independent GPU appraiser</dd></div>
+          <div><dt>Legal counsel</dt><dd>Borrower's counsel, lien and SPV</dd></div>
+          <div><dt>Fiat on- and off-ramp</dt><dd>Licensed issuing partner</dd></div>
+        </dl></div>
+      </section>
+      <section class="block"><div class="ov2">
+        <div class="ovc"><div class="ovc-h"><h3>Collateral</h3><span>Appraisal ${usd(l.appraisal)}</span></div>
+          <div class="ltv2 sm"><i style="width:${ltv*100}%"></i><em></em><u style="left:80%"></u></div>
+          <dl class="cf2">
+            <div><dt><i class="c1"></i>Loan</dt><dd class="num">${usd(l.amount)}</dd><dd class="pc">${pct(ltv,0)}</dd></div>
+            <div><dt><i class="eq"></i>Operator equity, first loss</dt><dd class="num">${usd(l.appraisal-l.amount)}</dd><dd class="pc">${pct(1-ltv,0)}</dd></div>
+            <div><dt><i class="lim"></i>Maximum loan allowed</dt><dd class="num">${usd(l.appraisal*.8)}</dd><dd class="pc">80%</dd></div>
+          </dl>
+          <p class="ovc-n">A fall in value hits the operator's equity before holders.</p></div>
+        <div class="ovc"><div class="ovc-h"><h3>Monthly cash flow</h3><span>Rent ${usd(l.rent)}</span></div>
+          <div class="cflow"><i class="c1" style="flex:${p}"></i><i class="c2" style="flex:${fee}"></i><i class="c3" style="flex:${op}"></i></div>
+          <dl class="cf2">
+            <div><dt><i class="c1"></i>1 · ${sym} holders</dt><dd class="num">${usd(Math.round(p))}</dd><dd class="pc">${pct(p/l.rent,0)}</dd></div>
+            <div><dt><i class="c2"></i>2 · Service fee</dt><dd class="num">${usd(fee)}</dd><dd class="pc">${pct(fee/l.rent,0)}</dd></div>
+            <div><dt><i class="c3"></i>3 · Operator, the rest</dt><dd class="num">${usd(op)}</dd><dd class="pc">${pct(op/l.rent,0)}</dd></div>
+          </dl>
+          <p class="ovc-n">Holders are paid first. Coverage ${(l.rent/p).toFixed(2)}×.</p></div>
+      </div></section>
+      <section class="block"><div class="sec-t"><h2>Protections</h2></div><div class="prot2">
+        <div><b>Operator takes first loss</b><span>The loan is capped at 80% of appraised value.</span></div>
+        <div><b>Three-month reserve</b><span>${usd(Math.round(p*3))} sits in the collection contract from day one.</span></div>
+        <div><b>Coverage checked monthly</b><span>Below 1.15×, a 30-day cure period starts.</span></div>
+        <div><b>Enforcement</b><span>If the cure fails, the GPUs are re-rented or sold; proceeds repay holders first.</span></div>
+      </div></section>
+      <section class="block"><div class="sec-t"><h2>Documents</h2><p>Originals stay with the signer; the on-chain hash shows they have not been altered</p></div><div class="docs2">
+        ${docBtns([['Term sheet','PDF'],['Appraisal report','PDF'],['Offtake agreement, summary','PDF'],['Lien filing','PDF']])}
+      </div></section>`},
     conditions:()=>`<section class="block"><div class="panel">
       ${COND.map(([t,by],i)=>`<div class="crow"><span class="cidx ok"><i class="ph ph-check"></i></span><span><b>${t}</b><small>Signed by ${by}${i===2?` · filing ${l.filing}`:''}${i===5?` · ${usd(l.appraisal)} appraisal`:''}</small></span><span class="r"><small>${fmtD(l.cd[i])}</small>${txl(sym+'c'+i)}</span></div>`).join('')}
       <p class="note-line" style="margin:0;padding:14px 24px 18px">Each step happened off-chain and was signed by the party shown; only hashes, numbers and signatures are on-chain. Original documents stay with the signer and the platform, and the hash shows they have not been altered.</p>
@@ -1033,48 +1674,167 @@ function renderAsset(sym,tab){
           .concat(COND.map(([t],i)=>({d:l.cd[i],ic:'ph-seal-check',t:`Condition ${i+1} recorded`,s:t,seed:sym+'c'+i})).sort((a,b)=>b.d.localeCompare(a.d)))
           .map(e=>`<li><i class="ph-light ${e.ic}"></i><span><b>${e.t}</b><small>${e.s}</small></span><span class="r">${e.a?`<em>${e.a}</em>`:''}<small>${fmtD(e.d)}</small>${txl(e.seed)}</span></li>`).join('')}
       </ul></div></section>`
-  }[aTab]();
-  app.innerHTML=`<div class="xwrap">
+  }; const body=B[aTab]();
+  const first=COND.length?[...l.cd].sort()[0]:l.released, met=[...l.cd].sort().at(-1), next=mon(l.firstPay,k,1), mat=mon(l.firstPay,l.term-1,1);
+  const steps=[['Subscribed',fmtD(first)],['Conditions met',fmtD(met)],['Funds released',fmtD(l.released)],[`Repaying · ${k} of ${l.term}`,'Now'],['Maturity',fmtD(mat)]];
+  app.innerHTML=`<div class="xwrap ad ad2">
     <div class="crumb"><a href="#/markets">Markets</a><i class="ph-light ph-caret-right"></i><span>${sym}</span></div>
-    <div class="dhead"><div><div class="dtitle"><h1>${m.name}</h1><span class="pill repaying">Repaying</span></div>
-      <div class="dmeta"><span><i class="ph-light ph-cpu"></i>${m.loan.gpu}</span><span><i class="ph-light ph-map-pin"></i>${m.loan.site}</span><span><i class="ph-light ph-handshake"></i>Offtake: ${l.buyer}</span></div></div>
-      <div class="dact"><a class="btn btn-primary btn-sm" href="#/trade/${sym}">Trade ${sym}</a><small>${sym}/AIUSD ${px(m.price)} · ${pct(m.yld)} yield</small></div></div>
-    <div class="dsum"><div class="kstats">
-      <div><span>Loan amount</span><b class="num">${usdM(l.amount)}</b><em>${pct(l.amount/l.appraisal,0)} of ${usdM(l.appraisal)} appraisal</em></div>
-      <div><span>Rate</span><b class="num">${pct(l.rate)}</b><em>Fixed</em></div>
-      <div><span>Outstanding</span><b class="num">${usdM(bal(l,k))}</b><em>${k} of ${l.term} payments made</em></div>
-      <div><span>Paid to holders</span><b class="num">${usdM(p)}<small>/ month</small></b><em>Last month ${(l.got.at(-1)/p).toFixed(2)}× covered</em></div>
-    </div></div>
-    <nav class="tabs" aria-label="Asset sections">${tabs.map(([t,n,c])=>`<a href="#/asset/${sym}/${t}" ${t===aTab?'aria-current="page"':''}>${n}${c?`<span class="count">${c}</span>`:''}</a>`).join('')}</nav>
-    ${body}
+    <section class="ad-band">
+      <div class="ab-l">
+        <div class="ad-eye">Compute credit · Senior secured loan · ${sym}</div>
+        <h1>${m.name}</h1>
+        <div class="dmeta"><span><i class="ph-light ph-cpu"></i>${m.loan.gpu}</span><span><i class="ph-light ph-map-pin"></i>${m.loan.site}</span><span><i class="ph-light ph-handshake"></i>Offtake: ${l.buyer}</span></div>
+        <div class="ab-st"><span class="pill repaying">Repaying</span><small>As of Oct 12, 2026 · sample data</small>${OK()?'':`<span class="ab-cta">${gateBtn()}</span>`}</div>
+      </div>
+      <div class="ab-r"><div class="srv3d" data-n="1" aria-label="3D illustration of a GPU server"></div><small>Illustration · ${parseInt(m.loan.gpu,10)/8} servers × 8 GPUs · drag to rotate</small></div>
+      <div class="ab-k">
+        ${OK()?`<div class="y"><span>Yield to maturity</span><b class="num">${pct(m.yld,2)}</b><em>${pct(l.rate)} fixed · monthly</em></div>`:lockStat('Yield to maturity')}
+        <div><span>Outstanding</span><b class="num">${usd(Math.round(bal(l,k)))}</b><em>of ${usd(l.amount)}</em></div>
+        <div><span>Next payment</span><b class="num">${usd(Math.round(p))}</b><em>${fmtD(next)}</em></div>
+        <div><span>Coverage</span><b class="num">${(l.got.at(-1)/p).toFixed(2)}×</b><em>Cure trigger 1.15×</em></div>
+        <div><span>Loan to value</span><b class="num">${pct(l.amount/l.appraisal,1)}</b><em>Limit 80%</em></div>
+      </div>
+    </section>
+    <section class="ad-prog">
+      <div class="pg-h"><b>Repaying · month ${k} of ${l.term}</b><span class="pg-r"><b class="num">${usd(Math.round(l.amount-bal(l,k)))}</b> repaid · ${pct(1-bal(l,k)/l.amount,0)}</span></div>
+      <div class="pg-t">${Array.from({length:l.term},(_,i)=>{const c=i<k?l.got[i]/p:0;return `<i class="${i<k?(c<1.25?'pd lo':'pd'):i===k?'nx':''}" title="${mon(l.firstPay,i)} · ${i<k?`paid · ${c.toFixed(2)}× covered`:i===k?'next payment':'scheduled'}"></i>`}).join('')}</div>
+      <div class="pg-x"><span>Released ${fmtD(l.released)}</span><span class="lg"><em class="pd"></em>Paid<em class="pd lo"></em>Paid, coverage under 1.25×<em class="nx"></em>Next<em></em>Scheduled</span><span>Matures ${fmtD(mat)}</span></div>
+    </section>
+    <div class="ad-body"><div class="ad-main">
+      <nav class="tabs" aria-label="Asset sections">${tabs.map(([t,n,c])=>`<a href="#/asset/${sym}/${t}" ${t===aTab?'aria-current="page"':''}>${n}${c?`<span class="count">${c}</span>`:''}</a>`).join('')}</nav>
+      <div class="ad-tabbody">${body}</div>
+    </div>
+    </div>
   </div>`;
+  app.querySelectorAll('.ad-main .tabs a').forEach(a=>a.onclick=e=>{e.preventDefault();
+    const t=a.getAttribute('href').split('/').pop(); aTab=t; history.replaceState(null,'',a.getAttribute('href'));
+    app.querySelectorAll('.ad-main .tabs a').forEach(x=>x===a?x.setAttribute('aria-current','page'):x.removeAttribute('aria-current'));
+    const w=app.querySelector('.ad-tabbody'); w.innerHTML=B[t](); bindGate(w); w.classList.remove('tfade'); void w.offsetWidth; w.classList.add('tfade');});
+  bindGate();
 }
 function renderVaultAsset(m){
   const rows=Object.entries(LOANS).map(([s,l])=>({s,m:bySym(s),v:l.vault*bal(l,l.got.length)/l.amount,c:l.got.at(-1)/pmt(l)}))
     .concat([{s:'Dallas B200 Expansion',v:1400000,esc:'In escrow · 4/6'},{s:'Frankfurt H100 Portfolio',v:1200000,esc:'Subscribing'}]);
-  const nav=m.size;
-  app.innerHTML=`<div class="xwrap">
+  const nav=m.size, rep=rows.filter(r=>r.c), wc=rep.reduce((a,r)=>a+r.v*r.c,0)/rep.reduce((a,r)=>a+r.v,0);
+  const dep=!OK()?gateBtn():HIDE.has('earn')?`<button class="btn btn-primary btn-sm" type="button" data-ccvdep>Deposit into CCV</button>`:`<a class="btn btn-primary btn-sm" href="#/earn">Deposit into CCV</a>`;
+  app.innerHTML=`<div class="xwrap ad ad2">
     <div class="crumb"><a href="#/markets">Markets</a><i class="ph-light ph-caret-right"></i><span>CCV</span></div>
-    <div class="dhead"><div><div class="dtitle"><h1>${m.name}</h1><span class="pill repaying">Earning</span></div>
-      <div class="dmeta"><span><i class="ph-light ph-stack"></i>7 compute loans</span><span><i class="ph-light ph-calendar"></i>Withdrawals monthly, queued</span></div></div>
-      <div class="dact"><a class="btn btn-primary btn-sm" href="#/trade/CCV">Trade CCV</a><small>CCV/AIUSD ${px(m.price)} · NAV ${px(m.ref)}</small></div></div>
-    <div class="dsum"><div class="kstats">
-      <div><span>NAV per CCV</span><b class="num">${px(m.ref)}</b><em>Market ${px(m.price)}</em></div>
-      <div><span>Net APY, 30 days</span><b class="num">${pct(m.yld)}</b><em>After 10% fee on interest</em></div>
-      <div><span>Vault size</span><b class="num">${usdM(nav)}</b><em>Earning 61% · escrow 28% · cash 11%</em></div>
-      <div><span>Largest loan</span><b class="num">14.8%</b><em>Limit 15% of NAV</em></div>
-    </div></div>
-    <section class="block"><div class="sec-t"><h2>Holdings</h2><p>Each loan went through the same six release conditions</p></div><div class="panel tbl-wrap"><table class="tbl xt">
-      <thead><tr><th>Loan</th><th>Status</th><th>Value</th><th>Share of vault</th><th>Last coverage</th><th></th></tr></thead>
-      <tbody>${rows.map(r=>`<tr><td>${r.m?`<a href="#/asset/${r.s}"><b>${r.s}</b></a> <small class="muted">${r.m.name}</small>`:`<b>${r.s}</b>`}</td><td>${r.esc?`<span class="pill verifying">${r.esc}</span>`:'<span class="pill repaying">Repaying</span>'}</td><td>${usd(Math.round(r.v))}</td><td>${pct(r.v/nav)}</td><td>${r.c?r.c.toFixed(2)+'×':'—'}</td><td>${r.m?`<a class="lnk" href="#/asset/${r.s}">Details</a>`:''}</td></tr>`).join('')}</tbody>
-    </table></div></section>
-    <section class="block"><div class="sec-t"><h2>Rules in the vault contract</h2></div><div class="panel"><ul class="rules">
-      <li><i class="ph-light ph-git-branch"></i><span>Subscribes to every listed loan that meets the criteria, up to <b>50% of each loan</b></span></li>
-      <li><i class="ph-light ph-chart-pie-slice"></i><span>One loan ≤ <b>15%</b> of NAV; one borrower ≤ <b>25%</b>; one buyer ≤ <b>30%</b></span></li>
-      <li><i class="ph-light ph-coins"></i><span>Cash buffer around <b>10%</b>; deposits beyond the loan pipeline wait in a queue</span></li>
-      <li><i class="ph-light ph-scales"></i><span>NAV counts unpaid principal; loans below 1.15× stop accruing; defaults are written down</span></li>
-    </ul></div></section>
+    <section class="ad-band">
+      <div class="ab-l">
+        <div class="ad-eye">Compute credit · Pooled vault · CCV</div>
+        <h1>${m.name}</h1>
+        <div class="dmeta"><span><i class="ph-light ph-stack"></i>${rep.length} loans repaying · ${rows.length-rep.length} in escrow</span><span><i class="ph-light ph-calendar"></i>Withdrawals monthly</span><span><i class="ph-light ph-briefcase"></i>Licensed third-party manager</span></div>
+        <div class="ab-st"><span class="pill repaying">Earning</span><small>As of Oct 12, 2026 · sample data</small><span class="ab-cta">${dep}</span></div>
+      </div>
+      <div class="ab-r"><div class="srv3d" data-n="3" aria-label="3D illustration of stacked GPU servers"></div><small>Illustration · one share of every loan below</small></div>
+      <div class="ab-k">
+        ${OK()?`<div class="y"><span>Net APY · 30 days</span><b class="num">${pct(m.yld,2)}</b><em>After 10% fee on interest</em></div>`:lockStat('Net APY · 30 days')}
+        <div><span>Net asset value</span><b class="num">${usd(nav)}</b><em>${rows.length} holdings</em></div>
+        <div><span>NAV per CCV</span><b class="num">${m.ref.toFixed(4)}</b><em>Started at 1.0000</em></div>
+        <div><span>Coverage</span><b class="num">${wc.toFixed(2)}×</b><em>Weighted, last month</em></div>
+        <div><span>Largest loan</span><b class="num">14.8%</b><em>Limit 15% of NAV</em></div>
+      </div>
+    </section>
+    <section class="ad-prog"><div class="ad-life"><div class="alloc"><i class="a1" style="flex:61"></i><i class="a2" style="flex:28"></i><i class="a3" style="flex:11"></i></div>
+      <div class="alloc-leg"><span><i class="a1"></i>Earning in loans 61%</span><span><i class="a2"></i>In escrow 28%</span><span><i class="a3"></i>Cash buffer 11%</span><span class="r">Next withdrawal window Nov 1</span></div></div></section>
+    <div class="ad-body"><div class="ad-main">
+      <section class="block" style="margin-top:8px"><div class="sec-t"><h2>Holdings</h2><p>Each loan went through the same six release conditions</p></div><div class="panel tbl-wrap"><table class="tbl xt">
+        <thead><tr><th>Loan</th><th>Status</th><th>Value</th><th>Share</th><th>Coverage</th></tr></thead>
+        <tbody>${rows.map(r=>`<tr><td>${r.m?`<a href="#/asset/${r.s}"><b>${r.s}</b></a> <small class="muted">${r.m.name}</small>`:`<b>${r.s}</b>`}</td><td>${r.esc?`<span class="pill verifying">${r.esc}</span>`:'<span class="pill repaying">Repaying</span>'}</td><td>${usd(Math.round(r.v))}</td><td><span class="shr"><i style="width:${r.v/nav*100/15*100}%"></i></span>${pct(r.v/nav)}</td><td class="${r.c&&r.c<1.25?'warn':''}">${r.c?r.c.toFixed(2)+'×':'—'}</td></tr>`).join('')}</tbody>
+      </table></div></section>
+      <section class="block"><div class="sec-t"><h2>Rules in the vault contract</h2></div><div class="prot2">
+        <div><b>Subscribes by rule</b><span>Every listed loan that meets the criteria, up to 50% of each loan. The manager cannot pick or skip.</span></div>
+        <div><b>Concentration limits</b><span>One loan at most 15% of NAV; one borrower 25%; one buyer 30%.</span></div>
+        <div><b>Cash buffer</b><span>Around 10% kept in cash; deposits beyond the loan pipeline wait in a queue.</span></div>
+        <div><b>How NAV is counted</b><span>Unpaid principal plus accrued interest; loans below 1.15× stop accruing; defaults are written down.</span></div>
+      </div></section>
+      <section class="block">${OK()?`<div class="ad-tbl kt"><h4>Vault terms</h4><dl>
+        <div><dt>Manager</dt><dd>Licensed third-party manager (to be appointed)</dd></div>
+        <div><dt>Deposits</dt><dd>AIUSD, any time; queued if the pipeline is full</dd></div>
+        <div><dt>Fee</dt><dd>10% of interest received</dd></div>
+        <div><dt>Withdrawals</dt><dd>Monthly window, queued</dd></div>
+        <div><dt>Contract</dt><dd>${txl('CCVvault')}</dd></div>
+        <div><dt>Exit early</dt><dd>${TRADING?'Sell CCV on the order book':'Order book opens in a later phase'}</dd></div>
+      </dl></div>`:gatebox('Vault terms',['Net APY','Fee','Deposit and withdrawal terms'])}</section>
+      <section class="block"><div class="sec-t"><h2>Documents</h2></div><div class="docs2">
+        ${docBtns([['Vault rules','PDF'],['Monthly NAV report','PDF'],['Manager agreement, summary','PDF']])}
+      </div></section>
+    </div>
+    </div>
   </div>`;
+  bindGate();
+  const cb=app.querySelector('[data-ccvdep]'); if(cb) cb.onclick=()=>openInvDialog({title:'Deposit into CCV',min:10000,max:Infinity,quick:[50000,100000,250000,'max'],
+    rows:[['Net APY · 30 days',pct(m.yld,2)],['NAV per CCV',m.ref.toFixed(4)],['Withdrawals','Monthly window, queued']],
+    calcLabel:'You receive',calc:a=>`≈ ${num(a/m.ref)} CCV`,ack:'I have read the vault rules and the risk disclosure',cta:'Deposit',
+    note:'Deposits beyond the loan pipeline wait in a queue. You can withdraw in the monthly window.',
+    done:a=>{const ps=POS.find(x=>x.sym==='CCV');ps.avg=(ps.avg*ps.qty+a)/(ps.qty+a/m.ref);ps.qty+=a/m.ref},toast:a=>`Deposited ${num(a)} AIUSD into CCV (demo)`});
+}
+
+
+/* 3D GPU 主板插图（HGX 式 8 卡基板）：three.js 现场生成，不用外部模型或图片；自动慢转，可拖动；减少动态时静止 */
+let SRV=null;
+function mountServers(){
+  if(SRV){cancelAnimationFrame(SRV.raf);SRV.r.dispose();SRV=null}
+  const el=document.querySelector('.srv3d'); if(!el||!window.THREE) return;
+  const W=el.clientWidth,H=el.clientHeight, still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const r=new THREE.WebGLRenderer({antialias:true,alpha:true}); r.setPixelRatio(Math.min(2,devicePixelRatio)); r.setSize(W,H);
+  r.outputEncoding=THREE.sRGBEncoding; r.shadowMap.enabled=true; r.shadowMap.type=THREE.PCFSoftShadowMap; r.toneMapping=THREE.ACESFilmicToneMapping; r.toneMappingExposure=.82;
+  el.appendChild(r.domElement);
+  const sc=new THREE.Scene(), cam=new THREE.PerspectiveCamera(26,W/H,.1,100);
+  cam.position.set(7.1,5.9,7.8); cam.lookAt(0,.25,.15);
+  sc.add(new THREE.HemisphereLight(0xffffff,0x6f6f6b,.45));
+  const key=new THREE.DirectionalLight(0xffffff,1.35); key.position.set(4,9,5); key.castShadow=true;
+  key.shadow.mapSize.set(1024,1024); key.shadow.camera.left=-5;key.shadow.camera.right=5;key.shadow.camera.top=5;key.shadow.camera.bottom=-5; key.shadow.radius=6; key.shadow.bias=-.0008; sc.add(key);
+  const fill=new THREE.DirectionalLight(0xe9efe9,.55); fill.position.set(-6,4,3); sc.add(fill);
+  const rim=new THREE.DirectionalLight(0xffffff,.8); rim.position.set(-3,5,-7); sc.add(rim);
+  const tex=(w,h,draw)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.anisotropy=8;t.encoding=THREE.sRGBEncoding;return t};
+  const M=(o)=>new THREE.MeshStandardMaterial(o);
+  const black=M({color:0x0b0c0c,metalness:.55,roughness:.4}), black2=M({color:0x151616,metalness:.5,roughness:.5});
+  const fin=M({color:0x1a1b1b,metalness:.7,roughness:.32});
+  const gold=M({color:0xc8a45a,metalness:.9,roughness:.3});
+  const plateT=tex(256,384,(g,w,h)=>{const gr=g.createLinearGradient(0,0,w,h);gr.addColorStop(0,'#cbbfa8');gr.addColorStop(.5,'#b3a68e');gr.addColorStop(1,'#c4b8a0');g.fillStyle=gr;g.fillRect(0,0,w,h);
+    g.fillStyle='rgba(60,50,35,.35)';g.fillRect(24,h-70,w*.42,10);g.fillRect(24,h-50,w*.28,7);g.strokeStyle='rgba(255,255,255,.25)';g.lineWidth=3;g.strokeRect(6,6,w-12,h-12)});
+  const plate=M({map:plateT,metalness:.75,roughness:.32});
+  const ribT=tex(512,64,(g,w,h)=>{g.fillStyle='#1c1d1d';g.fillRect(0,0,w,h);for(let x=0;x<w;x+=4){g.fillStyle=x%8?'#0e0f0f':'#2a2c2c';g.fillRect(x,0,2,h)}});
+  ribT.wrapS=ribT.wrapT=THREE.RepeatWrapping; ribT.repeat.set(1,6);
+  const rib=M({map:ribT,metalness:.55,roughness:.45});
+  const pcbT=tex(512,512,(g,w,h)=>{g.fillStyle='#121313';g.fillRect(0,0,w,h);g.strokeStyle='rgba(120,120,110,.12)';g.lineWidth=1;for(let i=0;i<60;i++){g.beginPath();const y=Math.random()*h;g.moveTo(0,y);g.lineTo(w*Math.random(),y);g.stroke()}});
+  const pcb=M({map:pcbT,metalness:.3,roughness:.6});
+  const grp=new THREE.Group(); sc.add(grp);
+  const add=(geo,mat,x,y,z,cast=true)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=cast;m.receiveShadow=true;grp.add(m);return m};
+  // 基板
+  add(new THREE.BoxGeometry(4.9,.07,4.1),pcb,0,.035,0);
+  add(new THREE.BoxGeometry(4.9,.012,.06),gold,0,.075,2.02,false);
+  // 前沿接口和电源模块
+  for(let i=0;i<7;i++){add(new THREE.BoxGeometry(.42,.16,.22),black2,-1.95+i*.62,.15,1.88);add(new THREE.BoxGeometry(.3,.02,.04),gold,-1.95+i*.62,.235,1.99,false)}
+  add(new THREE.BoxGeometry(.9,.28,.5),black2,-1.85,.21,1.45); add(new THREE.BoxGeometry(.9,.28,.5),black2,-.8,.21,1.45);
+  for(let i=0;i<10;i++) add(new THREE.CylinderGeometry(.045,.045,.12,12),black2,.2+i*.2,.13,1.55);
+  // 8 座散热塔：两排各 4 座，每座 18 片鳍片 + 顶盖 + 铭牌
+  const TW=.98,TD=1.28,TH=1.3, finG=new THREE.BoxGeometry(TW-.04,TH-.12,.026);
+  const fins=new THREE.InstancedMesh(finG,fin,8*18); fins.castShadow=true; fins.receiveShadow=true; let fi=0; const mm=new THREE.Matrix4();
+  const xs=[-1.62,-.54,.54,1.62], zs=[-1.02,.62];
+  zs.forEach(z=>xs.forEach(x=>{
+    for(let k=0;k<18;k++){mm.makeTranslation(x,.07+(TH-.12)/2+.02,z-TD/2+.08+k*(TD-.16)/17);fins.setMatrixAt(fi++,mm)}
+    add(new THREE.BoxGeometry(TW,.08,TD),black,x,.07+TH-.04,z);
+    add(new THREE.BoxGeometry(TW*.8,.012,TD*.74),plate,x,.07+TH+.006,z+.04,false);
+    add(new THREE.BoxGeometry(TW,TH-.1,.05),black,x,.07+(TH-.1)/2,z-TD/2+.025);
+    add(new THREE.BoxGeometry(TW,TH-.1,.05),black,x,.07+(TH-.1)/2,z+TD/2-.025);
+    add(new THREE.BoxGeometry(TW*.9,.04,TD*.9),black2,x,.09,z);
+  }));
+  grp.add(fins);
+  // 中间交换芯片散热带
+  add(new THREE.BoxGeometry(4.3,TH-.08,.42),rib,0,.07+(TH-.08)/2,-.2);
+  add(new THREE.BoxGeometry(4.3,.05,.44),black,0,.07+TH-.06,-.2);
+  // 地面投影
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(14,14),new THREE.ShadowMaterial({opacity:.22})); ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; sc.add(ground);
+  grp.position.set(0,0,0);
+  let ry=-.5, drag=null, vel=still?0:.0022;
+  el.onpointerdown=e=>{drag={x:e.clientX,ry};el.setPointerCapture(e.pointerId);el.classList.add('grab')};
+  el.onpointermove=e=>{if(drag) ry=drag.ry+(e.clientX-drag.x)*.01};
+  el.onpointerup=el.onpointercancel=()=>{drag=null;el.classList.remove('grab')};
+  const tick=()=>{if(!el.isConnected){r.dispose();SRV=null;return}
+    if(!drag) ry+=vel; grp.rotation.y=ry; r.render(sc,cam); SRV.raf=requestAnimationFrame(tick)};
+  SRV={r,raf:0}; tick();
 }
 
 /* ======================= Transparency ======================= */
@@ -1097,27 +1857,307 @@ function renderPublic(){
 
 /* ======================= Deposit ======================= */
 let dDir='mint';
+let dMethod='bank', dCur='USD';
 function renderDeposit(){
-  const mint=dDir==='mint';
-  app.innerHTML=`<div class="xwrap narrow">
-    <div class="page-head"><div><h1>${mint?'Deposit':'Withdraw'}</h1><p>${mint?'USDC is minted 1:1 into AIUSD, the account currency for every market.':'AIUSD is redeemed 1:1 to USDC.'}</p></div></div>
-    <div class="panel eform">
-      <div class="eleg"><div class="erow"><span class="lab">You send</span><span class="bal">Balance ${mint?'120,000':num(BAL)}</span></div>
-        <div class="emain"><div class="tok"><span class="ic" style="background:${mint?'#2775ca':'var(--ink)'}">${mint?'$':'A'}</span><b>${mint?'USDC':'AIUSD'}</b></div><div class="eamt"><input id="dIn" inputmode="numeric" placeholder="0"></div></div></div>
-      <div class="flipw"><button class="flip" type="button" id="dFlip" aria-label="Switch direction"><i class="ph ph-arrows-down-up"></i></button></div>
-      <div class="eleg"><div class="erow"><span class="lab">You receive</span><span class="bal">Balance ${mint?num(BAL):'120,000'}</span></div>
-        <div class="emain"><div class="tok"><span class="ic" style="background:${mint?'var(--ink)':'#2775ca'}">${mint?'A':'$'}</span><b>${mint?'AIUSD':'USDC'}</b></div><div class="eamt"><output id="dOut" class="zero">0</output></div></div></div>
-      <button class="ego" id="dGo" type="button" disabled>Enter an amount</button>
-      <div class="emeta"><div><span>Rate</span><b>1 : 1</b></div><div><span>Fee</span><b>Free</b></div><div><span>Yield on AIUSD</span><b>None</b></div></div>
+  const mint=dDir==='mint', bank=dMethod==='bank';
+  const head=`<div class="page-head"><div><h1>${mint?'Deposit':'Withdraw'}</h1><p>${mint?'Fund your account. Everything arrives as AIUSD, 1:1, the account currency for every market.':'Take money out. AIUSD is redeemed 1:1.'}</p></div></div>
+    <div class="dtop"><span class="seg sm" role="group" aria-label="Direction"><button type="button" data-dd="mint" aria-pressed="${mint}">Deposit</button><button type="button" data-dd="redeem" aria-pressed="${!mint}">Withdraw</button></span>
+      <span class="seg sm" role="group" aria-label="Method"><button type="button" data-dm="bank" aria-pressed="${bank}"><i class="ph ph-bank"></i> Bank transfer</button><button type="button" data-dm="usdc" aria-pressed="${!bank}"><i class="ph ph-currency-circle-dollar"></i> USDC</button></span></div>`;
+  const kyb=`<div class="kyb"><i class="ph-fill ph-seal-check"></i><span><b>Northwind Capital Ltd</b> · business verified</span><span class="muted">Sample account</span></div>`;
+  let body='';
+  if(bank&&mint){
+    const usd=dCur==='USD';
+    body=`${kyb}
+    <div class="panel bankbox">
+      <div class="bk-h"><b>Your deposit account</b><span class="seg sm" role="group" aria-label="Currency"><button type="button" data-dc="USD" aria-pressed="${usd}">USD</button><button type="button" data-dc="EUR" aria-pressed="${!usd}">EUR</button></span></div>
+      <p class="bk-sub">Sample details. This account is assigned to your company only. Money sent here is converted 1:1 to AIUSD and credited to your Loka account automatically.</p>
+      <dl class="bk-dl">
+        <div><dt>Beneficiary</dt><dd>Northwind Capital Ltd · via Loka issuing partner</dd></div>
+        ${usd?`<div><dt>Account number</dt><dd class="mono">•••• •••• 3906 <button class="cp" type="button" data-copy="sample-account">Copy</button></dd></div>
+        <div><dt>Routing number</dt><dd class="mono">••• ••• 150 <button class="cp" type="button" data-copy="sample-routing">Copy</button></dd></div>
+        <div><dt>Rails</dt><dd>Wire (same business day) · ACH (next business day)</dd></div>`
+        :`<div><dt>IBAN</dt><dd class="mono">DE•• •••• •••• •••• 1300 00 <button class="cp" type="button" data-copy="sample-iban">Copy</button></dd></div>
+        <div><dt>Rails</dt><dd>SEPA · converted EUR → USD at the partner's rate</dd></div>`}
+        <div><dt>Reference</dt><dd class="mono">LOKA-7A3F-C91E <button class="cp" type="button" data-copy="LOKA-7A3F-C91E">Copy</button></dd></div>
+      </dl>
+      <ul class="bk-rules">
+        <li><i class="ph ph-check"></i>Send from a bank account in your company's name. Third-party payments are returned.</li>
+        <li><i class="ph ph-check"></i>Loka charges no conversion fee. Your bank may charge for the transfer.</li>
+        <li><i class="ph ph-check"></i>Loka never holds your money. The issuing partner holds the dollars in reserve, 1:1.</li>
+      </ul>
     </div>
-  </div>`;
-  const i=$('#dIn'),o=$('#dOut'),g=$('#dGo');
-  i.addEventListener('input',()=>{const n=Number(i.value.replace(/[^0-9]/g,''))||0;i.value=n?num(n):'';o.textContent=n?num(n):'0';o.classList.toggle('zero',!n);const ok=n&&(mint||n<=BAL);g.disabled=!ok;g.textContent=!n?'Enter an amount':ok?(mint?'Mint AIUSD':'Redeem to USDC'):'More than your balance'});
-  $('#dFlip').onclick=()=>{dDir=mint?'redeem':'mint';renderDeposit()};
-  g.onclick=()=>{const n=Number(i.value.replace(/[^0-9]/g,''));BAL+=mint?n:-n;toast(mint?`Minted ${num(n)} AIUSD`:`Redeemed ${num(n)} AIUSD to USDC`);route()};
+    <div class="panel bk-recent"><div class="bk-h"><b>Recent deposits</b><span class="muted">Sample</span></div>
+      <div class="bk-row"><span>Oct 9 · Wire</span><span class="num">$250,000.00</span><span class="pos">Credited 250,000 AIUSD</span></div>
+      <div class="bk-row"><span>Oct 2 · ACH</span><span class="num">$40,000.00</span><span class="pos">Credited 40,000 AIUSD</span></div>
+    </div>`;
+  } else {
+    const from=mint?'USDC':'AIUSD', to=mint?'AIUSD':(bank?'USD':'USDC');
+    body=`${bank?kyb:''}<div class="panel eform">
+      <div class="eleg"><div class="erow"><span class="lab">You send</span><span class="bal">Balance ${mint?'120,000':num(BAL)}</span></div>
+        <div class="emain"><div class="tok"><span class="ic" style="background:${from==='USDC'?'#2775ca':'var(--ink)'}">${from==='USDC'?'$':'A'}</span><b>${from}</b></div><div class="eamt"><input id="dIn" inputmode="numeric" placeholder="0"></div></div></div>
+      <div class="flipw"><span class="flip" aria-hidden="true"><i class="ph ph-arrow-down"></i></span></div>
+      <div class="eleg"><div class="erow"><span class="lab">You receive</span><span class="bal">${bank?'To bank ····7710 · Northwind Capital Ltd':'Balance '+(mint?num(BAL):'120,000')}</span></div>
+        <div class="emain"><div class="tok"><span class="ic" style="background:${to==='AIUSD'?'var(--ink)':to==='USD'?'#3d6f5b':'#2775ca'}">${to==='AIUSD'?'A':'$'}</span><b>${to}</b></div><div class="eamt"><output id="dOut" class="zero">0</output></div></div></div>
+      <button class="ego" id="dGo" type="button" disabled>Enter an amount</button>
+      <div class="emeta"><div><span>Rate</span><b>1 : 1</b></div><div><span>Loka fee</span><b>Free</b></div>${bank?'<div><span>Arrives</span><b>Wire: same business day · ACH: next business day</b></div><div><span>Destination</span><b>Only verified accounts in your company\'s name</b></div>':'<div><span>Network</span><b>On-chain, a few seconds</b></div>'}<div><span>Yield on AIUSD</span><b>None</b></div></div>
+    </div>`;
+  }
+  app.innerHTML=`<div class="xwrap narrow">${head}${body}</div>`;
+  app.querySelectorAll('[data-dd]').forEach(b=>b.onclick=()=>{dDir=b.dataset.dd;renderDeposit()});
+  app.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>{dMethod=b.dataset.dm;renderDeposit()});
+  app.querySelectorAll('[data-dc]').forEach(b=>b.onclick=()=>{dCur=b.dataset.dc;renderDeposit()});
+  app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{try{navigator.clipboard.writeText(b.dataset.copy)}catch(e){} toast('Copied')});
+  const i=$('#dIn'); if(!i) return;
+  const o=$('#dOut'),g=$('#dGo'), label=mint?'Mint AIUSD':(bank?'Withdraw to bank':'Redeem to USDC');
+  i.addEventListener('input',()=>{const n=Number(i.value.replace(/[^0-9]/g,''))||0;i.value=n?num(n):'';o.textContent=n?num(n):'0';o.classList.toggle('zero',!n);const ok=n&&(mint||n<=BAL);g.disabled=!ok;g.textContent=!n?'Enter an amount':ok?label:'Not enough AIUSD'});
+  g.onclick=()=>{const n=Number(i.value.replace(/[^0-9]/g,''));BAL+=mint?n:-n;toast(mint?`Minted ${num(n)} AIUSD`:bank?`Withdrawal of $${num(n)} sent to your bank`:`Redeemed ${num(n)} AIUSD to USDC`);route()};
 }
 
-$('#xWal').textContent=short(ME);
+/* ======================= 募资中的项目 =======================
+   #/asset/<代号>，代号在 NEW 里。和已放款的详情页同一套框架；顶部换成募集进度和认购框，没有还款页签。
+   认购规则（示例）：最低 100,000 AIUSD；先到先得，CCV 按规则最多认购每笔 50%；募满或截止前可撤回，之后锁定到放款或退款。 */
+const MIN_SUB=100000;
+const mo=(a,r,t)=>{const i=r/12;return a*i/(1-Math.pow(1+i,-t))};
+const usdK=n=>n>=1e6?'$'+(n/1e6)+'M':'$'+Math.round(n/1e3)+'K';
+function withdrawSub(n){if(!n||!n.mine||!isOpen(n))return;BAL+=n.mine;n.sub=Math.max(0,n.sub-n.mine/n.amt);toast(`Withdrew ${num(n.mine)} AIUSD from ${n.sym} escrow (demo)`);n.mine=0}
+function invPanel(o){
+  if(!OK()) return `<div class="inv inv-lock"><div class="inv-h"><b>${o.title}</b></div><p class="inv-p">${ACCESS==='pending'?'Your business verification is in review. You can subscribe as soon as it is approved.':'Open to verified institutional investors. Rate, terms and documents appear after verification.'}</p>${ACCESS==='pending'?'<span class="xpend">Verification in review</span>':gateBtn()}</div>`;
+  return `<div class="inv">
+    <div class="inv-h"><b id="invT">${o.title}</b><span>Balance <b class="num">${num(BAL)}</b> AIUSD</span></div>
+    ${o.mine?`<div class="inv-mine"><span>Your subscription</span><b class="num">${usd(o.mine)}</b>${o.withdraw?'<button type="button" data-wd>Withdraw</button>':''}</div>`:''}
+    <div class="inv-in"><input id="invAmt" inputmode="numeric" autocomplete="off" placeholder="${num(o.min)} minimum" aria-label="Amount in AIUSD"><span>AIUSD</span></div>
+    <div class="inv-q">${o.quick.map(q=>`<button type="button" data-q="${q}">${q==='max'?'Max':usdK(q)}</button>`).join('')}</div>
+    <dl class="inv-dl">${o.rows.map(([a,b])=>`<div><dt>${a}</dt><dd>${b}</dd></div>`).join('')}<div><dt>${o.calcLabel}</dt><dd class="num" id="invCalc">—</dd></div></dl>
+    <label class="inv-ck"><input type="checkbox" id="invAck"><span>${o.ack}</span></label>
+    <button class="btn btn-primary inv-go" id="invGo" type="button" disabled>Enter an amount</button>
+    <p class="inv-n">${o.note}</p>
+  </div>`;
+}
+function bindInv(root,o,after){
+  const wd=root.querySelector('[data-wd]'); if(wd) wd.onclick=()=>{o.withdraw();after()};
+  const i=root.querySelector('#invAmt'); if(!i) return;
+  const g=root.querySelector('#invGo'),ck=root.querySelector('#invAck'),c=root.querySelector('#invCalc');
+  const val=()=>Number(i.value.replace(/[^0-9]/g,''))||0;
+  const upd=()=>{const n=val(); i.value=n?num(n):''; c.textContent=n?o.calc(n):'—'; let t,ok=false,dep=false;
+    if(!n) t='Enter an amount'; else if(n<o.min) t=`Minimum ${num(o.min)} AIUSD`; else if(n>o.max) t=`Only ${num(o.max)} AIUSD left`;
+    else if(n>BAL){t='Deposit AIUSD first';dep=true} else if(!ck.checked) t='Confirm you have read the documents'; else {t=`${o.cta} ${num(n)} AIUSD`;ok=true}
+    g.textContent=t; g.disabled=!(ok||dep); g.dataset.dep=dep?'1':''};
+  i.oninput=upd; ck.onchange=upd;
+  root.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const q=b.dataset.q;i.value=String(q==='max'?Math.max(0,Math.min(o.max,Math.floor(BAL))):q);upd()});
+  g.onclick=()=>{if(g.dataset.dep){$('#invd').open&&$('#invd').close();location.hash='#/deposit';return}
+    const n=val(); g.disabled=true; g.textContent='Confirm in your wallet…'; i.disabled=true;
+    setTimeout(()=>{BAL-=n;o.done(n);toast(o.toast(n));after()},900)};
+}
+function openInvDialog(o){
+  const d=$('#invd');
+  const draw=()=>{d.innerHTML=`<button class="gate-x" type="button" aria-label="Close"><i class="ph ph-x"></i></button>${invPanel(o)}`;
+    d.querySelector('.gate-x').onclick=()=>d.close(); bindInv(d,o,()=>{d.close();route()})};
+  draw(); d.onclick=e=>{if(e.target===d) d.close()}; d.showModal(); setTimeout(()=>{const i=d.querySelector('#invAmt');i&&i.focus()},50);
+}
+function renderNewIssue(n,tab){
+  const o=isOpen(n), raised=n.amt*n.sub, left=Math.max(0,Math.round(n.amt-raised)), ccv=VAULT?Math.min(raised,n.amt*.5):0, done=nDone(n);
+  const tabs=[['overview','Overview'],['conditions','Release conditions',`${done}/6`],['onchain','On-chain record']];
+  const focus=tab==='subscribe'; aTab=tabs.some(t=>t[0]===tab)?tab:'overview'; if(focus) history.replaceState(null,'','#/asset/'+n.sym);
+  const p=mo(n.amt,n.rate,n.term), fee=Math.round(n.rent*.02), op=Math.round(n.rent-p-fee), ltv=n.amt/n.appraisal;
+  const days=Math.max(0,Math.round((new Date(n.closes+'T00:00:00')-new Date('2026-10-12T00:00:00'))/864e5));
+  const art=(b=>(/^[aeiouAEIOU]/.test(b)?'an ':'a ')+b)(n.buyer[0].toLowerCase()+n.buyer.slice(1));
+  const B={
+    overview:()=>`<section class="block"><div class="sec-t"><h2>About this loan</h2></div>
+        <p class="ad-about">${n.name} is a new senior secured loan to a single-purpose company (SPV) that owns ${n.gpu} in ${n.site}. The GPUs are already installed and rented to ${art} under a ${n.offtake}-month offtake contract. Subscriptions wait in an escrow contract and are released only after all six conditions are signed and recorded on-chain. If they are not met by ${fmtD(n.deadline)}, every subscriber is refunded in full.</p>
+        ${OK()?`<div class="ad-tbl kt"><h4>Key terms</h4><dl>
+          <div><dt>Instrument</dt><dd>Senior secured loan to a bankruptcy-remote SPV</dd></div>
+          <div><dt>Eligible investors</dt><dd>Verified institutional investors</dd></div>
+          <div><dt>Principal · rate</dt><dd class="num">${usd(n.amt)} · ${pct(n.rate)} fixed</dd></div>
+          <div><dt>Minimum subscription</dt><dd class="num">${usd(MIN_SUB)}</dd></div>
+          <div><dt>Term</dt><dd>${n.term} months, level monthly payments</dd></div>
+          <div><dt>Subscription window</dt><dd>${fmtD(n.opened)} to ${fmtD(n.closes)}</dd></div>
+          <div><dt>Collateral</dt><dd>${n.gpu}; SPV equity pledged</dd></div>
+          <div><dt>Release deadline</dt><dd>${fmtD(n.deadline)} · full refund if not met</dd></div>
+          <div><dt>Offtake</dt><dd>${n.offtake} months remaining (minimum 24)</dd></div>
+          <div><dt>Allocation</dt><dd>First come, first served${VAULT?'; CCV up to 50%':''}</dd></div>
+          <div><dt>Reserve</dt><dd>3 months · ${usd(Math.round(p*3))}, funded at release</dd></div>
+          <div><dt>Withdrawals</dt><dd>Until fully subscribed or the window closes</dd></div>
+        </dl></div>`:gatebox('Key terms',['Rate','Minimum subscription','Allocation and withdrawal rules','Release deadline'])}
+      </section>
+      <section class="block"><div class="ov2">
+        <div class="ovc"><div class="ovc-h"><h3>Collateral</h3><span>Appraisal ${usd(n.appraisal)}</span></div>
+          <div class="ltv2 sm"><i style="width:${ltv*100}%"></i><em></em><u style="left:80%"></u></div>
+          <dl class="cf2">
+            <div><dt><i class="c1"></i>Loan</dt><dd class="num">${usd(n.amt)}</dd><dd class="pc">${pct(ltv,0)}</dd></div>
+            <div><dt><i class="eq"></i>Operator equity, first loss</dt><dd class="num">${usd(n.appraisal-n.amt)}</dd><dd class="pc">${pct(1-ltv,0)}</dd></div>
+            <div><dt><i class="lim"></i>Maximum loan allowed</dt><dd class="num">${usd(n.appraisal*.8)}</dd><dd class="pc">80%</dd></div>
+          </dl>
+          <p class="ovc-n">A fall in value hits the operator's equity before holders.</p></div>
+        <div class="ovc"><div class="ovc-h"><h3>Expected monthly cash flow</h3><span>Rent ${usd(n.rent)}</span></div>
+          <div class="cflow"><i class="c1" style="flex:${p}"></i><i class="c2" style="flex:${fee}"></i><i class="c3" style="flex:${op}"></i></div>
+          <dl class="cf2">
+            <div><dt><i class="c1"></i>1 · ${n.sym} holders</dt><dd class="num">${usd(Math.round(p))}</dd><dd class="pc">${pct(p/n.rent,0)}</dd></div>
+            <div><dt><i class="c2"></i>2 · Service fee</dt><dd class="num">${usd(fee)}</dd><dd class="pc">${pct(fee/n.rent,0)}</dd></div>
+            <div><dt><i class="c3"></i>3 · Operator, the rest</dt><dd class="num">${usd(op)}</dd><dd class="pc">${pct(op/n.rent,0)}</dd></div>
+          </dl>
+          <p class="ovc-n">Starts the month after release. Coverage ${(n.rent/p).toFixed(2)}×.</p></div>
+      </div></section>
+      <section class="block"><div class="sec-t"><h2>Protections</h2></div><div class="prot2">
+        <div><b>Refund if not released</b><span>Escrow returns every subscription in full if the six conditions are not met by ${fmtD(n.deadline)}.</span></div>
+        <div><b>Operator takes first loss</b><span>The loan is capped at 80% of appraised value.</span></div>
+        <div><b>Three-month reserve</b><span>Set aside in the collection contract on release day.</span></div>
+        <div><b>Rent paid to holders first</b><span>The buyer pays into a controlled account; holders are paid before the operator.</span></div>
+      </div></section>
+      <section class="block"><div class="sec-t"><h2>Documents</h2><p>Originals stay with the signer; the on-chain hash shows they have not been altered</p></div><div class="docs2">
+        ${docBtns([['Term sheet','PDF'],['Appraisal report','PDF'],['Offtake agreement, summary','PDF'],['Risk disclosure','PDF']])}
+      </div></section>`,
+    conditions:()=>`<section class="block"><div class="panel">
+      ${COND.map(([t,by],i)=>n.cd[i]?`<div class="crow"><span class="cidx ok"><i class="ph ph-check"></i></span><span><b>${t}</b><small>Signed by ${by}</small></span><span class="r"><small>${fmtD(n.cd[i])}</small>${txl(n.sym+'c'+i)}</span></div>`
+        :`<div class="crow"><span class="cidx">${i+1}</span><span><b>${t}</b><small>${i===0?`${pct(n.sub,0)} subscribed · checked by the escrow contract`:`To be signed by ${by}`}</small></span><span class="r"><small class="muted">Waiting</small></span></div>`).join('')}
+      <p class="note-line" style="margin:0;padding:14px 24px 18px">Conditions can be signed in any order while the issue is open. Funds move only when all six are recorded; otherwise every subscriber is refunded on ${fmtD(n.deadline)}.</p>
+    </div></section>`,
+    onchain:()=>`<section class="block"><div class="sec-t"><h2>Contracts</h2></div><div class="panel"><dl class="contracts">
+        <div><dt>Escrow contract</dt><dd>${txl(n.sym+'esc')}<small>Holds ${usd(Math.round(raised))} in subscriptions</small></dd></div>
+        <div><dt>Collection contract</dt><dd>${txl(n.sym+'col')}<small>Deployed; receives rent after release</small></dd></div>
+        <div><dt>${n.sym} token</dt><dd>${txl(n.sym+'tok')}<small>Issued to subscribers at release</small></dd></div></dl></div></section>
+      <section class="block"><div class="sec-t"><h2>Activity</h2></div><div class="panel"><ul class="events">
+        ${COND.map(([t],i)=>n.cd[i]?{d:n.cd[i],ic:'ph-seal-check',t:`Condition ${i+1} recorded`,s:t,seed:n.sym+'c'+i}:null).filter(Boolean)
+          .concat([{d:n.opened,ic:'ph-arrow-down-left',t:'Subscriptions opened',s:'Escrow contract accepting AIUSD',seed:n.sym+'open'}].concat(VAULT?[{d:n.opened,ic:'ph-stack',t:'CCV subscribed by rule',s:'Up to 50% of the loan',a:usd(Math.round(ccv)),seed:n.sym+'ccv'}]:[]))
+          .sort((a,b)=>b.d.localeCompare(a.d))
+          .map(e=>`<li><i class="ph-light ${e.ic}"></i><span><b>${e.t}</b><small>${e.s}</small></span><span class="r">${e.a?`<em>${e.a}</em>`:''}<small>${fmtD(e.d)}</small>${txl(e.seed)}</span></li>`).join('')}
+      </ul></div></section>`
+  }; const body=B[aTab]();
+  const steps=[['Subscriptions open',fmtD(n.opened),'done'],['Fully subscribed',o?`By ${fmtD(n.closes)}`:fmtD(n.full),o?'now':'done'],['Six conditions signed',`${done} of 6`,o?'todo':'now'],['Funds released',`By ${fmtD(n.deadline)}`,'todo'],['First payment','A month after release','todo']];
+  const io={title:'Subscribe',min:Math.min(MIN_SUB,left),max:left,quick:[100000,250000,500000,'max'],mine:n.mine,
+    rows:[['Rate',`${pct(n.rate)} fixed · ${n.term} months`],['Funds go to',`Escrow contract ${txl(n.sym+'esc')}`]],
+    calcLabel:'Expected monthly payment',calc:a=>usd(Math.round(mo(a,n.rate,n.term))),ack:'I have read the term sheet and the risk disclosure',cta:'Subscribe',
+    note:'Signed with your wallet. AIUSD moves from your account to the escrow contract.',
+    withdraw:()=>withdrawSub(n),
+    done:a=>{n.mine+=a;n.sub=Math.min(1,n.sub+a/n.amt);if(n.sub>=1){n.full='2026-10-12';n.cd[0]='2026-10-12'}},toast:a=>`Subscribed ${num(a)} AIUSD to ${n.sym}. Held in escrow until release (demo)`};
+  const closed=`<div class="inv"><div class="inv-h"><b>Subscription closed</b></div>
+    <p class="inv-p">Fully subscribed on ${fmtD(n.full)}. Waiting for ${6-done} of 6 release conditions.</p>
+    ${OK()&&n.mine?`<div class="inv-mine"><span>Your subscription</span><b class="num">${usd(n.mine)}</b><small>Locked until release</small></div>`:''}
+    <dl class="inv-dl"><div><dt>Release deadline</dt><dd>${fmtD(n.deadline)}</dd></div><div><dt>If not met</dt><dd>Full refund to every subscriber</dd></div><div><dt>Held in</dt><dd>Escrow contract ${txl(n.sym+'esc')}</dd></div></dl></div>`;
+  app.innerHTML=`<div class="xwrap ad ad2">
+    <div class="crumb"><a href="#/markets">Markets</a><i class="ph-light ph-caret-right"></i><span>${n.sym}</span></div>
+    <section class="ad-band">
+      <div class="ab-l">
+        <div class="ad-eye">Compute credit · New issue · ${n.sym}</div>
+        <h1>${n.name}</h1>
+        <div class="dmeta"><span><i class="ph-light ph-cpu"></i>${n.gpu}</span><span><i class="ph-light ph-map-pin"></i>${n.site}</span><span><i class="ph-light ph-handshake"></i>Offtake: ${n.buyer}</span></div>
+        <div class="ab-st"><span class="pill ${o?'raising':'verifying'}">${nState(n)}</span><small>As of Oct 12, 2026 · sample data</small></div>
+      </div>
+      <div class="ab-r"><div class="srv3d" data-n="1" aria-label="3D illustration of a GPU server"></div><small>Illustration · ${parseInt(n.gpu,10)/8} servers × 8 GPUs · drag to rotate</small></div>
+      <div class="ab-k">
+        ${OK()?`<div class="y"><span>Fixed rate</span><b class="num">${pct(n.rate,2)}</b><em>Paid monthly · ${n.term} months</em></div>`:lockStat('Fixed rate')}
+        <div><span>Raising</span><b class="num">${usd(n.amt)}</b><em>${pct(n.sub,0)} subscribed</em></div>
+        <div><span>${o?'Closes':'Release deadline'}</span><b class="num">${fmtD(o?n.closes:n.deadline).replace(/, \d{4}$/,'')}</b><em>${o?`${days} days left`:`${done} of 6 conditions met`}</em></div>
+        <div><span>Minimum</span><b class="num">${usdK(MIN_SUB)}</b><em>Per subscription</em></div>
+        <div><span>Loan to value</span><b class="num">${pct(ltv,1)}</b><em>Limit 80%</em></div>
+      </div>
+    </section>
+    <section class="ad-prog ip">
+      <div class="ip-l">
+        <div class="pg-h"><b>${o?'Raised so far':'Fully subscribed'}</b><span class="pg-r"><b class="num">${usd(Math.round(raised))}</b> of ${usd(n.amt)} · ${pct(n.sub,0)}</span></div>
+        <div class="ip-bar"><i class="v" style="width:${ccv/n.amt*100}%"></i><i class="d" style="width:${(raised-ccv)/n.amt*100}%"></i></div>
+        <div class="ip-leg">${VAULT?`<span><em class="v"></em>CCV, by rule <b class="num">${usdM(ccv)}</b></span>`:''}<span><em class="d"></em>${VAULT?'Direct':'Subscribed'} <b class="num">${usdM(raised-ccv)}</b></span>${o?`<span><em></em>Remaining <b class="num">${usdM(left)}</b></span>`:''}</div>
+        <ol class="ip-steps">${steps.map(([t,d,c])=>`<li class="${c}"><i></i><b>${t}</b><small>${d}</small></li>`).join('')}</ol>
+        <ul class="ip-facts">
+          <li><i class="ph-light ph-vault"></i><span><b>Held in escrow, not by Loka</b>The escrow contract releases funds only when all six conditions are recorded.</span></li>
+          <li><i class="ph-light ph-arrow-counter-clockwise"></i><span><b>${o?`Withdraw until ${fmtD(n.closes).replace(/, \d{4}$/,'')}`:'Locked until release'}</b>${o?'Any time before the issue is fully subscribed or the window closes.':'The issue is fully subscribed, so subscriptions can no longer be withdrawn.'}</span></li>
+          <li><i class="ph-light ph-shield-check"></i><span><b>Refund if not released</b>Every subscription comes back in full if the conditions are not met by ${fmtD(n.deadline)}.</span></li>
+        </ul>
+      </div>
+      <div class="ip-r">${o?invPanel(io):closed}</div>
+    </section>
+    <div class="ad-body"><div class="ad-main">
+      <nav class="tabs" aria-label="Issue sections">${tabs.map(([t,nm,c])=>`<a href="#/asset/${n.sym}/${t}" ${t===aTab?'aria-current="page"':''}>${nm}${c?`<span class="count">${c}</span>`:''}</a>`).join('')}</nav>
+      <div class="ad-tabbody">${body}</div>
+    </div></div>
+  </div>`;
+  app.querySelectorAll('.ad-main .tabs a').forEach(a=>a.onclick=e=>{e.preventDefault();
+    const t=a.getAttribute('href').split('/').pop(); aTab=t; history.replaceState(null,'',a.getAttribute('href'));
+    app.querySelectorAll('.ad-main .tabs a').forEach(x=>x===a?x.setAttribute('aria-current','page'):x.removeAttribute('aria-current'));
+    const w=app.querySelector('.ad-tabbody'); w.innerHTML=B[t](); bindGate(w); w.classList.remove('tfade'); void w.offsetWidth; w.classList.add('tfade');});
+  bindGate();
+  if(o&&OK()) bindInv(app.querySelector('.ip-r'),io,()=>{const y=scrollY;route();scrollTo({top:y})});
+  if(focus) setTimeout(()=>{const i=$('#invAmt'); if(i){i.focus({preventScroll:true});app.querySelector('.ip').scrollIntoView({block:'center'})}},60);
+}
+
+/* ======================= 访问分层 =======================
+   第一阶段只有通过企业认证（KYB）的机构能认购。所有人都能看规模、覆盖倍数、抵押率、还款记录和链上记录；
+   收益率、完整条款、文件和认购按钮只对已认证机构开放。个人投资者这一阶段只能留邮箱等通知。
+   原型里用左下角切换器演示四种身份，也可以用 ?view=public|unverified|pending|verified 打开。 */
+function renderHead(){
+  const w=`<span class="xwal"><span class="dot"></span><span class="mono">${short(ME)}</span></span>`;
+  $('#xRight').innerHTML={
+    public:`<button class="btn btn-ghost btn-sm" type="button" data-signin>Sign in</button><button class="btn btn-primary btn-sm" type="button" data-gate>Get access</button>`,
+    unverified:`<button class="btn btn-primary btn-sm" type="button" data-gate>Verify your business</button>${w}`,
+    pending:`<span class="xpend">Verification in review</span>${w}`,
+    verified:`<span class="xbal"><span class="ic">A</span><b>${num(BAL)}</b><small>AIUSD</small></span><a class="btn btn-primary btn-sm" href="#/deposit">Deposit</a>${w}`
+  }[ACCESS];
+  bindGate($('#xRight'));
+  document.querySelectorAll('.demo-sw [data-as]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.as===ACCESS));
+}
+function setAccess(a,msg){ACCESS=a;try{localStorage.setItem('loka-view',a)}catch(e){} if(location.search) history.replaceState(null,'',location.pathname+location.hash); route(); if(msg) toast(msg)}
+const lockv=(t='Verified investors')=>`<span class="lockv"><i class="ph ph-lock-simple"></i>${t}</span>`;
+const gateLabel=()=>({public:'Get access',unverified:'Verify to see terms',pending:'Verification in review'}[ACCESS]);
+const gateBtn=()=>`<button class="btn btn-primary btn-sm" type="button" data-gate>${gateLabel()}</button>`;
+const lockStat=t=>`<div class="y"><span>${t}</span><b class="lockb"><i class="ph ph-lock-simple"></i>Verified investors</b><em><button type="button" data-gate>See who can invest</button></em></div>`;
+const gatebox=(t,items)=>`<div class="gatebox"><div><h4>${t}</h4><p>${ACCESS==='pending'?'Your business verification is in review. These open as soon as it is approved.':'Shown to verified institutional investors. Collateral, coverage, repayments and the on-chain record stay open to everyone.'}</p>
+  <ul>${items.map(x=>`<li><i class="ph ph-lock-simple"></i>${x}</li>`).join('')}</ul></div>${ACCESS==='pending'?'<span class="xpend">In review</span>':gateBtn()}</div>`;
+const docBtns=ds=>ds.map(([t,f])=>OK()?`<button type="button" class="doc" onclick="toast('Download (demo)')"><i class="ph-light ph-file-text"></i><span><b>${t}</b><small>${f} · hash on-chain</small></span><i class="ph-light ph-download-simple"></i></button>`
+  :`<button type="button" class="doc locked" data-gate><i class="ph-light ph-file-text"></i><span><b>${t}</b><small>${f} · verified investors</small></span><i class="ph-light ph-lock-simple"></i></button>`).join('');
+function bindGate(root=app){
+  root.querySelectorAll('[data-gate]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();openGate()});
+  root.querySelectorAll('[data-signin]').forEach(b=>b.onclick=()=>setAccess('unverified','Signed in (demo)'));
+}
+function openGate(){
+  const d=$('#gate');
+  const inst={
+    public:{p:'Sign in, then verify your company. We check the business, its owners and who can sign for it.',b:'Sign in to start',go:()=>setAccess('unverified','Signed in (demo). Next: verify your business')},
+    unverified:{p:'About 15 minutes to submit. Review usually takes 2 to 5 business days (sample).',b:'Start verification',go:()=>{setAccess('pending','Submitted (demo). We will email you when it is approved');location.hash='#/portfolio'}},
+    pending:{p:'Your documents are in review. You will get an email when your account is approved.',b:'View status',go:()=>{location.hash='#/portfolio'}}
+  }[ACCESS];
+  d.innerHTML=`<div class="gate-h"><div><h3 id="gateT">Open to verified institutions</h3><p>Yields, full terms, documents and subscriptions are available to institutional investors after business verification. Everything else on Loka is public.</p></div><button class="gate-x" type="button" aria-label="Close"><i class="ph ph-x"></i></button></div>
+    <div class="gate-o">
+      <div><b>I invest for an institution</b><p>${inst.p}</p>
+        <ol><li>Company details and registration</li><li>Beneficial owners and authorized signers</li><li>Bank account in the company's name</li></ol>
+        <button class="btn btn-primary btn-sm" type="button" data-go>${inst.b}</button></div>
+      <div><b>I invest as an individual</b><p>Individual access is not open in this phase. Leave an email and we will tell you when it opens in your region.</p>
+        <label for="gEmail">Email</label><input id="gEmail" type="email" autocomplete="email" placeholder="you@example.com">
+        <button class="btn btn-ghost btn-sm" type="button" data-notify>Notify me</button></div>
+    </div>`;
+  d.querySelector('.gate-x').onclick=()=>d.close();
+  d.querySelector('[data-go]').onclick=()=>{d.close();inst.go()};
+  d.querySelector('[data-notify]').onclick=()=>{const v=d.querySelector('#gEmail').value.trim();if(!/^\S+@\S+\.\S+$/.test(v)){d.querySelector('#gEmail').focus();toast('Enter an email address');return}d.close();toast('Prototype: nothing was sent')};
+  d.onclick=e=>{if(e.target===d) d.close()};
+  d.showModal();
+}
+function renderOnboard(page){
+  const st=ACCESS, steps=[
+    ['Sign in','Email or wallet',st==='public'?'now':'done'],
+    ['Verify your business','Company, owners, authorized signers, bank account',st==='public'?'todo':st==='unverified'?'now':'done'],
+    ['Review','By the platform and the licensed issuing partner · usually 2 to 5 business days (sample)',st==='pending'?'now':'todo'],
+    ['Fund your account','Wire instructions for an account in your company\'s name appear here',`todo`],
+    ['Subscribe',`New issues${VAULT?' and the vault':''}, from $100,000 per subscription (sample)`,'todo']];
+  const act={public:`<button class="btn btn-primary btn-sm" type="button" data-signin>Sign in</button>`,unverified:`<button class="btn btn-primary btn-sm" type="button" data-gate>Start</button>`,pending:`<span class="xpend">In review</span>`};
+  app.innerHTML=`<div class="xwrap">
+    <div class="page-head"><div><h1>${page==='deposit'?'Deposit':'Portfolio'}</h1><p>${st==='pending'?'Your verification is in review. Funding and subscriptions open once it is approved.':'Investing on Loka is open to verified institutions in this phase.'}</p></div></div>
+    <div class="onb">
+      <div class="panel onb-steps"><ol>${steps.map(([t,s,c],i)=>`<li class="${c}"><span class="onb-i">${c==='done'?'<i class="ph ph-check"></i>':i+1}</span><span><b>${t}</b><small>${s}</small></span><span class="r">${c==='now'?act[st]:''}</span></li>`).join('')}</ol></div>
+      <aside class="panel onb-side">
+        <h3>Open to everyone</h3>
+        <ul><li><i class="ph ph-check"></i>Loan size, coverage and loan-to-value</li><li><i class="ph ph-check"></i>Monthly repayments and uptime</li><li><i class="ph ph-check"></i>Release conditions and the on-chain record</li></ul>
+        <hr><h3>After verification</h3>
+        <ul><li class="no"><i class="ph ph-lock-simple"></i>Yields and full terms</li><li class="no"><i class="ph ph-lock-simple"></i>Term sheets, appraisals, offtake summaries</li><li class="no"><i class="ph ph-lock-simple"></i>Deposits, subscriptions and withdrawals</li></ul>
+        <hr><p>Investing as an individual? Not open in this phase. <button type="button" data-gate>Get notified</button></p>
+      </aside>
+    </div>
+  </div>`;
+  bindGate();
+}
+
+const ACCS=['public','unverified','pending','verified'];
+let ACCESS=(()=>{const q=new URLSearchParams(location.search).get('view');if(ACCS.includes(q))return q;try{const v=localStorage.getItem('loka-view');if(ACCS.includes(v))return v}catch(e){}return 'verified'})();
+const OK=()=>ACCESS==='verified';
+document.querySelectorAll('.demo-sw [data-as]').forEach(b=>b.onclick=()=>setAccess(b.dataset.as));
+document.querySelectorAll('.xnav [data-nav]').forEach(e=>{if(HIDE.has(e.dataset.nav)) e.hidden=true});
 route();
 </script>
 </body>

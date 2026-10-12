@@ -181,41 +181,15 @@ section{scroll-margin-top:96px}
 .tag{display:inline-flex;align-items:center;height:24px;font-size:12px;color:var(--ink-3);border:1px solid var(--line-2);border-radius:999px;padding:0 10px;white-space:nowrap}
 .t-water .tag{color:var(--on-night-3);border-color:var(--night-line)}
 
-/* ---------- 为什么用我们：产品预览 ---------- */
-.preview{border-radius:22px;background:var(--paper);border:1px solid var(--line);box-shadow:0 60px 120px -60px rgba(14,15,15,.32),0 20px 40px -30px rgba(14,15,15,.18);overflow:hidden}
-.pv-bar{height:48px;display:flex;align-items:center;gap:8px;padding:0 20px;border-bottom:1px solid var(--line)}
-.pv-bar i{width:10px;height:10px;border-radius:50%;background:#e2e4e1}
-.pv-bar .url{margin-left:16px;font-family:var(--mono);font-size:12px;color:var(--ink-3);background:var(--bg);border-radius:999px;padding:4px 14px}
-.pv-bar .tag{margin-left:auto}
-.pv{display:grid;grid-template-columns:1.4fr 1fr}
-.pv-main{padding:36px 40px;border-right:1px solid var(--line)}
-.pv-side{padding:36px 34px;background:#fafaf8}
-.pv-title{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-.pv-title h3{font-family:var(--serif);font-size:26px;font-weight:400;letter-spacing:-.01em;margin:0 0 8px}
-.pv-title p{margin:0;font-size:14px;color:var(--ink-3)}
+/* ---------- 为什么用我们：核对演示 ---------- */
 .status{display:inline-flex;align-items:center;gap:8px;height:28px;font-size:13px;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:0 12px;white-space:nowrap}
 .status::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.pv-stats{display:grid;grid-template-columns:repeat(4,1fr);margin:32px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.pv-stats div{padding:18px 0}
-.pv-stats div+div{padding-left:20px;border-left:1px solid var(--line)}
-.pv-stats span{display:block;font-size:12.5px;color:var(--ink-3)}
-.pv-stats b{font-family:"Geist",var(--sans);font-weight:300;font-size:22px;letter-spacing:-.01em}
-.pv-stats b small{font-family:var(--cn);font-size:12px;font-weight:400;color:var(--ink-3);margin-left:4px}
-.pv h4{font-size:14px;font-weight:500;margin:0 0 14px}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tbl th{font-weight:400;font-size:12.5px;color:var(--ink-3);text-align:right;padding:0 0 10px}
 .tbl th:first-child,.tbl td:first-child{text-align:left}
 .tbl td{padding:12px 0;border-top:1px solid var(--line);text-align:right;font-family:var(--mono);font-size:13.5px}
 .tbl td:first-child{font-family:var(--cn)}
 .neg{color:#8c5634}
-.ledger{list-style:none;margin:0;padding:0}
-.ledger li{display:grid;grid-template-columns:20px 1fr auto;gap:12px;align-items:start;padding:13px 0;border-top:1px solid var(--line)}
-.ledger li:first-child{border-top:0;padding-top:0}
-.ledger .ph-light{font-size:18px;color:var(--ink);margin-top:3px}
-.ledger b{display:block;font-weight:500;font-size:14px}
-.ledger small{font-size:12.5px;color:var(--ink-3)}
-.ledger em{font-style:normal;font-family:var(--mono);font-size:13px;white-space:nowrap}
-.pv-note{font-size:12.5px;color:var(--ink-3);margin:20px 0 0}
 .benefits{display:grid;grid-template-columns:repeat(3,1fr);margin-top:72px;border-top:1px solid var(--line)}
 .benefit{padding:36px 36px 0 0}
 .benefit+.benefit{padding-left:36px;border-left:1px solid var(--line)}
@@ -224,12 +198,6 @@ section{scroll-margin-top:96px}
 .benefit p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.8}
 
 /* ---------- 流程 ---------- */
-.steps{display:grid;grid-template-columns:repeat(4,1fr);list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
-.step{padding:32px 32px 8px 0}
-.step+.step{padding-left:32px;border-left:1px solid var(--line)}
-.step .idx{font-family:"Geist",var(--sans);font-weight:200;font-size:56px;line-height:1;letter-spacing:-.04em;color:var(--ink)}
-.step h3{font-size:19px;font-weight:500;margin:28px 0 10px}
-.step p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.8}
 
 /* ---------- 常见问题 ---------- */
 .faq{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:start}
@@ -307,6 +275,58 @@ section{scroll-margin-top:96px}
 /* ---------- 进场与出现 ---------- */
 .rise{opacity:0;transform:translateY(18px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .rise.in{opacity:1;transform:none}
+
+/* ---------- 滚动动效：只在没关闭动效时生效；每块进视口时加 .in，子项按 --i 依次出现 ---------- */
+@media (prefers-reduced-motion:no-preference){
+  /* 标题：引导线画出，大标题从下往上露出 */
+  .sec-head .label::before{transform:scaleX(0);transform-origin:left;transition:transform .9s var(--ease) .1s}
+  .sec-head h2{clip-path:inset(-.2em -.2em 100% -.2em);transform:translateY(.35em);transition:clip-path 1.1s var(--ease) .15s,transform 1.1s var(--ease) .15s}
+  .sec-head p,.sec-head .btn{opacity:0;transform:translateY(12px);transition:opacity .9s var(--ease) .4s,transform .9s var(--ease) .4s,background-color .3s}
+  .sec-head.in .label::before{transform:none}
+  .sec-head.in h2{clip-path:inset(-.2em -.2em -.2em -.2em);transform:none}
+  .sec-head.in p,.sec-head.in .btn{opacity:1;transform:none}
+
+  /* 依次出现的一组 */
+  .stg>*{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:calc(var(--i,0) * 90ms + var(--d,0ms))}
+  .stg.in>*{opacity:1;transform:none}
+
+  /* 功能卡里的小图：行滑入、勾选弹出、柱子长高 */
+  .fall-row{opacity:0;transform:translateX(-14px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0) * 90ms + 350ms)}
+  .tile.in .fall-row{opacity:1;transform:none}
+  .checks li{opacity:0;transform:translateY(8px);transition:opacity .6s var(--ease),transform .6s var(--ease);transition-delay:calc(var(--i,0) * 80ms + 300ms)}
+  .checks .ph{transform:scale(0);transition:transform .5s var(--ease);transition-delay:calc(var(--i,0) * 80ms + 450ms)}
+  .tile.in .checks li{opacity:1;transform:none}
+  .tile.in .checks .ph{transform:none}
+  .lossbar span{transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease);transition-delay:calc(var(--i,0) * 180ms + 300ms)}
+  .tile.in .lossbar span{transform:none}
+  .spark span i{transform:scaleY(0);transform-origin:bottom;transition:transform .9s var(--ease);transition-delay:calc(var(--i,0) * 60ms + 300ms)}
+  .tile.in .spark span i{transform:none}
+
+  /* 收益链路：节点依次点亮，轨道从左往右画出 */
+  .ytrack{transform:scaleX(0);transform-origin:left;transition:transform 1.6s var(--ease) .3s}
+  .ypanel.in .ytrack{transform:none}
+  .ynode{opacity:0;transform:translateY(14px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0) * 320ms + 250ms)}
+  .ypanel.in .ynode{opacity:1;transform:none}
+  .ycalc{opacity:0;transform:translateY(14px);transition:opacity .8s var(--ease) 1.5s,transform .8s var(--ease) 1.5s}
+  .ypanel.in .ycalc{opacity:1;transform:none}
+  /* 核对演示：从倾斜放平 */
+  .vfy{transform:perspective(1600px) rotateX(8deg) translateY(48px) scale(.97);transform-origin:50% 0;transition:opacity 1.2s var(--ease),transform 1.4s var(--ease)}
+  .vfy.in{transform:none}
+  /* 流程：节点依次点亮，虚线往下画，文字跟着出现 */
+  .fsteps li::before{opacity:0;transform:scale(.4);transition:opacity .5s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0) * 300ms + 200ms)}
+  .fsteps li:not(:last-child)::after{transform:scaleY(0);transform-origin:top;transition:transform .55s var(--ease);transition-delay:calc(var(--i,0) * 300ms + 380ms)}
+  .fsteps h4,.fsteps p{opacity:0;transform:translateX(-8px);transition:opacity .6s var(--ease),transform .6s var(--ease);transition-delay:calc(var(--i,0) * 300ms + 280ms)}
+  .fsteps p{transition-delay:calc(var(--i,0) * 300ms + 340ms)}
+  .flow-cta{opacity:0;transform:translateY(8px);transition:opacity .6s var(--ease),transform .6s var(--ease);transition-delay:calc(var(--n,3) * 300ms + 250ms)}
+  .flow.in .fsteps li::before,.flow.in .fsteps h4,.flow.in .fsteps p,.flow.in .flow-cta{opacity:1;transform:none}
+  .flow.in .fsteps li::after{transform:none}
+  .flow.in .fsteps li:last-child::before{animation:ring 1.6s var(--ease) calc(var(--i,0) * 300ms + 650ms) 1}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(61,111,91,.35)}100%{box-shadow:0 0 0 14px rgba(61,111,91,0)}}
+
+  /* 底部行动区：背景图慢慢归位 */
+  .cta-bg img{transform:scale(1.08);transition:transform 2.4s var(--ease)}
+  .cta.in .cta-bg img{transform:none}
+}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{transition:none!important;animation:none!important}
@@ -349,12 +369,9 @@ section{scroll-margin-top:96px}
   .sec-head h2,.cta h2{font-size:34px}
   .bento{display:flex;flex-direction:column}
   .big{font-size:68px}
-  .benefits,.steps{grid-template-columns:1fr}
-  .benefit,.benefit+.benefit,.step,.step+.step{padding:28px 0;border-left:0;border-top:1px solid var(--line)}
-  .benefit:first-child,.step:first-child{border-top:0}
-  .pv-main,.pv-side{padding:24px}
-  .pv-stats{grid-template-columns:1fr 1fr}
-  .pv-stats div:nth-child(3){padding-left:0;border-left:0}
+  .benefits{grid-template-columns:1fr}
+  .benefit,.benefit+.benefit{padding:28px 0;border-left:0;border-top:1px solid var(--line)}
+  .benefit:first-child{border-top:0}
   .faq{display:block}
   .faq-side{position:static;margin-bottom:12px}
   .cta{margin:104px 12px 0;border-radius:24px}
@@ -369,25 +386,111 @@ section{scroll-margin-top:96px}
 .terms.classes .term span:last-child{margin-top:0}
 .cls-tag{align-self:flex-start;font-size:11.5px!important;margin:0 0 6px!important;padding:2px 10px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-3)!important}
 .cls-tag.live{border-color:var(--accent-soft);background:var(--accent-soft);color:var(--accent)!important}
-.fall.mk .fall-row span em,.pv-title .pair{font-style:normal;color:var(--on-night-3);margin-left:1px}
-.pv-title .pair{color:var(--ink-3);font-size:.7em}
+.fall.mk .fall-row span em{font-style:normal;color:var(--on-night-3);margin-left:1px}
 .fall.mk .fall-row .n .ph{font-size:13px}
 .fall.mk .fall-row.dim{opacity:.55}
 .checks{list-style:none;margin:auto 0 0;padding:28px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .checks li{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-2);padding:10px 12px;border-radius:12px;background:var(--bg)}
 .checks .ph{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11px;flex:none}
-.mini-book{display:grid;gap:4px}
-.mini-book span{height:10px;border-radius:3px;width:var(--w);justify-self:end}
-.mini-book .a{background:rgba(163,50,31,.18)} .mini-book .b{background:rgba(61,111,91,.25)}
-.mini-book b{font-weight:400;font-size:12px;color:var(--ink-3);text-align:center;padding:4px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.lossbar{display:flex;gap:3px;height:58px}
+.lossbar span{position:relative;flex:0 0 var(--w);display:flex;flex-direction:column;justify-content:flex-end;padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.3;color:var(--ink-2);overflow:hidden}
+.lossbar b{font-family:var(--mono);font-weight:400;font-size:11px;color:var(--ink-3);margin-bottom:2px}
+.lossbar .l1{background:#ecd9c6}.lossbar .l2{background:#f1e7d8}.lossbar .l3{background:var(--accent-soft);color:var(--accent)}
+.lossnote{margin:12px 0 0;font-size:12.5px!important;line-height:1.6!important;color:var(--ink-3)!important}
 .issuer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:64px;align-items:center;padding:56px;border-radius:32px;background:var(--paper);border:1px solid var(--line)}
 .issuer .sec-head{margin:0}
 .issuer .terms{grid-template-columns:1fr 1fr}
 .issuer .term:nth-child(3){border-left:0}
 .issuer .term:nth-child(n+3){border-top:1px solid var(--line)}
-.track{margin-top:40px}
-.track-h{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:16px}
-.steps.s3{grid-template-columns:repeat(3,1fr)}
+.flows{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+.flow{display:flex;flex-direction:column;padding:40px 40px 36px;border-radius:var(--r-card);background:var(--paper);border:1px solid var(--line)}
+.flow-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding-bottom:28px;margin-bottom:32px;border-bottom:1px solid var(--line)}
+.flow-h h3{margin:0;font-size:22px;font-weight:500;letter-spacing:-.01em}
+.flow-h span{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.fsteps{list-style:none;margin:0;padding:0;counter-reset:fs}
+.fsteps li{position:relative;display:grid;grid-template-columns:36px 1fr;column-gap:20px;padding-bottom:32px;counter-increment:fs}
+.fsteps li:last-child{padding-bottom:0}
+.fsteps li::before{content:counter(fs,decimal-leading-zero);grid-row:1/3;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--paper);border:1px solid var(--line-2);position:relative;z-index:1}
+.fsteps li:not(:last-child)::after{content:"";position:absolute;left:18px;top:40px;bottom:4px;border-left:1px dashed var(--line-2)}
+.fsteps li:last-child::before{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.fsteps h4{margin:7px 0 6px;font-size:17px;font-weight:500}
+.fsteps p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.7;max-width:34em}
+.flow-cta{margin-top:auto;padding-top:36px}
+@media (max-width:900px){.flows{grid-template-columns:1fr}.flow{padding:28px 24px}}
+
+/* ---------- v0.7：首屏数字条、收益链路、计算器、核对演示、对比表 ---------- */
+.hstats{display:flex;flex-wrap:wrap;gap:20px 0;margin:56px 0 0}
+.hstats div{padding-right:40px;margin-right:40px;border-right:1px solid rgba(255,255,255,.2)}
+.hstats div:last-child{border-right:0;margin-right:0;padding-right:0}
+.hstats b{display:block;font-family:"Geist",var(--sans);font-weight:200;font-size:46px;line-height:1;letter-spacing:-.03em;color:#fff}
+.hstats span{display:block;margin-top:12px;font-size:13.5px;line-height:1.5;color:var(--on-night-2)}
+.hero .logos{margin-top:56px}
+.hero h1{margin-bottom:44px}
+
+.ypanel{position:relative;border-radius:32px;background:var(--night);color:var(--on-night);padding:48px 56px 56px;overflow:hidden}
+.ypanel::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 80% at 62% 0%,rgba(61,111,91,.32),rgba(10,11,11,0) 70%);pointer-events:none}
+.ypanel .tag{color:var(--on-night-2);border-color:var(--night-line)}
+.ytop{position:relative;margin-bottom:44px}
+.ytop .tag{white-space:normal;height:auto;min-height:24px;padding:3px 10px;line-height:1.4}
+.ychain{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
+.ytrack{position:absolute;left:28px;right:calc(25% - 52px);top:27px;height:2px;background:repeating-linear-gradient(90deg,rgba(159,209,185,.55) 0 6px,transparent 6px 14px)}
+.ytrack span{position:absolute;inset:0;animation:ytravel 3.4s cubic-bezier(.45,0,.25,1) infinite}
+.ytrack i{position:absolute;left:0;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--accent-light);box-shadow:0 0 0 5px rgba(159,209,185,.18),0 0 18px rgba(159,209,185,.6)}
+@keyframes ytravel{0%{transform:translateX(0);opacity:0}8%{opacity:1}88%{opacity:1}100%{transform:translateX(100%);opacity:0}}
+.ynode{position:relative}
+.ydot{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:#141716;border:1px solid var(--night-line);color:var(--on-night)}
+.ydot.hi{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 8px rgba(61,111,91,.25)}
+.ynode h3{margin:26px 0 10px;font-size:19px;font-weight:500;line-height:1.35;color:#fff}
+.ynode p{margin:0;font-size:14.5px;line-height:1.7;color:var(--on-night-2)}
+.yfig{display:block;margin-top:18px;font-family:var(--mono);font-weight:400;font-size:13px;color:var(--accent-light)}
+.ycalc{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;margin-top:56px;padding-top:48px;border-top:1px solid var(--night-line)}
+.ycalc h3{margin:0 0 22px;font-family:var(--serif);font-weight:400;font-size:32px;letter-spacing:-.01em;color:#fff}
+.yseg{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--night-line);margin-bottom:30px}
+.yseg button{height:36px;padding:0 16px;border:0;border-radius:999px;background:none;color:var(--on-night-2);font-size:13.5px;cursor:pointer;transition:background-color .25s,color .25s}
+.yseg button[aria-pressed="true"]{background:var(--on-night);color:var(--ink)}
+.yamt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.yamt span{font-size:13.5px;color:var(--on-night-2)}
+.yamt b{font-weight:300;font-size:22px;color:#fff}
+.ycalc input[type=range]{width:100%;height:4px;margin:0;-webkit-appearance:none;appearance:none;border-radius:4px;background:linear-gradient(90deg,var(--accent-light) var(--p,9%),rgba(255,255,255,.14) var(--p,9%));cursor:pointer}
+.ycalc input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:0;box-shadow:0 0 0 6px rgba(159,209,185,.22)}
+.ycalc input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:0}
+.yticks{display:flex;justify-content:space-between;margin-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--on-night-3)}
+.ycalc-out{align-self:end}
+.ycalc-out>span{font-size:14px;color:var(--on-night-2)}
+.ycalc-out>b{display:block;margin:6px 0 20px;font-family:"Geist",var(--sans);font-weight:200;font-size:88px;line-height:1;letter-spacing:-.04em;color:#fff}
+.yrows{display:flex;gap:28px;padding:14px 0;border-top:1px solid var(--night-line);border-bottom:1px solid var(--night-line);font-size:14px;color:var(--on-night-2)}
+.yrows b{font-weight:500;color:#fff;margin-left:6px}
+.ycalc-out p{margin:14px 0 0;font-size:12px;line-height:1.6;color:var(--on-night-3)}
+
+.vfy{position:relative;display:grid;grid-template-columns:340px minmax(0,1fr);border-radius:22px;background:var(--paper);border:1px solid var(--line);box-shadow:0 60px 120px -60px rgba(14,15,15,.3),0 20px 40px -30px rgba(14,15,15,.16);overflow:hidden}
+.vfy-tag{position:absolute;top:20px;right:22px}
+.vfy-side{padding:28px 20px 24px;background:#fafaf8;border-right:1px solid var(--line)}
+.vfy-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:0 10px 20px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.vfy-h b{display:block;font-family:var(--serif);font-weight:400;font-size:24px;line-height:1.1}
+.vfy-h small{font-size:13px;color:var(--ink-3)}
+.vfy-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.vfy-list button{position:relative;width:100%;display:grid;grid-template-columns:24px 1fr;gap:12px;align-items:center;padding:12px 10px;border:0;border-radius:12px;background:none;text-align:left;font-size:14px;color:var(--ink-2);cursor:pointer;overflow:hidden;transition:background-color .25s,color .25s}
+.vfy-list button:hover{background:var(--bg)}
+.vfy-list button[aria-selected="true"]{background:var(--paper);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 6px 16px -10px rgba(14,15,15,.25)}
+.vfy-list .ph{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11px}
+.vfy-list button i.bar{position:absolute;left:10px;right:10px;bottom:4px;height:2px;border-radius:2px;background:var(--accent);transform:scaleX(0);transform-origin:left}
+.vfy-list button[aria-selected="true"] i.bar.run{animation:vbar 4.2s linear forwards}
+@keyframes vbar{to{transform:scaleX(1)}}
+.vfy-main{padding:44px 48px 40px;min-height:420px}
+.vfy-main .k{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.vfy-main h3{margin:12px 0 10px;font-family:var(--serif);font-weight:400;font-size:34px;letter-spacing:-.01em;line-height:1.15}
+.vfy-main>p{margin:0 0 28px;color:var(--ink-2);max-width:34em}
+.vfy-dl{display:grid;grid-template-columns:150px 1fr;margin:0;border-top:1px solid var(--line)}
+.vfy-dl dt,.vfy-dl dd{margin:0;padding:14px 0;border-bottom:1px solid var(--line);font-size:14px}
+.vfy-dl dt{color:var(--ink-3)}
+.vfy-dl dd.mono{font-family:var(--mono);font-size:13px}
+.vfy-dl dd .ok{color:var(--accent);font-weight:500}
+.vfy-main .fade{animation:vfade .45s var(--ease)}
+@keyframes vfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+
+@media (max-width:1100px){.ychain{grid-template-columns:1fr 1fr}.ytrack{display:none}.ycalc{grid-template-columns:1fr;gap:32px}.vfy{grid-template-columns:1fr}.vfy-side{border-right:0;border-bottom:1px solid var(--line)}}
+@media (max-width:767px){.hstats div{padding-right:20px;margin-right:20px}.hstats b{font-size:32px}.ypanel{padding:28px 22px 32px;border-radius:24px}.ychain{grid-template-columns:1fr}.ycalc-out>b{font-size:64px}.vfy-main{padding:28px 22px;min-height:0}.vfy-main h3{font-size:26px}.vfy-dl{grid-template-columns:110px 1fr}.vfy-tag{display:none}}
 @media (max-width:1100px){.issuer{grid-template-columns:1fr;padding:32px}.checks{grid-template-columns:1fr}}
 </style>
 </head>
@@ -397,6 +500,7 @@ section{scroll-margin-top:96px}
   <div class="nav-bar">
     <a class="brand" href="#top" aria-label="Loka, back to top"><span class="brand-mark" aria-hidden="true"></span>Loka</a>
     <ul class="nav-links">
+      <li><a href="#yield">Yield</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#why">Why us</a></li>
       <li><a href="#issuers">Issuers</a></li>
@@ -410,7 +514,7 @@ section{scroll-margin-top:96px}
     </div>
   </div>
   <nav class="menu" id="menu" aria-label="Page navigation">
-    <a href="#features">Features</a><a href="#why">Why us</a><a href="#issuers">Issuers</a><a href="#process">How it works</a><a href="#faq">FAQ</a>
+    <a href="#yield">Yield</a><a href="#features">Features</a><a href="#why">Why us</a><a href="#issuers">Issuers</a><a href="#process">How it works</a><a href="#faq">FAQ</a>
     <a class="btn btn-primary" href="app/index.html#/markets">Launch app</a>
     <button class="btn btn-ghost" data-open="center">List an asset</button>
   </nav>
@@ -422,11 +526,16 @@ section{scroll-margin-top:96px}
 <section class="hero on-dark" id="hero">
   <div class="hero-bg" aria-hidden="true"><video id="heroVideo" src="../assets/video/hero-towers.mp4" poster="../assets/video/hero-towers-poster.jpg" autoplay muted loop playsinline preload="auto"></video></div>
   <div class="wrap hero-main">
-    <h1 class="rise">Capital for the machines<br>that power AI</h1>
-    <p class="sub rise">An exchange for the cash flows behind AI compute. Trade assets backed by GPU rent, settled in AIUSD.</p>
+    <h1 class="rise">Earn the rent AI companies<br>pay for GPUs</h1>
     <div class="hero-cta rise">
       <a class="btn btn-primary" href="app/index.html#/markets">Launch app<span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></a>
       <button class="btn btn-ghost" data-open="center">List an asset</button>
+    </div>
+    <div class="hstats rise" aria-label="Sample listing NH200-1">
+      <div><b class="num">11.2%</b><span>Sample yield to maturity</span></div>
+      <div><b>Monthly</b><span>Rent paid to holders first</span></div>
+      <div><b class="num">6/6</b><span>Proofs on-chain before funds move</span></div>
+      <div><b class="num">&le;80%</b><span>Loan-to-value on the GPUs</span></div>
     </div>
     <div class="logos rise">
       <div class="logo-window"><div class="logo-track" aria-hidden="true"><img src="../assets/logos/adv-mit.png" alt="" loading="lazy"><img src="../assets/logos/adv-harvard.png" alt="" loading="lazy"><img src="../assets/logos/adv-princeton.png" alt="" loading="lazy"><img src="../assets/logos/adv-columbia.png" class="sq" alt="" loading="lazy"><img src="../assets/logos/adv-berkeley.png" alt="" loading="lazy"><img src="../assets/logos/adv-yale.png" class="sq" alt="" loading="lazy"><img src="../assets/logos/adv-nus.png" class="sq" alt="" loading="lazy"><img src="../assets/logos/adv-ethz.png" class="wide" alt="" loading="lazy"><img src="../assets/logos/adv-stanford.png" class="sq" alt="" loading="lazy"><img src="../assets/logos/adv-mit.png" alt="" loading="lazy"><img src="../assets/logos/adv-harvard.png" alt="" loading="lazy"><img src="../assets/logos/adv-princeton.png" alt="" loading="lazy"><img src="../assets/logos/adv-columbia.png" class="sq" alt="" loading="lazy"><img src="../assets/logos/adv-berkeley.png" alt="" loading="lazy"><img src="../assets/logos/adv-yale.png" class="sq" alt="" loading="lazy"><img src="../assets/logos/adv-nus.png" class="sq" alt="" loading="lazy"><img src="../assets/logos/adv-ethz.png" class="wide" alt="" loading="lazy"><img src="../assets/logos/adv-stanford.png" class="sq" alt="" loading="lazy"></div></div>
@@ -444,60 +553,105 @@ section{scroll-margin-top:96px}
   </div>
 </div></div>
 
+<!-- ========== 收益从哪来：以下数字全部是示例 ========== -->
+<section class="sec" id="yield" aria-labelledby="t-yield">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <div class="label">Yield</div>
+      <h2 id="t-yield">Where your yield comes from</h2>
+      <p>An AI company rents the GPUs and pays every month. The rent goes into a contract that pays holders before anyone else.</p>
+    </div>
+    <div class="ypanel rise">
+      <div class="ytop"><span class="tag">Sample listing · NH200-1 · 256 × NVIDIA H200 · Oslo</span></div>
+      <div class="ychain">
+        <div class="ytrack" aria-hidden="true"><span><i></i></span></div>
+        <div class="ynode"><div class="ydot"><i class="ph-light ph-buildings" aria-hidden="true"></i></div><h3>An AI company rents the GPUs</h3><p>Under a signed offtake contract with 23 months left.</p><b class="yfig">$318,000 / month</b></div>
+        <div class="ynode"><div class="ydot"><i class="ph-light ph-vault" aria-hidden="true"></i></div><h3>Rent lands in a contract</h3><p>Not with the operator. Three months of payments are held in reserve.</p><b class="yfig">1.30× coverage</b></div>
+        <div class="ynode"><div class="ydot hi"><i class="ph-light ph-user" aria-hidden="true"></i></div><h3>You are paid first</h3><p>Holders get their share before the service fee and before the operator.</p><b class="yfig">11.2% sample yield</b></div>
+        <div class="ynode"><div class="ydot"><i class="ph-light ph-cpu" aria-hidden="true"></i></div><h3>The operator keeps the rest</h3><p>If rent falls below 1.15× coverage, a 30-day cure period starts.</p><b class="yfig">After holders and fees</b></div>
+      </div>
+      <div class="ycalc">
+        <div class="ycalc-in">
+          <h3>See what a position pays</h3>
+          <div class="yseg" role="group" aria-label="Sample listing">
+            <button type="button" data-y="0.112" data-kind="loan" aria-pressed="true">NH200-1 · 11.2%</button>
+            <button type="button" data-y="0.062" data-kind="vault" aria-pressed="false">CCV vault · 6.2%</button>
+          </div>
+          <label class="yamt" for="yAmt"><span>Amount</span><b class="num" id="yAmtV">$100,000</b></label>
+          <input type="range" id="yAmt" min="10000" max="1000000" step="10000" value="100000">
+          <div class="yticks"><span>$10K</span><span>$1M</span></div>
+        </div>
+        <div class="ycalc-out" aria-live="polite">
+          <span id="yOutL">Paid to you each month</span>
+          <b class="num" id="yOut">$933</b>
+          <div class="yrows"><span>Per year <b class="num" id="yYear">$11,200</b></span><span>Settled in <b>AIUSD</b></span></div>
+          <p>Illustration with sample listing data: simple interest, before fees. Not a forecast. Listed assets can lose value.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ========== 功能 ========== -->
 <section class="sec" id="features" aria-labelledby="t-features">
   <div class="wrap">
     <div class="sec-head rise">
-      <div class="label">Features</div>
-      <h2 id="t-features">Built for assets that pay monthly</h2>
+      <div class="label">Protection</div>
+      <h2 id="t-features">How your money is protected</h2>
+      <p>Six safeguards, each enforced by a contract, a signed record or a legal claim on the GPUs.</p>
     </div>
     <div class="bento">
       <article class="tile t-water rise">
-        <div class="tile-top"><i class="ph-light ph-wallet ico" aria-hidden="true"></i><span class="tag">Sample data</span></div>
-        <h3>One account for every market</h3>
-        <p>Deposit USDC and it becomes AIUSD 1:1, the account currency for every market. Trades, repayments and vault returns all settle in it.</p>
-        <div class="fall mk" aria-label="Sample markets">
-          <div class="fall-in"><span>Market</span><b>Quoted in AIUSD</b></div>
-          <div class="fall-row first"><span class="n"><i class="ph ph-vault"></i></span><span>CCV<em>/AIUSD</em> · Compute Credit Vault</span><em>Live</em></div>
-          <div class="fall-row"><span class="n"><i class="ph ph-cpu"></i></span><span>NH200-1<em>/AIUSD</em> · Nordic H200 loan</span><em>Live</em></div>
-          <div class="fall-row"><span class="n"><i class="ph ph-cpu"></i></span><span>AUS-H100<em>/AIUSD</em> · Austin H100 loan</span><em>Live</em></div>
-          <div class="fall-row dim"><span class="n"><i class="ph ph-chart-line"></i></span><span>H100-PERP · GPU rental price</span><em>Coming</em></div>
+        <div class="tile-top"><i class="ph-light ph-arrows-split ico" aria-hidden="true"></i><span class="tag">Sample listing NH200-1</span></div>
+        <h3>Rent never touches the borrower</h3>
+        <p>The AI company pays rent into a controlled account that can only send it on-chain. The collection contract pays out in an order fixed at listing, and nobody can change it afterwards.</p>
+        <div class="fall" aria-label="Monthly payout order, sample">
+          <div class="fall-in"><span>Each month</span><b>$318,000 rent in</b></div>
+          <div class="fall-row first"><span class="n">1</span><span>Holders: principal and interest</span><em>$245,000</em></div>
+          <div class="fall-row"><span class="n">2</span><span>Service fee</span><em>Set at listing</em></div>
+          <div class="fall-row"><span class="n">3</span><span>Operator</span><em>What is left</em></div>
+          <p class="fall-note">Rent covers what holders are owed 1.30 times. Below 1.15 times, a 30-day cure period starts.</p>
         </div>
       </article>
 
       <article class="tile t-first rise">
-        <h3>Verified before it lists</h3>
-        <p>Every asset passes its class&rsquo;s release conditions before it trades. For compute credit there are six, each signed by a named party and recorded on-chain.</p>
-        <ul class="checks" aria-label="Compute credit release conditions">
-          <li><i class="ph ph-check"></i>Fully subscribed</li><li><i class="ph ph-check"></i>SPV formed, equipment pledged</li><li><i class="ph ph-check"></i>Lien filed</li>
-          <li><i class="ph ph-check"></i>Rent routed to collection contract</li><li><i class="ph ph-check"></i>Equipment verified online</li><li><i class="ph ph-check"></i>Loan &le; 80% of appraisal</li>
+        <h3>Six proofs before a dollar moves</h3>
+        <p>Your money waits in escrow until six conditions are signed by named parties and recorded on-chain. If one is missing at the deadline, everyone is refunded.</p>
+        <ul class="checks" aria-label="Release conditions">
+          <li><i class="ph ph-check"></i>Fully subscribed</li><li><i class="ph ph-check"></i>SPV formed, GPUs pledged</li><li><i class="ph ph-check"></i>Lien filed</li>
+          <li><i class="ph ph-check"></i>Rent routed to contract</li><li><i class="ph ph-check"></i>GPUs verified online</li><li><i class="ph ph-check"></i>Loan &le; 80% of appraisal</li>
         </ul>
       </article>
 
       <article class="tile t-reserve rise">
-        <h3>Order books with quotes on both sides</h3>
-        <p>A liquidity vault quotes buy and sell orders, so you can sell before maturity. Market prices can be below NAV or par.</p>
+        <h3>Losses hit the operator first</h3>
+        <p>Loans are capped at 80% of an independent appraisal, so the operator&rsquo;s own 20% absorbs a fall in value first. Three months of payments are held in reserve from day one.</p>
         <div class="foot-vis">
-          <div class="mini-book" aria-hidden="true"><span class="a" style="--w:46%"></span><span class="a" style="--w:70%"></span><span class="a" style="--w:30%"></span><b>Spread</b><span class="b" style="--w:54%"></span><span class="b" style="--w:80%"></span><span class="b" style="--w:38%"></span></div>
+          <div class="lossbar" aria-label="Order in which losses are absorbed">
+            <span class="l1" style="--w:20%"><b>1</b>Operator equity</span>
+            <span class="l2" style="--w:15%"><b>2</b>Reserve</span>
+            <span class="l3" style="--w:65%"><b>3</b>Holders</span>
+          </div>
+          <p class="lossnote">If the cure period fails, the lien is enforced and the GPUs are re-rented or sold. Proceeds go to holders first.</p>
         </div>
       </article>
 
       <article class="tile t-project rise">
-        <i class="ph-light ph-stack ico" aria-hidden="true"></i>
-        <h3>Two vaults</h3>
-        <p>The credit vault earns from rent across many loans. The liquidity vault earns from spreads on the order books.</p>
+        <i class="ph-light ph-lock-key ico" aria-hidden="true"></i>
+        <h3>We can&rsquo;t move your money</h3>
+        <p>No pooled funds sit with the platform. Escrow and payouts run on contracts, vaults are run by licensed third parties, and the platform cannot redirect funds.</p>
       </article>
 
       <article class="tile t-vendor rise">
-        <i class="ph-light ph-arrows-split ico" aria-hidden="true"></i>
-        <h3>Rent pays holders first</h3>
-        <p>Buyers pay rent into a collection contract. Holders are paid first, then the service fee, then the operator.</p>
+        <i class="ph-light ph-arrows-left-right ico" aria-hidden="true"></i>
+        <h3>Exit without waiting</h3>
+        <p>Sell your position on the order book at any time instead of waiting for the loan to end. Market makers quote both sides; prices can be below par.</p>
       </article>
 
       <article class="tile t-disclose rise">
-        <div class="tile-top"><i class="ph-light ph-chart-bar ico" aria-hidden="true"></i><span class="tag">Example</span></div>
-        <h3>Monthly disclosure</h3>
-        <p>Rent received, variance, uptime and reserve balance, published for every asset.</p>
+        <div class="tile-top"><i class="ph-light ph-seal-check ico" aria-hidden="true"></i><span class="tag">Example</span></div>
+        <h3>Signed data, every month</h3>
+        <p>Rent received, uptime and coverage for every loan. Uptime is signed by monitoring nodes and every payment is on-chain.</p>
         <div class="foot-vis">
           <div class="spark" aria-hidden="true">
             <span><i style="height:78%"></i><i style="height:76%"></i></span>
@@ -519,51 +673,22 @@ section{scroll-margin-top:96px}
   <div class="wrap">
     <div class="sec-head rise">
       <div class="label">Why us</div>
-      <h2 id="t-why">Every asset has a public record</h2>
-      <p>Release conditions, rent receipts and payouts are recorded in contracts. Anyone can check them, without waiting for a report.</p>
+      <h2 id="t-why">Check every loan yourself</h2>
+      <p>Before any dollar leaves escrow, six conditions are signed by named parties and recorded on-chain. Pick one to see what it proves.</p>
     </div>
 
-    <!-- 交易页示意：以下全部为示例数据 -->
-    <div class="preview rise" role="img" aria-label="Sample market page: price, monthly reporting and on-chain records">
-      <div class="pv-bar"><i></i><i></i><i></i><span class="url">NH200-1/AIUSD</span><span class="tag">Sample data</span></div>
-      <div class="pv">
-        <div class="pv-main">
-          <div class="pv-title">
-            <div><h3>NH200-1<span class="pair">/AIUSD</span></h3><p>Nordic H200 Cluster I · 256 × NVIDIA H200 · Oslo</p></div>
-            <span class="status">Repaying</span>
-          </div>
-          <div class="pv-stats">
-            <div><span>Price</span><b class="num">0.9984</b></div>
-            <div><span>Yield to maturity</span><b class="num">11.2%</b></div>
-            <div><span>Outstanding</span><b class="num">$5.05M</b></div>
-            <div><span>Conditions</span><b class="num">6<small>/ 6</small></b></div>
-          </div>
-          <h4>Monthly reporting</h4>
-          <table class="tbl">
-            <thead><tr><th>Month</th><th>Rent due</th><th>Received</th><th>Uptime</th><th>Coverage</th></tr></thead>
-            <tbody>
-              <tr><td>Oct</td><td>318,000</td><td>318,000</td><td>99.7%</td><td>1.30×</td></tr>
-              <tr><td>Sep</td><td>318,000</td><td>318,000</td><td>99.4%</td><td>1.30×</td></tr>
-              <tr><td>Aug</td><td>318,000</td><td>296,400</td><td>95.8%</td><td class="neg">1.21×</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pv-side">
-          <h4>On-chain records</h4>
-          <ul class="ledger">
-            <li><i class="ph-light ph-arrow-down-left" aria-hidden="true"></i><div><b>Rent received · Oct</b><small>Collection contract</small></div><em>318,000</em></li>
-            <li><i class="ph-light ph-arrows-split" aria-hidden="true"></i><div><b>Paid out in order</b><small>Holders → fee → operator</small></div><em>318,000</em></li>
-            <li><i class="ph-light ph-arrow-up-right" aria-hidden="true"></i><div><b>Released to borrower SPV</b><small>After all six conditions</small></div><em>6,400,000</em></li>
-            <li><i class="ph-light ph-seal-check" aria-hidden="true"></i><div><b>Equipment verified online</b><small>Monitoring nodes</small></div><em>Passed</em></li>
-            <li><i class="ph-light ph-signature" aria-hidden="true"></i><div><b>Three-party agreement</b><small>Buyer · operator · platform</small></div><em>Signed</em></li>
-          </ul>
-          <p class="pv-note">Every entry links to its transaction. Sample figures for illustration only.</p>
-        </div>
+    <!-- 核对演示：以下全部为示例数据 -->
+    <div class="vfy rise">
+      <div class="vfy-side">
+        <div class="vfy-h"><div><b>NH200-1</b><small>Nordic H200 Cluster I</small></div><span class="status">6/6 recorded</span></div>
+        <ol class="vfy-list" role="tablist" aria-label="Release conditions"></ol>
       </div>
+      <div class="vfy-main" role="tabpanel" id="vfyPanel" aria-live="polite"></div>
+      <span class="tag vfy-tag">Sample data</span>
     </div>
 
     <div class="benefits">
-      <div class="benefit rise"><i class="ph-light ph-magnifying-glass" aria-hidden="true"></i><h3>Check every asset yourself</h3><p>Each proof is on-chain and linked from the asset page, from the lien filing to last month&rsquo;s rent.</p></div>
+      <div class="benefit rise"><i class="ph-light ph-calendar-check" aria-hidden="true"></i><h3>Monthly numbers, not quarterly reports</h3><p>Rent received, uptime and coverage for every loan, published each month and linked to the payments.</p></div>
       <div class="benefit rise"><i class="ph-light ph-file-lock" aria-hidden="true"></i><h3>Rules are fixed at listing</h3><p>Release conditions and the payout order are written into the contract. The platform confirms conditions; it cannot redirect funds.</p></div>
       <div class="benefit rise"><i class="ph-light ph-arrows-left-right" aria-hidden="true"></i><h3>Exit before maturity</h3><p>Sell on the order book instead of waiting for the last payment.</p></div>
     </div>
@@ -597,20 +722,26 @@ section{scroll-margin-top:96px}
 <section class="sec" id="process" aria-labelledby="t-process">
   <div class="wrap">
     <div class="sec-head rise"><div class="label">Process</div><h2 id="t-process">How it works</h2></div>
-    <div class="track rise"><span class="track-h">Trading</span>
-      <ol class="steps s3">
-        <li class="step"><span class="idx num">01</span><h3>Deposit</h3><p>USDC is minted 1:1 into AIUSD, the account currency.</p></li>
-        <li class="step"><span class="idx num">02</span><h3>Trade or earn</h3><p>Buy assets on the order book, or deposit into a vault.</p></li>
-        <li class="step"><span class="idx num">03</span><h3>Get paid or sell</h3><p>Receive monthly repayments, or sell before maturity.</p></li>
-      </ol>
-    </div>
-    <div class="track rise"><span class="track-h">Listing</span>
-      <ol class="steps">
-        <li class="step"><span class="idx num">01</span><h3>Apply</h3><p>Submit the equipment and the signed offtake contract.</p></li>
-        <li class="step"><span class="idx num">02</span><h3>List</h3><p>After review and appraisal, the asset lists and investors subscribe into escrow.</p></li>
-        <li class="step"><span class="idx num">03</span><h3>Release</h3><p>Once all six conditions are on-chain, funds go to your SPV.</p></li>
-        <li class="step"><span class="idx num">04</span><h3>Repay</h3><p>Rent repays holders each month; the rest comes to you.</p></li>
-      </ol>
+    <div class="flows">
+      <div class="flow rise">
+        <div class="flow-h"><h3>For traders</h3><span>3 steps</span></div>
+        <ol class="fsteps">
+          <li><h4>Deposit</h4><p>USDC is minted 1:1 into AIUSD, the account currency.</p></li>
+          <li><h4>Trade or earn</h4><p>Buy assets on the order book, or deposit into a vault.</p></li>
+          <li><h4>Get paid or sell</h4><p>Receive monthly repayments, or sell before maturity.</p></li>
+        </ol>
+        <div class="flow-cta"><a class="btn btn-primary btn-sm" href="app/index.html#/markets">Launch app</a></div>
+      </div>
+      <div class="flow rise">
+        <div class="flow-h"><h3>For issuers</h3><span>4 steps</span></div>
+        <ol class="fsteps">
+          <li><h4>Apply</h4><p>Submit the equipment and the signed offtake contract.</p></li>
+          <li><h4>List</h4><p>After review and appraisal, the asset lists and investors subscribe into escrow.</p></li>
+          <li><h4>Release</h4><p>Once all six conditions are on-chain, funds go to your SPV.</p></li>
+          <li><h4>Repay</h4><p>Rent repays holders each month; the rest comes to you.</p></li>
+        </ol>
+        <div class="flow-cta"><button class="btn btn-ghost btn-sm" data-open="center">List an asset</button></div>
+      </div>
     </div>
   </div>
 </section>
@@ -666,7 +797,7 @@ section{scroll-margin-top:96px}
     <div class="foot-top">
       <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Loka</a>
       <ul class="foot-links">
-        <li><a href="#features">Features</a></li><li><a href="#why">Why us</a></li><li><a href="#issuers">Issuers</a></li><li><a href="#process">How it works</a></li><li><a href="#faq">FAQ</a></li>
+        <li><a href="#yield">Yield</a></li><li><a href="#features">Features</a></li><li><a href="#why">Why us</a></li><li><a href="#issuers">Issuers</a></li><li><a href="#process">How it works</a></li><li><a href="#faq">FAQ</a></li>
       </ul>
     </div>
     <!-- 风险提示与法律声明：等法律意见，先留位置 -->
@@ -747,6 +878,7 @@ section{scroll-margin-top:96px}
   /* 进场：首屏图片缓慢归位，文字依次出现；其他块滚动到视口时出现一次 */
   requestAnimationFrame(() => hero.classList.add('in'));
   [...hero.querySelectorAll('.rise')].forEach((el, i) => setTimeout(() => el.classList.add('in'), reduce ? 0 : 200 + i * 110));
+  if (!reduce) setTimeout(() => hero.querySelectorAll('.hstats b.num').forEach(b => count(b)), 700);
   const once = new IntersectionObserver(entries => entries.forEach(e => {
     if (e.isIntersecting) { e.target.classList.add('in'); once.unobserve(e.target); }
   }), {threshold: .12});
@@ -754,6 +886,89 @@ section{scroll-margin-top:96px}
   document.querySelectorAll('.bento .tile, .benefits .benefit').forEach(el => {
     const i = [...el.parentNode.children].indexOf(el); el.style.transitionDelay = (reduce ? 0 : i * 80) + 'ms';
   });
+
+
+  /* 滚动动效：给组内子项编号，进视口加 .in；数字从 0 数上去 */
+  const idx = (sel, scope = document) => scope.querySelectorAll(sel).forEach(g => [...g.children].forEach((c, i) => c.style.setProperty('--i', i)));
+  document.querySelectorAll('.terms.classes, .issuer .terms, .faq-list').forEach(g => g.classList.add('stg'));
+  idx('.stg'); idx('.checks'); idx('.ychain'); idx('.fsteps');
+  document.querySelectorAll('.fall').forEach(f => f.querySelectorAll('.fall-row').forEach((r, i) => r.style.setProperty('--i', i)));
+  document.querySelectorAll('.lossbar').forEach(b => [...b.children].forEach((s, i) => s.style.setProperty('--i', i)));
+  document.querySelectorAll('.spark i').forEach((s, i) => s.style.setProperty('--i', i));
+  document.querySelectorAll('.flow').forEach(f => f.style.setProperty('--n', f.querySelectorAll('.fsteps li').length));
+  const count = el => {
+    const t = [...el.childNodes].find(n => n.nodeType === 3 && /\d/.test(n.textContent)); if (!t) return;
+    const m = t.textContent.match(/^(\D*)([\d.]+)(.*)$/s); if (!m) return;
+    const to = parseFloat(m[2]), dec = (m[2].split('.')[1] || '').length, t0 = performance.now(), dur = 1300;
+    const step = now => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 4);
+      t.textContent = m[1] + (to * e).toFixed(dec) + m[3]; if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  };
+  const show = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return; const el = e.target; el.classList.add('in'); show.unobserve(el);
+    if (!reduce) el.querySelectorAll('.term b.num').forEach(count);
+  }), {threshold: .18, rootMargin: '0px 0px -6% 0px'});
+  document.querySelectorAll('.sec-head, .stg, .tile, .ypanel, .vfy, .flow, .cta').forEach(el => show.observe(el));
+
+  /* 首屏视差：背景比内容滚得慢，内容往上走时渐隐 */
+  if (!reduce) {
+    const bg = hero.querySelector('.hero-bg'), main = hero.querySelector('.hero-main'); let tick = false;
+    addEventListener('scroll', () => { if (tick) return; tick = true; requestAnimationFrame(() => {
+      const y = scrollY, h = hero.offsetHeight; tick = false; if (y > h) return;
+      bg.style.transform = `translate3d(0,${y * .32}px,0)`;
+      main.style.transform = `translate3d(0,${y * .12}px,0)`; main.style.opacity = Math.max(0, 1 - y / (h * .75));
+    }); }, {passive: true});
+  }
+
+
+  /* 收益计算器：示例数据，单利、未扣费 */
+  const yAmt = document.getElementById('yAmt');
+  if (yAmt) {
+    let rate = .112, kind = 'loan';
+    const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+    const upd = () => {
+      const v = +yAmt.value; yAmt.style.setProperty('--p', ((v - yAmt.min) / (yAmt.max - yAmt.min) * 100) + '%');
+      document.getElementById('yAmtV').textContent = fmt(v);
+      document.getElementById('yOut').textContent = fmt(v * rate / 12);
+      document.getElementById('yYear').textContent = fmt(v * rate);
+      document.getElementById('yOutL').textContent = kind === 'loan' ? 'Paid to you each month' : 'Added to your vault value each month';
+    };
+    document.querySelectorAll('.yseg button').forEach(b => b.addEventListener('click', () => {
+      document.querySelectorAll('.yseg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+      rate = +b.dataset.y; kind = b.dataset.kind; upd();
+    }));
+    yAmt.addEventListener('input', upd); upd();
+  }
+
+  /* 核对演示：六条放款条件，进视口后自动轮播，点了就停 */
+  const CONDS = [
+    ['Fully subscribed', 'Escrow holds the full loan amount from investors. Nothing is released while the loan is short.', 'Escrow contract, automatic', 'Sep 2, 2026', '0x4c1e…a7d2', 'Escrow balance $6,400,000 of $6,400,000'],
+    ['SPV formed, equipment pledged', 'The GPUs belong to a company set up only for this loan, and are pledged to holders.', 'Borrower&rsquo;s counsel', 'Sep 4, 2026', '0x91b0…3e58', 'Certificate of formation, pledge agreement'],
+    ['Lien filed', 'The security interest over the equipment is registered, so holders rank first if the operator fails.', 'Registry filing agent', 'Sep 5, 2026', '0x2f7a…c019', 'Filing number and date'],
+    ['Rent routed to collection contract', 'The AI company pays rent into the contract, not to the operator. All three parties signed.', 'Offtaker, operator and platform', 'Sep 8, 2026', '0xd63e…8b4f', 'Three-party agreement'],
+    ['Equipment verified online', 'All 256 GPUs are online and their serial numbers match the pledge. Checked again every month.', 'Monitoring nodes', 'Sep 9, 2026', '0x7a3f…c91e', '256 of 256 online, 99.7% uptime'],
+    ['Loan within 80% of appraisal', 'The loan is $6.4M against an $8.2M appraisal, so the operator carries the first 22% of any loss.', 'Independent appraiser', 'Sep 10, 2026', '0xb8c2…14a6', '78% loan-to-value']
+  ];
+  const vList = document.querySelector('.vfy-list'), vPanel = document.getElementById('vfyPanel');
+  if (vList) {
+    vList.innerHTML = CONDS.map((c, i) => `<li><button type="button" role="tab" id="vt${i}" aria-controls="vfyPanel" aria-selected="${i === 0}"><i class="ph ph-check" aria-hidden="true"></i><span>${c[0]}</span><i class="bar" aria-hidden="true"></i></button></li>`).join('');
+    const tabs = [...vList.querySelectorAll('button')]; let cur = 0, timer = null, auto = !reduce;
+    const pick = (i, run) => {
+      cur = i; tabs.forEach((t, k) => { t.setAttribute('aria-selected', k === i); t.tabIndex = k === i ? 0 : -1; t.querySelector('.bar').classList.remove('run'); });
+      const c = CONDS[i];
+      vPanel.setAttribute('aria-labelledby', 'vt' + i);
+      vPanel.innerHTML = `<div class="fade"><span class="k">Condition ${i + 1} of 6</span><h3>${c[0]}</h3><p>${c[1]}</p>
+        <dl class="vfy-dl"><dt>Status</dt><dd><span class="ok">Recorded</span></dd><dt>Signed by</dt><dd>${c[2]}</dd><dt>Recorded</dt><dd>${c[3]}</dd><dt>Evidence</dt><dd>${c[5]}</dd><dt>On-chain record</dt><dd class="mono">${c[4]}</dd></dl></div>`;
+      clearTimeout(timer);
+      if (run && auto) { const bar = tabs[i].querySelector('.bar'); void bar.offsetWidth; bar.classList.add('run'); timer = setTimeout(() => pick((i + 1) % CONDS.length, true), 4200); }
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => { auto = false; pick(i, false); });
+      t.addEventListener('keydown', e => { const d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0; if (d) { e.preventDefault(); auto = false; const n = (cur + d + 6) % 6; pick(n, false); tabs[n].focus(); } });
+    });
+    pick(0, false);
+    new IntersectionObserver(([e], io) => { if (e.isIntersecting) { io.disconnect(); setTimeout(() => pick(cur, true), reduce ? 0 : 900); } }, {threshold: .4}).observe(document.querySelector('.vfy'));
+  }
 
   /* 常见问题：一次只展开一个；带锚点打开时自动展开 */
   const qas = [...document.querySelectorAll('.qa')];
