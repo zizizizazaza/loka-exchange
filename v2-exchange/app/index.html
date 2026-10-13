@@ -1613,7 +1613,7 @@ function renderAsset(sym,tab){
           <div><dt>Payments</dt><dd>Monthly, level · day ${day}</dd></div>
           <div><dt>Cure</dt><dd>Below 1.15× coverage · 30 days</dd></div>
           ${VAULT?`<div><dt>Funded by</dt><dd>CCV ${usdM(l.vault)} · direct ${usdM(l.amount-l.vault)}</dd></div>`:''}
-          <div><dt>Settlement</dt><dd>AIUSD; USD through the issuing partner</dd></div>
+          <div><dt>Settlement</dt><dd>AIUSD; redeemable 1:1 for USDC</dd></div>
         </dl></div>`:gatebox('Key terms',['Rate and yield','Minimum subscription','Term and maturity','Funding split'])}
         <div class="ad-tbl kt"><h4>Service providers <span>Sample · named at listing</span></h4><dl>
           <div><dt>Escrow</dt><dd>Escrow contract ${txl(sym+'esc')}</dd></div>
@@ -1621,7 +1621,7 @@ function renderAsset(sym,tab){
           <div><dt>Equipment monitoring</dt><dd>Independent monitoring nodes</dd></div>
           <div><dt>Appraisal</dt><dd>Independent GPU appraiser</dd></div>
           <div><dt>Legal counsel</dt><dd>Borrower's counsel, lien and SPV</dd></div>
-          <div><dt>Fiat on- and off-ramp</dt><dd>Licensed issuing partner</dd></div>
+          <div><dt>AIUSD</dt><dd>Minted and redeemed 1:1 against USDC</dd></div>
         </dl></div>
       </section>
       <section class="block"><div class="ov2">
@@ -1856,61 +1856,33 @@ function renderPublic(){
 }
 
 /* ======================= Deposit ======================= */
-let dDir='mint';
-let dMethod='bank', dCur='USD';
+// 第一阶段不做法币出入金（2026-10-13 决定）：入金是 USDC 1:1 换成 AIUSD，出金是 AIUSD 1:1 换回 USDC，只打到登记过的地址
+let dDir='mint', dNet='Ethereum';
+const NETS=['Ethereum','Base','Arbitrum'];
 function renderDeposit(){
-  const mint=dDir==='mint', bank=dMethod==='bank';
-  const head=`<div class="page-head"><div><h1>${mint?'Deposit':'Withdraw'}</h1><p>${mint?'Fund your account. Everything arrives as AIUSD, 1:1, the account currency for every market.':'Take money out. AIUSD is redeemed 1:1.'}</p></div></div>
+  const mint=dDir==='mint';
+  const head=`<div class="page-head"><div><h1>${mint?'Deposit':'Withdraw'}</h1><p>${mint?'Send USDC and receive AIUSD 1:1, the account currency for every market.':'Redeem AIUSD 1:1 for USDC, sent to a registered address.'}</p></div></div>
     <div class="dtop"><span class="seg sm" role="group" aria-label="Direction"><button type="button" data-dd="mint" aria-pressed="${mint}">Deposit</button><button type="button" data-dd="redeem" aria-pressed="${!mint}">Withdraw</button></span>
-      <span class="seg sm" role="group" aria-label="Method"><button type="button" data-dm="bank" aria-pressed="${bank}"><i class="ph ph-bank"></i> Bank transfer</button><button type="button" data-dm="usdc" aria-pressed="${!bank}"><i class="ph ph-currency-circle-dollar"></i> USDC</button></span></div>`;
+      <span class="seg sm" role="group" aria-label="Network">${NETS.map(n=>`<button type="button" data-net="${n}" aria-pressed="${n===dNet}">${n}</button>`).join('')}</span></div>`;
   const kyb=`<div class="kyb"><i class="ph-fill ph-seal-check"></i><span><b>Northwind Capital Ltd</b> · business verified</span><span class="muted">Sample account</span></div>`;
-  let body='';
-  if(bank&&mint){
-    const usd=dCur==='USD';
-    body=`${kyb}
-    <div class="panel bankbox">
-      <div class="bk-h"><b>Your deposit account</b><span class="seg sm" role="group" aria-label="Currency"><button type="button" data-dc="USD" aria-pressed="${usd}">USD</button><button type="button" data-dc="EUR" aria-pressed="${!usd}">EUR</button></span></div>
-      <p class="bk-sub">Sample details. This account is assigned to your company only. Money sent here is converted 1:1 to AIUSD and credited to your Loka account automatically.</p>
-      <dl class="bk-dl">
-        <div><dt>Beneficiary</dt><dd>Northwind Capital Ltd · via Loka issuing partner</dd></div>
-        ${usd?`<div><dt>Account number</dt><dd class="mono">•••• •••• 3906 <button class="cp" type="button" data-copy="sample-account">Copy</button></dd></div>
-        <div><dt>Routing number</dt><dd class="mono">••• ••• 150 <button class="cp" type="button" data-copy="sample-routing">Copy</button></dd></div>
-        <div><dt>Rails</dt><dd>Wire (same business day) · ACH (next business day)</dd></div>`
-        :`<div><dt>IBAN</dt><dd class="mono">DE•• •••• •••• •••• 1300 00 <button class="cp" type="button" data-copy="sample-iban">Copy</button></dd></div>
-        <div><dt>Rails</dt><dd>SEPA · converted EUR → USD at the partner's rate</dd></div>`}
-        <div><dt>Reference</dt><dd class="mono">LOKA-7A3F-C91E <button class="cp" type="button" data-copy="LOKA-7A3F-C91E">Copy</button></dd></div>
-      </dl>
-      <ul class="bk-rules">
-        <li><i class="ph ph-check"></i>Send from a bank account in your company's name. Third-party payments are returned.</li>
-        <li><i class="ph ph-check"></i>Loka charges no conversion fee. Your bank may charge for the transfer.</li>
-        <li><i class="ph ph-check"></i>Loka never holds your money. The issuing partner holds the dollars in reserve, 1:1.</li>
-      </ul>
-    </div>
-    <div class="panel bk-recent"><div class="bk-h"><b>Recent deposits</b><span class="muted">Sample</span></div>
-      <div class="bk-row"><span>Oct 9 · Wire</span><span class="num">$250,000.00</span><span class="pos">Credited 250,000 AIUSD</span></div>
-      <div class="bk-row"><span>Oct 2 · ACH</span><span class="num">$40,000.00</span><span class="pos">Credited 40,000 AIUSD</span></div>
-    </div>`;
-  } else {
-    const from=mint?'USDC':'AIUSD', to=mint?'AIUSD':(bank?'USD':'USDC');
-    body=`${bank?kyb:''}<div class="panel eform">
-      <div class="eleg"><div class="erow"><span class="lab">You send</span><span class="bal">Balance ${mint?'120,000':num(BAL)}</span></div>
-        <div class="emain"><div class="tok"><span class="ic" style="background:${from==='USDC'?'#2775ca':'var(--ink)'}">${from==='USDC'?'$':'A'}</span><b>${from}</b></div><div class="eamt"><input id="dIn" inputmode="numeric" placeholder="0"></div></div></div>
+  const from=mint?'USDC':'AIUSD', to=mint?'AIUSD':'USDC', wal=120000;
+  const ic=t=>`<span class="ic" style="background:${t==='USDC'?'#2775ca':'var(--ink)'}">${t==='USDC'?'$':'A'}</span>`;
+  const body=`${kyb}<div class="panel eform">
+      <div class="eleg"><div class="erow"><span class="lab">You send</span><span class="bal">${mint?`Wallet ${num(wal)} USDC`:`Balance ${num(BAL)} AIUSD`}</span></div>
+        <div class="emain"><div class="tok">${ic(from)}<b>${from}</b></div><div class="eamt"><input id="dIn" inputmode="numeric" placeholder="0"></div></div></div>
       <div class="flipw"><span class="flip" aria-hidden="true"><i class="ph ph-arrow-down"></i></span></div>
-      <div class="eleg"><div class="erow"><span class="lab">You receive</span><span class="bal">${bank?'To bank ····7710 · Northwind Capital Ltd':'Balance '+(mint?num(BAL):'120,000')}</span></div>
-        <div class="emain"><div class="tok"><span class="ic" style="background:${to==='AIUSD'?'var(--ink)':to==='USD'?'#3d6f5b':'#2775ca'}">${to==='AIUSD'?'A':'$'}</span><b>${to}</b></div><div class="eamt"><output id="dOut" class="zero">0</output></div></div></div>
+      <div class="eleg"><div class="erow"><span class="lab">You receive</span><span class="bal">${mint?`Balance ${num(BAL)} AIUSD`:`To treasury wallet ${short(hx('northwind-treasury'))}`}</span></div>
+        <div class="emain"><div class="tok">${ic(to)}<b>${to}</b></div><div class="eamt"><output id="dOut" class="zero">0</output></div></div></div>
       <button class="ego" id="dGo" type="button" disabled>Enter an amount</button>
-      <div class="emeta"><div><span>Rate</span><b>1 : 1</b></div><div><span>Loka fee</span><b>Free</b></div>${bank?'<div><span>Arrives</span><b>Wire: same business day · ACH: next business day</b></div><div><span>Destination</span><b>Only verified accounts in your company\'s name</b></div>':'<div><span>Network</span><b>On-chain, a few seconds</b></div>'}<div><span>Yield on AIUSD</span><b>None</b></div></div>
-    </div>`;
-  }
+      <div class="emeta"><div><span>Rate</span><b>1 : 1</b></div><div><span>Loka fee</span><b>Free</b></div><div><span>Network</span><b>${dNet} · a few seconds</b></div>${mint?'<div><span>Yield on AIUSD</span><b>None</b></div>':'<div><span>Destination</span><b>Registered addresses only · new ones usable after 24 hours</b></div>'}</div>
+    </div>
+    <p class="note-line" style="margin:14px 4px 0">Bank transfers are not supported in this phase. Fund with USDC from your own wallet or custodian.</p>`;
   app.innerHTML=`<div class="xwrap narrow">${head}${body}</div>`;
   app.querySelectorAll('[data-dd]').forEach(b=>b.onclick=()=>{dDir=b.dataset.dd;renderDeposit()});
-  app.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>{dMethod=b.dataset.dm;renderDeposit()});
-  app.querySelectorAll('[data-dc]').forEach(b=>b.onclick=()=>{dCur=b.dataset.dc;renderDeposit()});
-  app.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{try{navigator.clipboard.writeText(b.dataset.copy)}catch(e){} toast('Copied')});
-  const i=$('#dIn'); if(!i) return;
-  const o=$('#dOut'),g=$('#dGo'), label=mint?'Mint AIUSD':(bank?'Withdraw to bank':'Redeem to USDC');
-  i.addEventListener('input',()=>{const n=Number(i.value.replace(/[^0-9]/g,''))||0;i.value=n?num(n):'';o.textContent=n?num(n):'0';o.classList.toggle('zero',!n);const ok=n&&(mint||n<=BAL);g.disabled=!ok;g.textContent=!n?'Enter an amount':ok?label:'Not enough AIUSD'});
-  g.onclick=()=>{const n=Number(i.value.replace(/[^0-9]/g,''));BAL+=mint?n:-n;toast(mint?`Minted ${num(n)} AIUSD`:bank?`Withdrawal of $${num(n)} sent to your bank`:`Redeemed ${num(n)} AIUSD to USDC`);route()};
+  app.querySelectorAll('[data-net]').forEach(b=>b.onclick=()=>{dNet=b.dataset.net;renderDeposit()});
+  const i=$('#dIn'), o=$('#dOut'), g=$('#dGo'), label=mint?'Mint AIUSD':'Redeem to USDC', cap=mint?wal:BAL;
+  i.addEventListener('input',()=>{const n=Number(i.value.replace(/[^0-9]/g,''))||0;i.value=n?num(n):'';o.textContent=n?num(n):'0';o.classList.toggle('zero',!n);const ok=n&&n<=cap;g.disabled=!ok;g.textContent=!n?'Enter an amount':ok?label:`Not enough ${from}`});
+  g.onclick=()=>{const n=Number(i.value.replace(/[^0-9]/g,''));BAL+=mint?n:-n;toast(mint?`Minted ${num(n)} AIUSD from USDC (demo)`:`Redeemed ${num(n)} AIUSD to USDC (demo)`);route()};
 }
 
 /* ======================= 募资中的项目 =======================
@@ -2117,7 +2089,7 @@ function openGate(){
   d.innerHTML=`<div class="gate-h"><div><h3 id="gateT">Open to verified institutions</h3><p>Yields, full terms, documents and subscriptions are available to institutional investors after business verification. Everything else on Loka is public.</p></div><button class="gate-x" type="button" aria-label="Close"><i class="ph ph-x"></i></button></div>
     <div class="gate-o">
       <div><b>I invest for an institution</b><p>${inst.p}</p>
-        <ol><li>Company details and registration</li><li>Beneficial owners and authorized signers</li><li>Bank account in the company's name</li></ol>
+        <ol><li>Company details and registration</li><li>Beneficial owners and authorized signers</li><li>Withdrawal address controlled by the company</li></ol>
         <button class="btn btn-primary btn-sm" type="button" data-go>${inst.b}</button></div>
       <div><b>I invest as an individual</b><p>Individual access is not open in this phase. Leave an email and we will tell you when it opens in your region.</p>
         <label for="gEmail">Email</label><input id="gEmail" type="email" autocomplete="email" placeholder="you@example.com">
@@ -2132,9 +2104,9 @@ function openGate(){
 function renderOnboard(page){
   const st=ACCESS, steps=[
     ['Sign in','Email or wallet',st==='public'?'now':'done'],
-    ['Verify your business','Company, owners, authorized signers, bank account',st==='public'?'todo':st==='unverified'?'now':'done'],
-    ['Review','By the platform and the licensed issuing partner · usually 2 to 5 business days (sample)',st==='pending'?'now':'todo'],
-    ['Fund your account','Wire instructions for an account in your company\'s name appear here',`todo`],
+    ['Verify your business','Company, owners, authorized signers, withdrawal address',st==='public'?'todo':st==='unverified'?'now':'done'],
+    ['Review','By the platform and a licensed KYB provider · usually 2 to 5 business days (sample)',st==='pending'?'now':'todo'],
+    ['Fund your account','Deposit USDC and receive AIUSD 1:1',`todo`],
     ['Subscribe',`New issues${VAULT?' and the vault':''}, from $100,000 per subscription (sample)`,'todo']];
   const act={public:`<button class="btn btn-primary btn-sm" type="button" data-signin>Sign in</button>`,unverified:`<button class="btn btn-primary btn-sm" type="button" data-gate>Start</button>`,pending:`<span class="xpend">In review</span>`};
   app.innerHTML=`<div class="xwrap">
