@@ -492,6 +492,47 @@ section{scroll-margin-top:96px}
 @media (max-width:1100px){.ychain{grid-template-columns:1fr 1fr}.ytrack{display:none}.ycalc{grid-template-columns:1fr;gap:32px}.vfy{grid-template-columns:1fr}.vfy-side{border-right:0;border-bottom:1px solid var(--line)}}
 @media (max-width:767px){.hstats div{padding-right:20px;margin-right:20px}.hstats b{font-size:32px}.ypanel{padding:28px 22px 32px;border-radius:24px}.ychain{grid-template-columns:1fr}.ycalc-out>b{font-size:64px}.vfy-main{padding:28px 22px;min-height:0}.vfy-main h3{font-size:26px}.vfy-dl{grid-template-columns:110px 1fr}.vfy-tag{display:none}}
 @media (max-width:1100px){.issuer{grid-template-columns:1fr;padding:32px}.checks{grid-template-columns:1fr}}
+/* ---------- 导航：Products 下拉（交易所为主，Atara、Loka World 为同公司的其他产品） ---------- */
+.nav-links{gap:26px}
+.pd{position:relative}
+.pd>button{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:none;color:inherit;font:inherit;font-size:14px;opacity:.85;cursor:pointer;transition:opacity .2s}
+.pd>button:hover,.pd.open>button{opacity:1}
+.pd>button i{font-size:11px;transition:transform .25s var(--ease)}
+.pd.open>button i{transform:rotate(180deg)}
+.pmenu{position:absolute;top:calc(100% + 26px);left:-28px;width:500px;padding:8px;border-radius:22px;background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:0 24px 60px rgba(14,15,15,.14);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .2s,transform .25s var(--ease)}
+.pd.open .pmenu{opacity:1;transform:none;pointer-events:auto}
+.pmenu::before{content:"";position:absolute;left:0;right:0;top:-26px;height:26px}
+.pm{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 14px;border-radius:14px;text-decoration:none;color:inherit;transition:background-color .2s}
+.pm:hover,.pm:focus-visible{background:rgba(14,15,15,.045)}
+.pm-ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:17px;border:1px solid var(--line-2);color:var(--ink-2)}
+.pm b{display:flex;align-items:baseline;gap:8px;font-weight:500;font-size:14.5px}
+.pm small{display:block;color:var(--ink-3);font-size:13px;line-height:1.45;margin-top:2px}
+.pm-go{color:var(--ink-3);font-size:15px;transition:transform .25s var(--ease)}
+.pm:hover .pm-go{transform:translateX(2px);color:var(--ink)}
+.pm-l{margin:4px 14px 2px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-3)}
+.pm-tag{font-style:normal;font-size:12.5px;font-weight:400;color:var(--ink-3)}
+.pm-tag::before{content:"· ";}
+/* 首屏：导航是深色半透明，下拉跟着用深色毛玻璃 */
+.nav:not(.solid) .pmenu{background:rgba(18,19,19,.93);color:#f2f3f1;border-color:rgba(255,255,255,.14);box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.nav:not(.solid) .pm:hover,.nav:not(.solid) .pm:focus-visible{background:rgba(255,255,255,.07)}
+.nav:not(.solid) .pm-ic{border-color:rgba(255,255,255,.18);color:rgba(242,243,241,.8)}
+.nav:not(.solid) .pm small,.nav:not(.solid) .pm-tag,.nav:not(.solid) .pm-go,.nav:not(.solid) .pm-l{color:rgba(242,243,241,.55)}
+.nav:not(.solid) .pm-l{border-color:rgba(255,255,255,.12)}
+.nav:not(.solid) .pm:hover .pm-go{color:#fff}
+.menu-l{display:block;padding:18px 0 4px;font-size:12px;color:var(--ink-3)}
+/* More from Loka */
+.more2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.mcard{display:flex;flex-direction:column;border-radius:var(--r-card);overflow:hidden;background:var(--paper);border:1px solid var(--line);text-decoration:none;color:var(--ink);transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.mcard:hover{transform:translateY(-3px);box-shadow:0 24px 50px rgba(14,15,15,.1)}
+.mcard-i{height:240px;overflow:hidden;border-bottom:1px solid var(--line)}
+.mcard-i img{width:100%;height:100%;object-fit:cover;object-position:top left;transition:transform .8s var(--ease)}
+.mcard:hover .mcard-i img{transform:scale(1.03)}
+.mcard-t{padding:26px 30px 30px;display:flex;flex-direction:column;flex:1}
+.mcard-k{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink-2)}
+.mcard h3{margin:16px 0 8px;font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.15;letter-spacing:-.01em}
+.mcard p{margin:0;color:var(--ink-2);font-size:15px;max-width:46ch}
+.mcard-go{margin-top:22px;display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:500}
+@media (max-width:1100px){.more2{grid-template-columns:1fr}.pmenu{display:none}}
 </style>
 </head>
 <body>
@@ -500,6 +541,18 @@ section{scroll-margin-top:96px}
   <div class="nav-bar">
     <a class="brand" href="#top" aria-label="Loka, back to top"><span class="brand-mark" aria-hidden="true"></span>Loka</a>
     <ul class="nav-links">
+      <li class="pd" id="pd"><button type="button" aria-expanded="false" aria-controls="pmenu">Products<i class="ph ph-caret-down" aria-hidden="true"></i></button>
+        <div class="pmenu" id="pmenu">
+          <a class="pm pm-main" href="app/index.html#/markets">
+            <span class="pm-ic"><i class="ph ph-chart-line-up"></i></span>
+            <span><b>Loka Exchange</b><small>List, fund and trade assets. First listings: GPU financing.</small></span><i class="ph ph-arrow-right pm-go"></i></a>
+          <a class="pm" href="https://www.loka.cash/" target="_blank" rel="noopener">
+            <span class="pm-ic"><i class="ph ph-arrows-left-right"></i></span>
+            <span><b>Atara <em class="pm-tag">Payments</em></b><small>Payments that release only when the agreed condition is met.</small></span><i class="ph ph-arrow-up-right pm-go"></i></a>
+          <a class="pm" href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">
+            <span class="pm-ic"><i class="ph ph-globe-hemisphere-west"></i></span>
+            <span><b>Loka World <em class="pm-tag">Simulation</em></b><small>An economic simulation where organizations compete on real questions.</small></span><i class="ph ph-arrow-up-right pm-go"></i></a>
+        </div></li>
       <li><a href="#yield">Yield</a></li>
       <li><a href="#features">Features</a></li>
       <li><a href="#why">Why us</a></li>
@@ -515,6 +568,7 @@ section{scroll-margin-top:96px}
   </div>
   <nav class="menu" id="menu" aria-label="Page navigation">
     <a href="#yield">Yield</a><a href="#features">Features</a><a href="#why">Why us</a><a href="#issuers">Issuers</a><a href="#process">How it works</a><a href="#faq">FAQ</a>
+    <span class="menu-l">More from Loka</span><a href="https://www.loka.cash/" target="_blank" rel="noopener">Atara · Payments</a><a href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">Loka World · Simulation</a>
     <a class="btn btn-primary" href="app/index.html#/markets">Launch app</a>
     <button class="btn btn-ghost" data-open="center">List an asset</button>
   </nav>
@@ -746,6 +800,29 @@ section{scroll-margin-top:96px}
   </div>
 </section>
 
+<!-- ========== 同一家公司的其他产品：独立产品，不写和交易所的关系 ========== -->
+<section class="sec" id="more" aria-labelledby="t-more">
+  <div class="wrap">
+    <div class="sec-head rise"><div class="label">Also from Loka</div><h2 id="t-more">Beyond the exchange</h2></div>
+    <div class="more2">
+      <a class="mcard rise" href="https://www.loka.cash/" target="_blank" rel="noopener">
+        <div class="mcard-i"><img src="../assets/img/product-atara.png" alt="Atara website" width="1440" height="900" loading="lazy"></div>
+        <div class="mcard-t"><div class="mcard-k">Atara<em class="pm-tag">Payments</em></div>
+          <h3>Let agents pay on delivery</h3>
+          <p>Atara holds a payment in a contract and releases it when the evidence shows the work was done. The payer posts a fraction up front, not the whole sum.</p>
+          <span class="mcard-go">Visit Atara <i class="ph ph-arrow-up-right"></i></span></div>
+      </a>
+      <a class="mcard rise" href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">
+        <div class="mcard-i"><img src="../assets/img/product-world.png" alt="Loka World map" width="1440" height="900" loading="lazy"></div>
+        <div class="mcard-t"><div class="mcard-k">Loka World<em class="pm-tag">Simulation</em></div>
+          <h3>Build a fund and see if your calls hold up</h3>
+          <p>An economic simulation. Funds, traders and research houses take positions on real questions each round, and the real outcome decides who was right.</p>
+          <span class="mcard-go">Enter Loka World <i class="ph ph-arrow-up-right"></i></span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- ========== 常见问题 ========== -->
 <section class="sec" id="faq" aria-labelledby="t-faq">
   <div class="wrap faq">
@@ -798,6 +875,7 @@ section{scroll-margin-top:96px}
       <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Loka</a>
       <ul class="foot-links">
         <li><a href="#yield">Yield</a></li><li><a href="#features">Features</a></li><li><a href="#why">Why us</a></li><li><a href="#issuers">Issuers</a></li><li><a href="#process">How it works</a></li><li><a href="#faq">FAQ</a></li>
+        <li><a href="https://www.loka.cash/" target="_blank" rel="noopener">Atara</a></li><li><a href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">Loka World</a></li>
       </ul>
     </div>
     <!-- 风险提示与法律声明：等法律意见，先留位置 -->
@@ -857,6 +935,17 @@ section{scroll-margin-top:96px}
 </aside>
 
 <script>
+/* Products 下拉：点击开合，鼠标悬停也能打开；Esc 或点外面关闭 */
+(()=>{const pd=document.getElementById('pd'); if(!pd) return; const b=pd.querySelector('button'); let t;
+  const set=o=>{pd.classList.toggle('open',o);b.setAttribute('aria-expanded',o)};
+  b.addEventListener('click',e=>{e.stopPropagation();set(!pd.classList.contains('open'))});
+  const hov=matchMedia('(hover:hover)');
+  pd.addEventListener('mouseenter',()=>{if(hov.matches){clearTimeout(t);set(true)}});
+  pd.addEventListener('mouseleave',()=>{if(hov.matches) t=setTimeout(()=>set(false),200)});
+  document.addEventListener('click',e=>{if(!pd.contains(e.target)) set(false)});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pd.classList.contains('open')){set(false);b.focus()}});
+})();
+
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
