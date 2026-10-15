@@ -533,6 +533,15 @@ section{scroll-margin-top:96px}
 .mcard p{margin:0;color:var(--ink-2);font-size:15px;max-width:46ch}
 .mcard-go{margin-top:22px;display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:500}
 @media (max-width:1100px){.more2{grid-template-columns:1fr}.pmenu{display:none}}
+.terms.classes{grid-template-columns:repeat(3,1fr)}
+@media (max-width:760px){.terms.classes{grid-template-columns:1fr}.terms.classes .term+.term{border-left:0;border-top:1px solid var(--line)}}
+.benefits.std{margin-top:0;row-gap:0}
+.benefits.std .benefit{padding-bottom:40px}
+.benefits.std .benefit:nth-child(3n+1){padding-left:0;border-left:0}
+.benefits.std .benefit:nth-child(n+4){border-top:1px solid var(--line)}
+.std-n{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.benefits.std .benefit h3{margin-top:14px}
+@media (max-width:900px){.benefits.std .benefit{padding-left:0!important;border-left:0!important}.benefits.std .benefit+.benefit{border-top:1px solid var(--line)}}
 </style>
 </head>
 <body>
@@ -554,23 +563,23 @@ section{scroll-margin-top:96px}
             <span><b>Loka World <em class="pm-tag">Simulation</em></b><small>An economic simulation where organizations compete on real questions.</small></span><i class="ph ph-arrow-up-right pm-go"></i></a>
         </div></li>
       <li><a href="#yield">Yield</a></li>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#why">Why us</a></li>
+      <li><a href="#features">Protections</a></li>
+      <li><a href="#why">Verification</a></li>
       <li><a href="#issuers">Issuers</a></li>
       <li><a href="#process">How it works</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
     <div class="nav-cta">
-      <button class="btn btn-ghost btn-sm" data-open="center">List an asset</button>
-      <a class="btn btn-primary btn-sm" href="app/index.html#/markets">Launch app</a>
+      <a class="btn btn-ghost btn-sm" href="app/index.html#/markets">Sign in</a>
+      <button class="btn btn-primary btn-sm" data-open="investor">Request access</button>
       <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span><span></span></button>
     </div>
   </div>
   <nav class="menu" id="menu" aria-label="Page navigation">
-    <a href="#yield">Yield</a><a href="#features">Features</a><a href="#why">Why us</a><a href="#issuers">Issuers</a><a href="#process">How it works</a><a href="#faq">FAQ</a>
+    <a href="#yield">Yield</a><a href="#features">Protections</a><a href="#why">Verification</a><a href="#issuers">Issuers</a><a href="#process">How it works</a><a href="#faq">FAQ</a>
     <span class="menu-l">More from Loka</span><a href="https://www.loka.cash/" target="_blank" rel="noopener">Atara · Payments</a><a href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">Loka World · Simulation</a>
-    <a class="btn btn-primary" href="app/index.html#/markets">Launch app</a>
-    <button class="btn btn-ghost" data-open="center">List an asset</button>
+    <button class="btn btn-primary" data-open="investor">Request access</button>
+    <a class="btn btn-ghost" href="app/index.html#/markets">Sign in</a>
   </nav>
 </header>
 
@@ -582,7 +591,7 @@ section{scroll-margin-top:96px}
   <div class="wrap hero-main">
     <h1 class="rise">Earn the rent AI companies<br>pay for GPUs</h1>
     <div class="hero-cta rise">
-      <a class="btn btn-primary" href="app/index.html#/markets">Launch app<span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></a>
+      <button class="btn btn-primary" data-open="investor">Request access<span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></button>
       <button class="btn btn-ghost" data-open="center">List an asset</button>
     </div>
     <div class="hstats rise" aria-label="Sample listing NH200-1">
@@ -600,8 +609,7 @@ section{scroll-margin-top:96px}
 <!-- 资产类别：交易所里有哪些市场。上线前不放任何成交和规模数字 -->
 <div class="terms-band"><div class="wrap">
   <div class="terms classes rise" aria-label="Asset classes">
-    <div class="term"><span class="cls-tag live">At launch</span><b>Compute credit</b><span>Loans backed by GPU rent, and a vault that holds them</span></div>
-    <div class="term"><span class="cls-tag">Coming</span><b>Compute price</b><span>Perpetuals on GPU rental price indexes</span></div>
+    <div class="term"><span class="cls-tag live">At launch</span><b>Compute credit</b><span>Loans backed by GPUs that are installed and leased</span></div>
     <div class="term"><span class="cls-tag">Planned</span><b>Energy receivables</b><span>Payments owed under power purchase agreements</span></div>
     <div class="term"><span class="cls-tag">Planned</span><b>Equipment leases</b><span>Lease payments on other productive equipment</span></div>
   </div>
@@ -613,14 +621,14 @@ section{scroll-margin-top:96px}
     <div class="sec-head rise">
       <div class="label">Yield</div>
       <h2 id="t-yield">Where your yield comes from</h2>
-      <p>An AI company rents the GPUs and pays every month. The rent goes into a contract that pays holders before anyone else.</p>
+      <p>An AI company rents the GPUs and pays every month. The rent goes into a contract that pays holders before the service fee and the operator.</p>
     </div>
     <div class="ypanel rise">
       <div class="ytop"><span class="tag">Sample listing · NH200-1 · 256 × NVIDIA H200 · Oslo</span></div>
       <div class="ychain">
         <div class="ytrack" aria-hidden="true"><span><i></i></span></div>
         <div class="ynode"><div class="ydot"><i class="ph-light ph-buildings" aria-hidden="true"></i></div><h3>An AI company rents the GPUs</h3><p>Under a signed offtake contract with 23 months left.</p><b class="yfig">$318,000 / month</b></div>
-        <div class="ynode"><div class="ydot"><i class="ph-light ph-vault" aria-hidden="true"></i></div><h3>Rent lands in a contract</h3><p>Not with the operator. Three months of payments are held in reserve.</p><b class="yfig">1.30× coverage</b></div>
+        <div class="ynode"><div class="ydot"><i class="ph-light ph-vault" aria-hidden="true"></i></div><h3>Rent goes to a contract, not the operator</h3><p>Three months of payments are held in reserve.</p><b class="yfig">1.30× coverage</b></div>
         <div class="ynode"><div class="ydot hi"><i class="ph-light ph-user" aria-hidden="true"></i></div><h3>You are paid first</h3><p>Holders get their share before the service fee and before the operator.</p><b class="yfig">11.2% sample yield</b></div>
         <div class="ynode"><div class="ydot"><i class="ph-light ph-cpu" aria-hidden="true"></i></div><h3>The operator keeps the rest</h3><p>If rent falls below 1.15× coverage, a 30-day cure period starts.</p><b class="yfig">After holders and fees</b></div>
       </div>
@@ -629,7 +637,7 @@ section{scroll-margin-top:96px}
           <h3>See what a position pays</h3>
           <div class="yseg" role="group" aria-label="Sample listing">
             <button type="button" data-y="0.112" data-kind="loan" aria-pressed="true">NH200-1 · 11.2%</button>
-            <button type="button" data-y="0.062" data-kind="vault" aria-pressed="false">CCV vault · 6.2%</button>
+            <button type="button" data-y="0.103" data-kind="loan" aria-pressed="false">AUS-H100 · 10.3%</button>
           </div>
           <label class="yamt" for="yAmt"><span>Amount</span><b class="num" id="yAmtV">$100,000</b></label>
           <input type="range" id="yAmt" min="10000" max="1000000" step="10000" value="100000">
@@ -669,7 +677,7 @@ section{scroll-margin-top:96px}
       </article>
 
       <article class="tile t-first rise">
-        <h3>Six proofs before a dollar moves</h3>
+        <h3>Six conditions before funds are released</h3>
         <p>Your money waits in escrow until six conditions are signed by named parties and recorded on-chain. If one is missing at the deadline, everyone is refunded.</p>
         <ul class="checks" aria-label="Release conditions">
           <li><i class="ph ph-check"></i>Fully subscribed</li><li><i class="ph ph-check"></i>SPV formed, GPUs pledged</li><li><i class="ph ph-check"></i>Lien filed</li>
@@ -693,13 +701,13 @@ section{scroll-margin-top:96px}
       <article class="tile t-project rise">
         <i class="ph-light ph-lock-key ico" aria-hidden="true"></i>
         <h3>We can&rsquo;t move your money</h3>
-        <p>No pooled funds sit with the platform. Escrow and payouts run on contracts, vaults are run by licensed third parties, and the platform cannot redirect funds.</p>
+        <p>No pooled funds sit with the platform. Escrow and payouts run on contracts, and the platform cannot redirect funds.</p>
       </article>
 
       <article class="tile t-vendor rise">
-        <i class="ph-light ph-arrows-left-right ico" aria-hidden="true"></i>
-        <h3>Exit without waiting</h3>
-        <p>Sell your position on the order book at any time instead of waiting for the loan to end. Market makers quote both sides; prices can be below par.</p>
+        <i class="ph-light ph-signature ico" aria-hidden="true"></i>
+        <h3>Independent, named signers</h3>
+        <p>Each release condition is signed by a named party: legal counsel, the appraiser or the monitoring nodes. Their signatures and document hashes are recorded on-chain.</p>
       </article>
 
       <article class="tile t-disclose rise">
@@ -722,13 +730,32 @@ section{scroll-margin-top:96px}
   </div>
 </section>
 
+<!-- ========== 机构标准：只写已经确定的事，没有签约的服务方不写名字 ========== -->
+<section class="sec" id="standards" aria-labelledby="t-standards">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <div class="label">Standards</div>
+      <h2 id="t-standards">Institutional standards</h2>
+      <p>What applies to every listing before any investor subscribes.</p>
+    </div>
+    <div class="benefits std">
+      <div class="benefit rise"><span class="std-n">01</span><h3>Only GPUs that are installed and leased</h3><p>Each loan is secured by equipment already running under a signed lease with at least 24 months left. An independent appraiser values it, and the loan is capped at 80% of that value.</p></div>
+      <div class="benefit rise"><span class="std-n">02</span><h3>One SPV and one escrow per loan</h3><p>Every loan is made to a bankruptcy-remote SPV that owns the equipment, with a first-priority lien. Investor funds sit in that loan&rsquo;s own escrow contract.</p></div>
+      <div class="benefit rise"><span class="std-n">03</span><h3>Named providers for every listing</h3><p>Legal counsel, the appraiser, equipment monitoring and investor verification are named in each listing&rsquo;s documents before subscriptions open.</p></div>
+      <div class="benefit rise"><span class="std-n">04</span><h3>Independent contract audit</h3><p>The escrow and collection contracts are audited by an independent firm before launch.</p></div>
+      <div class="benefit rise"><span class="std-n">05</span><h3>Verified institutions only</h3><p>Investors complete business verification (KYB) and sanctions screening with a licensed provider before they can see full terms or subscribe.</p></div>
+      <div class="benefit rise"><span class="std-n">06</span><h3>Monthly, signed reporting</h3><p>Rent received, uptime and coverage are published for every loan each month, with on-chain records and downloadable data.</p></div>
+    </div>
+  </div>
+</section>
+
 <!-- ========== 为什么用我们 ========== -->
 <section class="sec" id="why" aria-labelledby="t-why">
   <div class="wrap">
     <div class="sec-head rise">
-      <div class="label">Why us</div>
+      <div class="label">Verification</div>
       <h2 id="t-why">Check every loan yourself</h2>
-      <p>Before any dollar leaves escrow, six conditions are signed by named parties and recorded on-chain. Pick one to see what it proves.</p>
+      <p>Before funds leave escrow, six conditions are signed by named parties and recorded on-chain. Pick one to see what it proves.</p>
     </div>
 
     <!-- 核对演示：以下全部为示例数据 -->
@@ -742,9 +769,9 @@ section{scroll-margin-top:96px}
     </div>
 
     <div class="benefits">
-      <div class="benefit rise"><i class="ph-light ph-calendar-check" aria-hidden="true"></i><h3>Monthly numbers, not quarterly reports</h3><p>Rent received, uptime and coverage for every loan, published each month and linked to the payments.</p></div>
+      <div class="benefit rise"><i class="ph-light ph-calendar-check" aria-hidden="true"></i><h3>Monthly reporting for every loan</h3><p>Rent received, uptime and coverage for every loan, published each month and linked to the payments.</p></div>
       <div class="benefit rise"><i class="ph-light ph-file-lock" aria-hidden="true"></i><h3>Rules are fixed at listing</h3><p>Release conditions and the payout order are written into the contract. The platform confirms conditions; it cannot redirect funds.</p></div>
-      <div class="benefit rise"><i class="ph-light ph-arrows-left-right" aria-hidden="true"></i><h3>Exit before maturity</h3><p>Sell on the order book instead of waiting for the last payment.</p></div>
+      <div class="benefit rise"><i class="ph-light ph-arrows-left-right" aria-hidden="true"></i><h3>Refunded if not released</h3><p>If the six conditions are not met by the release deadline, every subscription is returned in full.</p></div>
     </div>
   </div>
 </section>
@@ -755,7 +782,7 @@ section{scroll-margin-top:96px}
     <div class="issuer rise">
       <div class="sec-head">
         <div class="label">For issuers</div>
-        <h2 id="t-issuers">List your GPUs, get funded</h2>
+        <h2 id="t-issuers">Financing for GPUs already installed and leased</h2>
         <p>For compute operators with GPUs already installed and rented out. Financing is repaid from offtake rent, and you keep your equity.</p>
         <button class="btn btn-primary" style="margin-top:32px" data-open="center">List an asset<span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></button>
       </div>
@@ -778,13 +805,13 @@ section{scroll-margin-top:96px}
     <div class="sec-head rise"><div class="label">Process</div><h2 id="t-process">How it works</h2></div>
     <div class="flows">
       <div class="flow rise">
-        <div class="flow-h"><h3>For traders</h3><span>3 steps</span></div>
+        <div class="flow-h"><h3>For investors</h3><span>3 steps</span></div>
         <ol class="fsteps">
           <li><h4>Deposit</h4><p>USDC is minted 1:1 into AIUSD, the account currency.</p></li>
-          <li><h4>Trade or earn</h4><p>Buy assets on the order book, or deposit into a vault.</p></li>
-          <li><h4>Get paid or sell</h4><p>Receive monthly repayments, or sell before maturity.</p></li>
+          <li><h4>Subscribe</h4><p>Choose a new loan. Funds wait in escrow until all six conditions are met.</p></li>
+          <li><h4>Get paid</h4><p>Receive repayments every month until the loan matures.</p></li>
         </ol>
-        <div class="flow-cta"><a class="btn btn-primary btn-sm" href="app/index.html#/markets">Launch app</a></div>
+        <div class="flow-cta"><button class="btn btn-primary btn-sm" data-open="investor">Request access</button></div>
       </div>
       <div class="flow rise">
         <div class="flow-h"><h3>For issuers</h3><span>4 steps</span></div>
@@ -809,7 +836,7 @@ section{scroll-margin-top:96px}
         <div class="mcard-i"><img src="../assets/img/product-atara.png" alt="Atara website" width="1440" height="900" loading="lazy"></div>
         <div class="mcard-t"><div class="mcard-k">Atara<em class="pm-tag">Payments</em></div>
           <h3>Let agents pay on delivery</h3>
-          <p>Atara holds a payment in a contract and releases it when the evidence shows the work was done. The payer posts a fraction up front, not the whole sum.</p>
+          <p>Atara holds a payment in a contract and releases it when the evidence shows the work was done. The payer posts only part of the amount up front.</p>
           <span class="mcard-go">Visit Atara <i class="ph ph-arrow-up-right"></i></span></div>
       </a>
       <a class="mcard rise" href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">
@@ -831,14 +858,14 @@ section{scroll-margin-top:96px}
       <p>Can&rsquo;t find an answer? <button class="linkbtn" data-open="investor">Contact us directly</button>.</p>
     </div>
     <div class="faq-list">
-      <div class="qa" id="q-trade"><h3><button aria-expanded="false" aria-controls="a1" id="b1">What can I trade?<span class="plus" aria-hidden="true"></span></button></h3>
-        <div class="qa-body" id="a1" role="region" aria-labelledby="b1"><div><p>Assets backed by compute loans, and the Compute Credit Vault, all quoted in AIUSD. Compute price perpetuals and other asset classes will follow.</p></div></div></div>
+      <div class="qa" id="q-trade"><h3><button aria-expanded="false" aria-controls="a1" id="b1">What can I invest in?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a1" role="region" aria-labelledby="b1"><div><p>Loans backed by GPUs that are installed and leased to AI companies, quoted in AIUSD. Other asset classes will follow.</p></div></div></div>
       <div class="qa" id="q-aiusd"><h3><button aria-expanded="false" aria-controls="a2" id="b2">What is AIUSD?<span class="plus" aria-hidden="true"></span></button></h3>
         <div class="qa-body" id="a2" role="region" aria-labelledby="b2"><div><p>The account currency. It is minted 1:1 from USDC, can always be redeemed 1:1, and pays no interest. Returns come from the assets you hold.</p></div></div></div>
-      <div class="qa" id="q-price"><h3><button aria-expanded="false" aria-controls="a3" id="b3">How are prices set?<span class="plus" aria-hidden="true"></span></button></h3>
-        <div class="qa-body" id="a3" role="region" aria-labelledby="b3"><div><p>On order books. A liquidity vault quotes both sides. Prices can be above or below the vault&rsquo;s NAV or a loan&rsquo;s par value.</p></div></div></div>
+      <div class="qa" id="q-exit"><h3><button aria-expanded="false" aria-controls="a3" id="b3">Can I exit before maturity?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a3" role="region" aria-labelledby="b3"><div><p>Not in the first version. Positions are held to maturity. If a loan is not released by its deadline, subscriptions are refunded in full. Transfers between holders are planned for a later phase.</p></div></div></div>
       <div class="qa" id="q-yield"><h3><button aria-expanded="false" aria-controls="a4" id="b4">Where do returns come from?<span class="plus" aria-hidden="true"></span></button></h3>
-        <div class="qa-body" id="a4" role="region" aria-labelledby="b4"><div><p>From rent the offtaker pays each month. The credit vault earns from the loans it holds; the liquidity vault earns from spreads.</p></div></div></div>
+        <div class="qa-body" id="a4" role="region" aria-labelledby="b4"><div><p>From rent the offtaker pays each month. Holders are paid before the service fee and the operator.</p></div></div></div>
       <div class="qa" id="q-lend"><h3><button aria-expanded="false" aria-controls="a5" id="b5">Does the platform lend?<span class="plus" aria-hidden="true"></span></button></h3>
         <div class="qa-body" id="a5" role="region" aria-labelledby="b5"><div><p>No. Funds move from investors through the escrow contract to the borrower SPV. The platform never holds them.</p></div></div></div>
       <div class="qa" id="q-who"><h3><button aria-expanded="false" aria-controls="a6" id="b6">Which operators can list?<span class="plus" aria-hidden="true"></span></button></h3>
@@ -858,10 +885,10 @@ section{scroll-margin-top:96px}
 <section class="cta" aria-labelledby="t-cta">
   <div class="cta-bg" aria-hidden="true"><img src="../assets/img/sky-glass.jpg" alt="" width="2400" height="1057" loading="lazy"></div>
   <div class="wrap rise">
-    <h2 id="t-cta">Trade compute credit,<br>or list your GPUs</h2>
+    <h2 id="t-cta">Invest in compute credit,<br>or list your GPUs</h2>
     <p>The first version is open only to verified institutional and professional investors. Operators who apply to list will hear from us.</p>
     <div class="hero-cta">
-      <a class="btn btn-primary" href="app/index.html#/markets">Launch app<span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></a>
+      <button class="btn btn-primary" data-open="investor">Request access<span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></button>
       <button class="btn btn-ghost" data-open="center">List an asset</button>
     </div>
   </div>
@@ -874,7 +901,7 @@ section{scroll-margin-top:96px}
     <div class="foot-top">
       <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Loka</a>
       <ul class="foot-links">
-        <li><a href="#yield">Yield</a></li><li><a href="#features">Features</a></li><li><a href="#why">Why us</a></li><li><a href="#issuers">Issuers</a></li><li><a href="#process">How it works</a></li><li><a href="#faq">FAQ</a></li>
+        <li><a href="#yield">Yield</a></li><li><a href="#features">Protections</a></li><li><a href="#why">Verification</a></li><li><a href="#issuers">Issuers</a></li><li><a href="#process">How it works</a></li><li><a href="#faq">FAQ</a></li>
         <li><a href="https://www.loka.cash/" target="_blank" rel="noopener">Atara</a></li><li><a href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">Loka World</a></li>
       </ul>
     </div>

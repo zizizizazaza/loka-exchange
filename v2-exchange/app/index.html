@@ -1179,6 +1179,11 @@ dialog.invd .inv-h{padding-right:44px;flex-direction:column;gap:4px}
 .demo-sw button{height:28px;padding:0 12px;border-radius:999px;border:0;background:none;color:rgba(242,243,241,.8);font:inherit;cursor:pointer}
 .demo-sw button[aria-pressed="true"]{background:#f2f3f1;color:var(--ink)}
 @media (max-width:640px){.demo-sw span{display:none}.demo-sw button{padding:0 9px}}
+.ab-k span sup,.fnotes sup{font-size:.7em;margin-left:2px;vertical-align:super;line-height:0}
+.fnotes{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.7;color:var(--ink-3);max-width:80ch}
+.fnotes p{margin:0 0 6px}
+.lnk{background:none;border:0;padding:0;font:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.lnk i{font-size:13px}
 </style>
 </head>
 <body class="xc">
@@ -1614,6 +1619,9 @@ function renderAsset(sym,tab){
           <div><dt>Cure</dt><dd>Below 1.15× coverage · 30 days</dd></div>
           ${VAULT?`<div><dt>Funded by</dt><dd>CCV ${usdM(l.vault)} · direct ${usdM(l.amount-l.vault)}</dd></div>`:''}
           <div><dt>Settlement</dt><dd>AIUSD; redeemable 1:1 for USDC</dd></div>
+          <div><dt>Structure</dt><dd>Bankruptcy-remote SPV · jurisdiction to be confirmed</dd></div>
+          <div><dt>Loan ID</dt><dd class="mono">${sym}</dd></div>
+          <div><dt>Transfer</dt><dd>Not transferable in this phase; held to maturity</dd></div>
         </dl></div>`:gatebox('Key terms',['Rate and yield','Minimum subscription','Term and maturity','Funding split'])}
         <div class="ad-tbl kt"><h4>Service providers <span>Sample · named at listing</span></h4><dl>
           <div><dt>Escrow</dt><dd>Escrow contract ${txl(sym+'esc')}</dd></div>
@@ -1650,7 +1658,13 @@ function renderAsset(sym,tab){
       </div></section>
       <section class="block"><div class="sec-t"><h2>Documents</h2><p>Originals stay with the signer; the on-chain hash shows they have not been altered</p></div><div class="docs2">
         ${docBtns([['Term sheet','PDF'],['Appraisal report','PDF'],['Offtake agreement, summary','PDF'],['Lien filing','PDF']])}
-      </div></section>`},
+      </div></section>
+      <section class="fnotes" aria-label="Notes">
+        <p><sup>1</sup> Yield to maturity: annual return to a holder who subscribed at par and holds to maturity, from scheduled payments, before platform fees. Not a forecast.</p>
+        <p><sup>2</sup> Coverage: rent received in the latest month divided by the payment due to holders that month.</p>
+        <p><sup>3</sup> Loan to value: principal at release divided by the independent appraisal at listing.</p>
+        <p>All figures are sample data as of Oct 12, 2026.</p>
+      </section>`},
     conditions:()=>`<section class="block"><div class="panel">
       ${COND.map(([t,by],i)=>`<div class="crow"><span class="cidx ok"><i class="ph ph-check"></i></span><span><b>${t}</b><small>Signed by ${by}${i===2?` · filing ${l.filing}`:''}${i===5?` · ${usd(l.appraisal)} appraisal`:''}</small></span><span class="r"><small>${fmtD(l.cd[i])}</small>${txl(sym+'c'+i)}</span></div>`).join('')}
       <p class="note-line" style="margin:0;padding:14px 24px 18px">Each step happened off-chain and was signed by the party shown; only hashes, numbers and signatures are on-chain. Original documents stay with the signer and the platform, and the hash shows they have not been altered.</p>
@@ -1661,11 +1675,11 @@ function renderAsset(sym,tab){
         <div class="thr" style="bottom:${1.15/mx*100}%"><span>1.15× cure trigger</span></div>
         ${rows.map(r=>`<div class="col"><b>${r.c.toFixed(2)}×</b><i class="${r.c<1.25?'low':''}" style="height:${r.c/mx*100}%"></i></div>`).join('')}</div>
         <div class="cov-x">${rows.map(r=>`<span>${r.mon.split(' ')[0]}</span>`).join('')}</div></div></section>
-      <section class="block"><div class="sec-t"><h2>Monthly disclosure</h2></div><div class="panel tbl-wrap"><table class="tbl xt">
+      <section class="block"><div class="sec-t"><h2>Monthly disclosure</h2><p>As of Oct 12, 2026 · sample data · <button type="button" class="lnk" data-csv="${encodeURIComponent(['Month,Rent due,Received,Uptime %,To holders,Coverage'].concat(rows.map(r=>[r.mon,l.rent,r.g,r.u.toFixed(1),Math.round(p),r.c.toFixed(2)].join(','))).join('\n'))}" data-name="${sym}-monthly-disclosure.csv"><i class="ph ph-download-simple"></i> Download CSV</button></p></div><div class="panel tbl-wrap"><table class="tbl xt">
         <thead><tr><th>Month</th><th>Rent due</th><th>Received</th><th>Uptime</th><th>To holders</th><th>Coverage</th><th>Tx</th></tr></thead>
         <tbody>${rows.slice().reverse().map((r,j)=>`<tr><td>${r.mon}</td><td>${usd(l.rent)}</td><td>${usd(r.g)}</td><td>${r.u.toFixed(1)}%</td><td>${usd(Math.round(p))}</td><td class="${r.c<1.25?'neg':''}">${r.c.toFixed(2)}×</td><td>${txl(sym+'p'+j)}</td></tr>`).join('')}</tbody></table></div></section>`},
     onchain:()=>`<section class="block"><div class="sec-t"><h2>Contracts</h2></div><div class="panel"><dl class="contracts">
-        <div><dt>${sym} token</dt><dd>${txl(sym+'tok')}<small>Transferable; traded as ${sym}/AIUSD</small></dd></div>
+        <div><dt>${sym} token</dt><dd>${txl(sym+'tok')}<small>Not transferable in this phase</small></dd></div>
         <div><dt>Escrow contract</dt><dd>${txl(sym+'esc')}<small>Released ${fmtD(l.released)}</small></dd></div>
         <div><dt>Collection contract</dt><dd>${txl(sym+'col')}<small>Receives rent; pays in order</small></dd></div></dl></div></section>
       <section class="block"><div class="sec-t"><h2>Activity</h2></div><div class="panel"><ul class="events">
@@ -1688,11 +1702,11 @@ function renderAsset(sym,tab){
       </div>
       <div class="ab-r"><div class="srv3d" data-n="1" aria-label="3D illustration of a GPU server"></div><small>Illustration · ${parseInt(m.loan.gpu,10)/8} servers × 8 GPUs · drag to rotate</small></div>
       <div class="ab-k">
-        ${OK()?`<div class="y"><span>Yield to maturity</span><b class="num">${pct(m.yld,2)}</b><em>${pct(l.rate)} fixed · monthly</em></div>`:lockStat('Yield to maturity')}
+        ${OK()?`<div class="y"><span>Yield to maturity<sup>1</sup></span><b class="num">${pct(m.yld,2)}</b><em>${pct(l.rate)} fixed · monthly</em></div>`:lockStat('Yield to maturity')}
         <div><span>Outstanding</span><b class="num">${usd(Math.round(bal(l,k)))}</b><em>of ${usd(l.amount)}</em></div>
         <div><span>Next payment</span><b class="num">${usd(Math.round(p))}</b><em>${fmtD(next)}</em></div>
-        <div><span>Coverage</span><b class="num">${(l.got.at(-1)/p).toFixed(2)}×</b><em>Cure trigger 1.15×</em></div>
-        <div><span>Loan to value</span><b class="num">${pct(l.amount/l.appraisal,1)}</b><em>Limit 80%</em></div>
+        <div><span>Coverage<sup>2</sup></span><b class="num">${(l.got.at(-1)/p).toFixed(2)}×</b><em>Cure trigger 1.15×</em></div>
+        <div><span>Loan to value<sup>3</sup></span><b class="num">${pct(l.amount/l.appraisal,1)}</b><em>Limit 80%</em></div>
       </div>
     </section>
     <section class="ad-prog">
@@ -1949,6 +1963,9 @@ function renderNewIssue(n,tab){
           <div><dt>Allocation</dt><dd>First come, first served${VAULT?'; CCV up to 50%':''}</dd></div>
           <div><dt>Reserve</dt><dd>3 months · ${usd(Math.round(p*3))}, funded at release</dd></div>
           <div><dt>Withdrawals</dt><dd>Until fully subscribed or the window closes</dd></div>
+          <div><dt>Subscription cut-off</dt><dd>5:00 pm ET on ${fmtD(n.closes)} (sample)</dd></div>
+          <div><dt>Settlement</dt><dd>On-chain in AIUSD, same day; redeemable 1:1 for USDC</dd></div>
+          <div><dt>Structure</dt><dd>Bankruptcy-remote SPV · jurisdiction to be confirmed</dd></div>
         </dl></div>`:gatebox('Key terms',['Rate','Minimum subscription','Allocation and withdrawal rules','Release deadline'])}
       </section>
       <section class="block"><div class="ov2">
@@ -2050,6 +2067,11 @@ function renderNewIssue(n,tab){
   if(o&&OK()) bindInv(app.querySelector('.ip-r'),io,()=>{const y=scrollY;route();scrollTo({top:y})});
   if(focus) setTimeout(()=>{const i=$('#invAmt'); if(i){i.focus({preventScroll:true});app.querySelector('.ip').scrollIntoView({block:'center'})}},60);
 }
+
+/* 下载月度披露 CSV：数据在按钮的 data-csv 里，现场生成文件 */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-csv]'); if(!b) return;
+  const url=URL.createObjectURL(new Blob([decodeURIComponent(b.dataset.csv)],{type:'text/csv'}));
+  const a=Object.assign(document.createElement('a'),{href:url,download:b.dataset.name||'data.csv'}); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); toast('Downloaded '+(b.dataset.name||'data.csv'))});
 
 /* ======================= 访问分层 =======================
    第一阶段只有通过企业认证（KYB）的机构能认购。所有人都能看规模、覆盖倍数、抵押率、还款记录和链上记录；
