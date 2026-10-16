@@ -22,3 +22,7 @@ python3 -m http.server 8000
   - Trading, the vaults and the transparency page are built but hidden for this phase.
 
 Shared images, video and logos are in `assets/`.
+
+## Backend and contracts
+
+Not started. `backend/` will hold the API, indexer and keeper; `contracts/` holds the smart contracts and is the audit scope. Each folder's README describes its plan.

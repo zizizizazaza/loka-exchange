@@ -1,0 +1,195 @@
+// Data model for the user system: accounts, institutions, wallets and KYB.
+// Flows are described in docs/wallets-and-permissions.md and docs/kyb.md.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// A person who signed in through Privy (email or wallet).
+model User {
+  id          String       @id @default(uuid()) @db.Uuid
+  privyDid    String       @unique @map("privy_did")
+  /// Lowercase. One email belongs to one Privy user: Privy merges sign-ins by email, and the backend refuses a
+  /// second Privy user with the same email instead of merging it here (docs/wallets-and-permissions.md).
+  email       String?      @unique
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  memberships Membership[]
+  wallets     Wallet[]
+
+  @@map("users")
+}
+
+/// An investing institution. KYB status is tracked per institution; the whitelist is per wallet address.
+model Institution {
+  id        String       @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  members   Membership[]
+  wallets   Wallet[]
+  kybCase   KybCase?
+
+  @@map("institutions")
+}
+
+enum MemberRole {
+  ADMIN
+  MEMBER
+}
+
+model Membership {
+  userId        String      @map("user_id") @db.Uuid
+  institutionId String      @map("institution_id") @db.Uuid
+  role          MemberRole  @default(MEMBER)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, institutionId])
+  @@map("memberships")
+}
+
+enum WalletKind {
+  EXTERNAL // the user's own wallet: MetaMask, WalletConnect, custody
+  EMBEDDED // Privy embedded wallet created at email sign-in; owned by the user only
+}
+
+/// A wallet linked to a user in Privy. When an institution chooses it as an investing address,
+/// it is whitelisted on-chain after KYB.
+model Wallet {
+  id               String       @id @default(uuid()) @db.Uuid
+  /// Lowercase 0x address.
+  address          String       @unique
+  kind             WalletKind
+  /// Privy embedded wallet with the app's server granted signing rights. Never whitelisted:
+  /// embedded wallets must be owned by the user alone (docs/wallets-and-permissions.md).
+  delegated        Boolean      @default(false)
+  userId           String       @map("user_id") @db.Uuid
+  institutionId    String?      @map("institution_id") @db.Uuid
+  whitelistChainId Int?         @map("whitelist_chain_id")
+  whitelistTxHash  String?      @map("whitelist_tx_hash")
+  whitelistedAt    DateTime?    @map("whitelisted_at")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution      Institution? @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+
+  @@index([institutionId])
+  @@map("wallets")
+}
+
+/// See docs/kyb.md section 2.
+enum KybStatus {
+  NOT_STARTED
+  IN_PROGRESS // filling in the form; checks run as each step is completed
+  SUBMITTED // waiting for platform review
+  INFO_REQUESTED // the reviewer asked for more (someone's ID, a certificate, an ownership chart)
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum KybDecision {
+  ACCEPT
+  REVIEW
+  REJECT
+}
+
+enum KybCheckKind {
+  COMPANY // one /kyb call on the registration certificate
+  APPLICANT_ID // the applicant's DocuPass session: ID document, selfie and liveness
+  SCREENING // one /amlv3 name search for a director or owner (or the applicant)
+  PERSON_ID // a DocuPass session for another person, only when the reviewer asks for one
+}
+
+/// One KYB case per institution.
+model KybCase {
+  id              String      @id @default(uuid()) @db.Uuid
+  institutionId   String      @unique @map("institution_id") @db.Uuid
+  status          KybStatus   @default(NOT_STARTED)
+  provider        String
+  /// The member who filled in and submitted the application.
+  applicantUserId String?     @map("applicant_user_id") @db.Uuid
+  /// The form as the applicant last saved it (company, applicant, people, addresses, declarations).
+  /// Validated by the KYB module; results of the checks are kept in kyb_checks, not here.
+  draft           Json?
+  /// Company name, registration number, country and status as read from the documents and registry.
+  companyData     Json?       @map("company_data")
+  /// False when no registry result came back; such cases always go to manual review.
+  registryFound   Boolean?    @map("registry_found")
+  rejectReason    String?     @map("reject_reason")
+  reviewedBy      String?     @map("reviewed_by") @db.Uuid
+  reviewNote      String?     @map("review_note")
+  submittedAt     DateTime?   @map("submitted_at")
+  decidedAt       DateTime?   @map("decided_at")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  institution     Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  checks          KybCheck[]
+
+  @@map("kyb_cases")
+}
+
+/// One provider transaction: the company check, or one person's identity check.
+/// Only ids, decisions and warning codes are stored; documents and selfies stay with the provider.
+model KybCheck {
+  id                    String       @id @default(uuid()) @db.Uuid
+  caseId                String       @map("case_id") @db.Uuid
+  kind                  KybCheckKind
+  providerTransactionId String?      @unique @map("provider_transaction_id")
+  /// DocuPass session reference, used to poll the result.
+  providerReference     String?      @unique @map("provider_reference")
+  /// Which person in the draft this check is about (draft people key, or "applicant").
+  personKey             String?      @map("person_key")
+  /// Date of birth the check was made with. A changed name or birth date needs a new check.
+  personDob             String?      @map("person_dob")
+  personName            String?      @map("person_name")
+  personRole            String?      @map("person_role")
+  ownershipPercent      Decimal?     @map("ownership_percent") @db.Decimal(5, 2)
+  personEmail           String?      @map("person_email")
+  sessionUrl            String?      @map("session_url")
+  sessionExpiresAt      DateTime?    @map("session_expires_at")
+  decision              KybDecision?
+  warnings              Json?
+  /// Provider data worth showing a reviewer: registry result, extracted company fields, screening hits.
+  result                Json?
+  createdAt             DateTime     @default(now()) @map("created_at")
+  updatedAt             DateTime     @updatedAt @map("updated_at")
+  case                  KybCase      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+  @@map("kyb_checks")
+}
+
+/// Raw provider webhooks, kept for audit and de-duplication.
+model KybEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  provider      String
+  eventType     String   @map("event_type")
+  transactionId String   @map("transaction_id")
+  payload       Json
+  receivedAt    DateTime @default(now()) @map("received_at")
+
+  @@unique([provider, transactionId, eventType])
+  @@map("kyb_events")
+}
+
+/// Every manual or privileged action: KYB reviews, whitelist writes, multisig proposals.
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  actorUserId String?  @map("actor_user_id") @db.Uuid
+  action      String
+  target      String?
+  detail      Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([target])
+  @@map("audit_logs")
+}

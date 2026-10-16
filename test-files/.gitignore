@@ -1,0 +1,6 @@
+# Real documents (public records, but they name real people): keep them local, not in git.
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.webp
