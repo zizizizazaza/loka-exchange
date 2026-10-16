@@ -1,0 +1,577 @@
+/* v7 lender app (#/v7/...): the original pages moved toward Galaxy's restraint for institutions, PRD v0.3 wording.
+   Scoped under .mk7, plus body.mk7-page, which hides the shared header and footer (the v7 shell draws its own).
+   - white page, black hero band, square boxes (4px) and flat tables under a black rule;
+   - one grotesque throughout (Inter Tight): titles at 500 and set tight, text at 400, figures at 500 with tabular
+     digits; labels in sentence case; Geist Mono only for codes and addresses;
+   - black for actions; one brand colour, the original Loka green, in a few fixed places (interest rates, progress,
+     completed steps, the chart line, current nav and tab, text links, section numbers); amber only for waiting or watch;
+   - figures use tabular digits everywhere. */
+
+body.mk7-page { background: #fff; }
+body.mk7-page .xtop:not(.mk7-top), body.mk7-page .xfoot { display: none; }
+body.mk7-page #app { max-width: none; padding: 0; }
+
+.mk7 {
+  --sans: 'Inter Tight', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --serif: var(--sans);
+  --k-ink: #0e0f0f;
+  --k-2: #464b49;
+  --k-3: #6d716f;
+  --k-hair: #e5e5e1;
+  --k-line2: rgba(14, 15, 15, .18);
+  --k-soft: #f6f6f3;
+  /* The original Loka green (prototype --accent), and its light tint for dark backgrounds (prototype .ab-k .y b). */
+  --k-brand: #3d6f5b;
+  --k-brand-dk: #9fd1b9;
+  /* Chart series, validated as a pair (dataviz validate_palette.js, light): 1 = the brand hue raised to the chroma
+     floor, 2 = reference slot 1. */
+  --k-series-1: #1f7a50;
+  --k-series-2: #2a78d6;
+  --k-amber: #8a5a12;
+  /* Colour beyond the brand green: one deep forest for dark surfaces and actions, a pale green tint for hover and
+     tags, and a steel blue only to tell construction facilities from operating ones. */
+  --k-forest: #13261e;
+  --k-forest-2: #1d3b2f;
+  --k-tint: #edf4f0;
+  --k-steel: #4f6b80;
+  --k-steel-tint: #edf1f5;
+  /* Pale sky to mint to a touch of lime: the Loans figures strip and the lending box header. */
+  --k-grad: radial-gradient(70% 120% at 0% 0%, #cfe8f3 0%, rgba(207, 232, 243, 0) 60%), radial-gradient(60% 120% at 100% 100%, #eaf7cf 0%, rgba(234, 247, 207, 0) 65%), linear-gradient(110deg, #d7eef0 0%, #dcf1e4 50%, #e8f5d6 100%);
+  color: var(--k-ink);
+  font-size: 14px;
+  line-height: 1.55;
+  font-family: var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+/* :where() keeps this reset at one class, so the single-class rules below can set margins. */
+.mk7 :where(h1, h2, h3, p, dl, dd, ol, ul) { margin: 0; }
+.mk7 .mk7-w { max-width: 1240px; margin: 0 auto; padding: 0 40px; }
+.mk7 .r { text-align: right; }
+.mk7-eye { font-size: 12.5px; font-weight: 500; color: var(--k-3); }
+/* Two classes, so it wins over the .mk7 .mk7-w padding shorthand. */
+.mk7 .mk7-main { padding-top: 48px; }
+.mk7-fine { margin-top: 16px; font-size: 12.5px; color: var(--k-3); }
+.mk7-note { max-width: 680px; margin-bottom: 18px; font-size: 14px; color: var(--k-2); }
+.mk7-dim { font-size: 12.5px; color: var(--k-3); }
+.mk7-wide { width: 100%; justify-content: center; padding: 0 20px; }
+.mk7 .btn-primary { background: var(--k-forest-2); }
+.mk7 .btn-primary:hover { background: var(--k-brand); }
+.mk7-btn-light { background: #fff; color: var(--k-ink); }
+.mk7-btn-light:hover { background: #e9e9e6; }
+
+/* Header: rendered with the shared header's own classes (.xtop, .brand, .xnav, .xright in prototype.css), so the
+   layout matches it: full width, brand and nav at the left edge, account at the right edge. */
+.mk7-top { font-size: 15px; line-height: 1.6; }
+.mk7-top .xright { gap: 20px; }
+.mk7-org { display: flex; align-items: center; gap: 8px; font-size: 13.5px; white-space: nowrap; }
+.mk7-org i { font-size: 16px; color: var(--k-brand); }
+.mk7-top .xnav a[aria-current]::after { background: var(--k-brand); }
+.mk7-hlink { padding: 0; border: 0; background: none; font: inherit; font-size: 13.5px; color: var(--k-3); cursor: pointer; white-space: nowrap; }
+.mk7-hlink:hover { color: var(--k-ink); }
+.mk7-pend { font-size: 13.5px; color: var(--k-amber); white-space: nowrap; }
+
+/* Facilities hero band */
+/* Page header: white, title and lead, then the key figures under a black rule (was a black band). */
+.mk7-hero { color: var(--k-ink); }
+.mk7-hero .mk7-w { padding-top: 40px; }
+.mk7-hero h1 { margin-top: 20px; max-width: 640px; font-weight: 500; font-size: 60px; line-height: 1.02; letter-spacing: -.03em; }
+.mk7-lead { margin-top: 20px; max-width: 540px; font-size: 16px; line-height: 1.6; color: var(--k-2); }
+.mk7-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 24px; border-top: 1px solid var(--k-ink); border-bottom: 1px solid var(--k-hair); }
+.mk7-stats > div { padding: 20px 24px 24px; }
+.mk7-stats > div:first-child { padding-left: 0; }
+.mk7-stats > div + div { border-left: 1px solid var(--k-hair); }
+.mk7-stats dt { font-size: 12.5px; color: var(--k-3); }
+.mk7-stats dt .mk7-info { margin-left: 4px; vertical-align: -4px; }
+.mk7-stats dd { margin-top: 8px; font-weight: 500; font-size: 36px; line-height: 1.1; letter-spacing: -.01em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.mk7-stats dd.brand { color: var(--k-brand); }
+.mk7-stats small { display: block; margin-top: 6px; font-size: 12.5px; color: var(--k-3); }
+
+/* Sections */
+.mk7-sec { padding-top: 112px; }
+.mk7-blk { padding-top: 88px; }
+.mk7-sh { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; padding-bottom: 24px; }
+/* Section titles at display size, against 14px text: the contrast carries the hierarchy (Galaxy sets 48–72px). */
+.mk7-sh h2 { font-weight: 500; font-size: 52px; line-height: 1.02; letter-spacing: -.035em; }
+.mk7-blk .mk7-sh h2 { font-size: 40px; letter-spacing: -.03em; }
+/* Split sections: title and note in a sticky left column, content on the right. */
+.mk7-blk.split { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 40px; }
+.mk7-blk.split .mk7-blk-l { position: sticky; top: 84px; align-self: start; }
+.mk7-blk.split .mk7-sh { flex-direction: column; align-items: flex-start; gap: 8px; padding-bottom: 12px; }
+.mk7-blk.split .mk7-sh h2 { font-size: 30px; line-height: 1.08; letter-spacing: -.025em; }
+.mk7-blk.split .mk7-note { font-size: 13.5px; line-height: 1.55; }
+.mk7-blk.split .mk7-tkv > div { grid-template-columns: 170px minmax(0, 1fr); }
+.mk7-sh .mk7-eye { white-space: nowrap; }
+
+/* Open facilities: cards, rate first. Motion is limited to a staggered entrance (once per visit), the commitment bar
+   growing from the left, a 2px lift on hover and a press on the button; reduced motion keeps only the fades. */
+.mk7 { --ease-out: cubic-bezier(.23, 1, .32, 1); }
+.mk7-open { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.mk7-oc { position: relative; display: flex; flex-direction: column; padding: 28px; border: 1px solid var(--k-hair); border-radius: 4px; background: #fff; animation: mk7-in 520ms var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 70ms + 80ms); transition: transform 240ms var(--ease-out), border-color 240ms ease, box-shadow 240ms ease; }
+/* A 3px type colour along the top; on hover a pale green wash fades in and the border takes the brand green. */
+.mk7-oc::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(160deg, var(--k-tint) 0%, rgba(237, 244, 240, 0) 62%); opacity: 0; transition: opacity 280ms ease; pointer-events: none; }
+.mk7-oc::after { content: ""; position: absolute; top: -1px; left: -1px; right: -1px; height: 3px; border-radius: 4px 4px 0 0; background: var(--k-brand); }
+.mk7-oc.con::after { background: var(--k-steel); }
+.mk7-oc > * { position: relative; }
+.mk7-kind { display: inline-block; margin-right: 8px; padding: 2px 8px; border-radius: 3px; background: var(--k-tint); font-weight: 500; color: var(--k-brand); }
+.mk7-oc.con .mk7-kind { background: var(--k-steel-tint); color: var(--k-steel); }
+.mk7-oc-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 12.5px; color: var(--k-3); white-space: nowrap; }
+.mk7-oc-top .mono { font-size: 12px; }
+.mk7-oc h3 { margin-top: 14px; font-weight: 500; font-size: 24px; line-height: 1.15; letter-spacing: -.02em; }
+/* The title link covers the card, so the whole card opens the facility. */
+.mk7-oc-link { text-decoration: none; }
+.mk7-oc-link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.mk7-oc-link:focus-visible { outline: none; }
+.mk7-oc:has(.mk7-oc-link:focus-visible) { outline: 2px solid var(--k-ink); outline-offset: 2px; }
+.mk7-oc-rate { margin-top: 22px; }
+.mk7-oc-rate span { display: block; font-size: 12.5px; color: var(--k-3); }
+.mk7-oc-rate b { display: block; margin-top: 6px; font-weight: 500; font-size: 40px; line-height: 1.05; letter-spacing: -.025em; color: var(--k-brand); }
+.mk7-oc-rate .mk7-lock { position: relative; z-index: 1; height: 42px; font-size: 15px; }
+.mk7-oc-figs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--k-hair); }
+.mk7-oc-figs dt { font-size: 12px; color: var(--k-3); }
+.mk7-oc-figs dd { margin-top: 4px; font-weight: 500; font-size: 16px; white-space: nowrap; }
+.mk7-oc-cmt { margin-top: 24px; }
+.mk7-oc-cmt p { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--k-2); }
+.mk7-oc-bar { display: block; height: 3px; margin-top: 10px; overflow: hidden; border-radius: 2px; background: var(--k-hair); }
+.mk7-oc-bar i { display: block; height: 100%; background: var(--k-brand); transform-origin: left; animation: mk7-grow 1100ms var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 70ms + 380ms); }
+.mk7-oc-act { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 36px; margin-top: auto; padding-top: 28px; }
+.mk7-oc-act .btn { position: relative; z-index: 1; }
+.mk7-oc-act .btn:active { transform: scale(.97); }
+.mk7-oc-more { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; font-size: 13.5px; font-weight: 500; color: var(--k-brand); }
+.mk7-oc-more i { transition: transform 240ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .mk7-oc:hover { transform: translateY(-2px); border-color: rgba(61, 111, 91, .45); box-shadow: 0 18px 36px -20px rgba(19, 38, 30, .35); }
+  .mk7-oc:hover::before { opacity: 1; }
+  .mk7-oc.con:hover { border-color: rgba(79, 107, 128, .45); }
+  .mk7-oc.con::before { background: linear-gradient(160deg, var(--k-steel-tint) 0%, rgba(237, 241, 245, 0) 62%); }
+  .mk7-oc:hover .mk7-oc-more i { transform: translateX(4px); }
+}
+@keyframes mk7-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes mk7-grow { from { transform: scaleX(0); } }
+
+.mk7-bar { height: 2px; margin-top: 10px; background: var(--k-hair); }
+.mk7-bar i { display: block; height: 100%; background: var(--k-brand); transition: width .8s var(--ease); }
+.mk7-kv { margin-top: 18px; font-size: 13.5px; }
+.mk7-kv div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-top: 1px solid var(--k-hair); }
+.mk7-kv dt { color: var(--k-3); }
+.mk7-kv dd { text-align: right; }
+.mk7-more { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500; text-decoration: none; color: var(--k-brand); }
+.mk7-more i { transition: transform .3s var(--ease); }
+.mk7-more:hover i { transform: translateX(3px); }
+
+/* Status: a dot and a word; colour only here */
+.mk7-st { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--k-2); white-space: nowrap; }
+.mk7-st::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.mk7-st.open, .mk7-st.build { color: var(--k-ink); }
+.mk7-st.wait { color: var(--k-amber); }
+.mk7-st.ok { color: var(--k-brand); }
+
+/* ⓘ explanations: the detail that used to sit under each figure */
+.mk7-info { position: relative; display: inline-flex; vertical-align: middle; }
+.mk7-info button { display: grid; place-items: center; width: 18px; height: 18px; padding: 0; border: 0; background: none; font-size: 14px; color: var(--k-3); cursor: help; }
+.mk7-info button:hover, .mk7-info button:focus-visible { color: var(--k-ink); }
+.mk7-info-tip { position: absolute; left: 50%; bottom: calc(100% + 8px); z-index: 5; width: max-content; max-width: 260px; padding: 8px 10px; border-radius: 4px; background: var(--k-ink); color: #fff; font-size: 12px; font-weight: 400; line-height: 1.45; letter-spacing: 0; text-align: left; text-transform: none; white-space: normal; pointer-events: none; opacity: 0; transform: translate(-50%, 4px); transition: opacity .15s, transform .15s; }
+.mk7-info:hover .mk7-info-tip, .mk7-info:focus-within .mk7-info-tip { opacity: 1; transform: translate(-50%, 0); }
+
+/* Locked figures */
+.mk7-lock { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 400; letter-spacing: 0; color: var(--k-3); cursor: pointer; }
+.mk7-lock:hover { color: var(--k-ink); }
+.mk7-hero .mk7-lock { height: 40px; font-size: 15px; }
+
+/* Active facilities: a flat table under a black rule */
+.mk7-tbl { border-top: 1px solid var(--k-ink); }
+.mk7-row { display: grid; grid-template-columns: minmax(220px, 2.4fr) 1.3fr .85fr .9fr .7fr .7fr 1fr 20px; gap: 20px; align-items: center; padding: 18px 12px; border-bottom: 1px solid var(--k-hair); font-size: 14px; text-decoration: none; transition: background-color .2s; }
+.mk7-row.hd { padding-top: 12px; padding-bottom: 12px; white-space: nowrap; font-size: 12.5px; font-weight: 500; color: var(--k-3); }
+a.mk7-row:hover { background: var(--k-soft); }
+.mk7-row.hd > span { display: inline-flex; align-items: center; gap: 4px; }
+.mk7-row.hd > .r { justify-content: flex-end; }
+.mk7-row small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--k-3); }
+.mk7-fac { display: flex; align-items: baseline; gap: 10px; min-width: 0; white-space: nowrap; }
+.mk7-fac b { font-weight: 500; font-size: 15px; overflow: hidden; text-overflow: ellipsis; }
+.mk7-fac a { min-width: 0; overflow: hidden; text-overflow: ellipsis; text-decoration: none; }
+.mk7-fac a:hover b { color: var(--k-brand); text-decoration: underline; text-underline-offset: 3px; }
+.mk7-fac .mono { color: var(--k-3); }
+.mk7-row .warn { color: var(--k-amber); }
+.mk7-row .go { justify-self: end; color: var(--k-3); transition: color .2s, transform .3s var(--ease); }
+a.mk7-row:hover .go { color: var(--k-ink); transform: translateX(3px); }
+
+/* Step labels on Borrow and the layer list on facility pages */
+.mk7-process .mk7-eye, .mk7-layers .mk7-eye { color: var(--k-brand); }
+
+/* Inner pages: a shorter hero band (title, actions, key figures), then the page on white */
+.mk7-phero .mk7-w { padding-top: 48px; }
+.mk7-phero-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+.mk7-phero h1 { margin-top: 14px; font-size: 52px; }
+.mk7-phero .mk7-lead { margin-top: 14px; max-width: 680px; font-size: 15.5px; }
+.mk7-phero .mk7-stats { margin-top: 40px; }
+.mk7-phero-end { height: 48px; }
+/* Loans: the key figures on a pale sky-to-mint-to-lime strip (--k-grad). */
+.mk7-banner { position: relative; overflow: hidden; margin-top: 32px; border-radius: 6px; isolation: isolate; --bn-1: var(--k-ink); --bn-2: rgba(14, 15, 15, .62); --bn-rule: rgba(14, 15, 15, .14); --bn-rate: var(--k-brand); background: var(--k-grad); }
+.mk7 .mk7-banner .mk7-stats { position: relative; margin: 0 32px; padding: 0; border: 0; }
+.mk7-banner .mk7-stats > div { padding: 30px 24px 32px; }
+.mk7-banner .mk7-stats > div:first-child { padding-left: 0; }
+.mk7-banner .mk7-stats > div + div { border-left-color: var(--bn-rule); }
+.mk7-banner .mk7-stats dt, .mk7-banner .mk7-info button { color: var(--bn-2); }
+.mk7-banner .mk7-info button:hover { color: var(--bn-1); }
+.mk7-banner .mk7-stats dd { color: var(--bn-1); }
+.mk7-banner .mk7-stats dd.brand { color: var(--bn-rate); }
+.mk7-banner .mk7-lock { color: var(--bn-2); }
+/* The racks drawing sits beside the Loans title, in the header's empty right half. */
+.mk7-phero.big .mk7-phero-top { align-items: center; }
+.mk7-phero.big .mk7-asof { display: block; margin-top: 16px; }
+.mk7-phero.big .mk7-ph-act { flex: 0 1 400px; }
+.mk7-banner-art { display: block; width: 100%; height: 220px; color: rgba(14, 15, 15, .6); fill: none; stroke: currentColor; stroke-width: 1; stroke-linejoin: round; }
+.mk7-banner-art .units { opacity: .6; }
+.mk7-banner-art .vol { fill: #fff; }
+/* 1. The outline draws in. */
+.mk7-banner-art .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: mk7-draw 1400ms var(--ease-out) 100ms forwards; }
+/* 2. Racks rise in, left to right, as the outline finishes. */
+.mk7-banner-art .rack { animation: mk7-rise 640ms var(--ease-out) backwards; animation-delay: calc(500ms + var(--i) * 45ms); }
+/* 3. Lights blink out of step: some flicker like disk activity, some breathe. */
+.mk7-banner-art .light { fill: var(--k-brand); stroke: none; animation: var(--t) ease-in-out var(--d) infinite; }
+.mk7-banner-art .light.breathe { animation-name: mk7-breathe; }
+.mk7-banner-art .light.blink { animation-name: mk7-blink; animation-timing-function: steps(1, end); }
+@keyframes mk7-draw { to { stroke-dashoffset: 0; } }
+@keyframes mk7-rise { from { opacity: 0; transform: translateY(6px); } }
+@keyframes mk7-breathe { 50% { opacity: .2; } }
+@keyframes mk7-blink { 0%, 100% { opacity: 1; } 6% { opacity: .15; } 10% { opacity: 1; } 14% { opacity: .15; } 18% { opacity: 1; } 52% { opacity: .35; } 56% { opacity: 1; } }
+
+.mk7-phero.big h1 { font-size: 76px; line-height: 1; letter-spacing: -.04em; }
+.mk7-phero.big .mk7-stats dd { font-size: 44px; letter-spacing: -.025em; }
+.mk7-phero.big, .mk7-phero.big ~ .mk7-sec .mk7-sh { animation: mk7-fade 480ms ease backwards; }
+@keyframes mk7-fade { from { opacity: 0; } }
+.mk7-asof { font-size: 13px; color: var(--k-3); white-space: nowrap; }
+/* Compact: the working pages (Portfolio, Fund account), so tables and forms start higher. */
+.mk7-phero.compact .mk7-w { padding-top: 24px; }
+.mk7-phero.compact h1 { margin-top: 8px; font-size: 40px; }
+.mk7-phero.compact .mk7-stats { margin-top: 18px; }
+.mk7-phero.compact .mk7-stats > div { padding-top: 14px; padding-bottom: 18px; }
+.mk7-phero.compact .mk7-stats dd { font-size: 30px; }
+.mk7-phero.compact .mk7-stats dd.sm { padding-top: 8px; font-size: 17px; }
+.mk7-phero.compact .mk7-phero-end { height: 32px; }
+.mk7-ph-act { display: flex; flex-wrap: wrap; gap: 10px; }
+.mk7-ph-act .btn { gap: 8px; }
+.mk7-stats.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.mk7-stats.c5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.mk7-stats dd.sm { padding-top: 10px; font-weight: 400; font-size: 18px; letter-spacing: 0; white-space: normal; }
+/* Two classes, so it wins over the .mk7 .mk7-w padding shorthand; the first block's own top space is dropped. */
+.mk7 .mk7-after { padding-top: 56px; }
+.mk7-after > :first-child { margin-top: 0; padding-top: 0; }
+
+/* Generic table */
+.mk7-tscroll { overflow-x: auto; }
+.mk7-table { width: 100%; border-collapse: collapse; font-size: 14px; border-top: 1px solid var(--k-ink); }
+.mk7-table th { padding: 12px; border-bottom: 1px solid var(--k-hair); text-align: left; white-space: nowrap; font-weight: 500; font-size: 12.5px; color: var(--k-3); }
+.mk7-table td { padding: 14px 12px; border-bottom: 1px solid var(--k-hair); vertical-align: middle; }
+.mk7-table th:first-child, .mk7-table td:first-child { padding-left: 0; }
+.mk7-table th:last-child, .mk7-table td:last-child { padding-right: 0; }
+.mk7-table .r { text-align: right; }
+.mk7-table td small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--k-3); }
+.mk7-table td a { text-decoration: none; }
+.mk7-table td a:hover { color: var(--k-brand); text-decoration: underline; text-underline-offset: 3px; }
+.mk7-table b { font-weight: 500; }
+.mk7-table .warn { color: var(--k-amber); }
+.mk7-table .mono { font-family: var(--mono); font-size: 12.5px; }
+.mk7-chart + .mk7-tscroll { margin-top: 28px; }
+.mk7-empty { padding: 20px 0; border-top: 1px solid var(--k-ink); border-bottom: 1px solid var(--k-hair); font-size: 14px; color: var(--k-2); }
+.mk7-empty a { color: var(--k-brand); }
+.mk7-two { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 48px; }
+
+/* Facility detail: the list page's header (title, one line of facts, four figures), then a jump list */
+.mk7-dhead-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 40px; align-items: stretch; }
+.mk7-dhead-main { display: flex; flex-direction: column; min-width: 0; }
+.mk7-dhead-main .mk7-stats { margin-top: 32px; }
+.mk7-dhead-art { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0; }
+/* No panel: the board sits on the page. A fixed aspect keeps the whole model in view, whatever the column height. */
+.mk7-dhead-art .srv3d { width: 100%; height: auto; aspect-ratio: 5 / 4; margin: 0; }
+.mk7-dhead-art figcaption { margin-top: 4px; text-align: center; font-size: 11.5px; color: var(--k-3); }
+.mk7-dhead h1 { font-weight: 500; font-size: 46px; line-height: 1.05; letter-spacing: -.03em; }
+.mk7-dmeta { margin-top: 12px; font-size: 14px; color: var(--k-2); }
+.mk7-dmeta .mono { font-size: 13px; }
+.mk7-dhead-st { display: flex; align-items: center; gap: 16px; margin-top: 14px; white-space: nowrap; }
+.mk7-dhead .mk7-stats dd { font-size: 30px; }
+.mk7-dhead .mk7-lock { height: 33px; font-size: 15px; }
+/* Spec sheet: what the facility is, in large type under small uppercase labels (Galaxy's campus facts). */
+/* Commitment progress under the figures, for loans still raising. The bar grows in once on load. */
+.mk7-raise { padding: 20px 0 22px; border-top: 1px solid var(--k-hair); }
+.mk7-raise-top, .mk7-raise-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.mk7-raise-top b { font-weight: 500; font-size: 17px; }
+.mk7-raise-top span { font-size: 14px; color: var(--k-2); }
+.mk7-raise-bar { display: block; height: 6px; margin-top: 12px; overflow: hidden; border-radius: 3px; background: var(--k-hair); }
+.mk7-raise-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6fa98f, var(--k-brand)); transform-origin: left; animation: mk7-grow 1200ms var(--ease-out) 300ms backwards; }
+.mk7-raise-meta { margin-top: 10px; font-size: 13px; color: var(--k-3); }
+@media (prefers-reduced-motion: reduce) { .mk7-raise-bar i { animation: none; } }
+
+/* Spec: the same four columns as the figures, one step quieter (hairline above, 15px values). */
+.mk7-spec { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--k-hair); }
+.mk7-spec > div { padding: 16px 24px 0; }
+.mk7-spec > div:first-child { padding-left: 0; }
+.mk7-spec dt { font-size: 12.5px; color: var(--k-3); }
+.mk7-spec dd { margin-top: 4px; font-weight: 500; font-size: 15px; line-height: 1.35; }
+.mk7-jump { display: flex; flex-wrap: wrap; gap: 6px 24px; margin-top: 40px; padding: 14px 0; border-bottom: 1px solid var(--k-hair); }
+.mk7-jump button { padding: 0; border: 0; background: none; font: inherit; font-size: 13.5px; color: var(--k-3); cursor: pointer; }
+.mk7-jump button:hover { color: var(--k-ink); }
+.mk7 .mk7-dhead .mk7-stats { border-bottom: 0; }
+.mk7-blk { scroll-margin-top: 76px; }
+.mk7-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 13.5px; color: var(--k-3); text-decoration: none; }
+.mk7-back:hover { color: var(--k-brand); }
+.mk7-dbody { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 56px; align-items: start; }
+.mk7-daside { position: sticky; top: 84px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 56px; }
+
+/* Terms: a term-sheet table */
+.mk7-tkv { border-top: 1px solid var(--k-ink); font-size: 14px; }
+.mk7-tkv > div { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; padding: 12px 0; border-bottom: 1px solid var(--k-hair); }
+.mk7-tkv dt { color: var(--k-3); }
+.mk7-box .mk7-tkv > div { grid-template-columns: 110px minmax(0, 1fr); gap: 16px; }
+
+/* Conditions and milestones */
+.mk7-steps, .mk7-layers { padding: 0; list-style: none; border-top: 1px solid var(--k-ink); }
+.mk7-steps li, .mk7-layers li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--k-hair); }
+.mk7-steps i { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--k-line2); border-radius: 50%; font-size: 12px; font-style: normal; color: var(--k-2); }
+.mk7-steps li.done i { border-color: var(--k-brand); background: var(--k-brand); color: #fff; }
+.mk7-steps li.now i { border-color: var(--k-amber); color: var(--k-amber); }
+.mk7-steps b, .mk7-layers b { display: block; font-weight: 500; }
+.mk7-steps small, .mk7-layers small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--k-3); }
+.mk7-steps em, .mk7-layers em { font-style: normal; font-size: 13.5px; text-align: right; white-space: nowrap; color: var(--k-3); }
+.mk7-steps li.done em, .mk7-layers em { color: var(--k-ink); }
+.mk7-steps li.now em { color: var(--k-amber); }
+
+/* Coverage chart: one series in ink, the covenant line in amber, hover and focus tooltip */
+.mk7-chart { position: relative; margin-top: 4px; }
+.mk7-chart-in { position: relative; }
+.mk7-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.mk7-chart .grid { stroke: var(--k-hair); stroke-width: 1; }
+.mk7-chart .tick { font-size: 11px; fill: var(--k-3); }
+.mk7-chart .th { stroke: var(--k-amber); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.mk7-chart .th-l { font-size: 11.5px; fill: var(--k-2); }
+.mk7-chart .ln { fill: none; stroke: var(--k-series-1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.mk7-chart .pt { fill: var(--k-series-1); stroke: #fff; stroke-width: 2; }
+.mk7-chart .lbl { font-size: 12.5px; font-weight: 500; fill: var(--k-ink); }
+.mk7-chart .cross { stroke: var(--k-line2); stroke-width: 1; }
+.mk7-chart .base { stroke: var(--k-line2); stroke-width: 1; }
+.mk7-chart .bar.p { fill: var(--k-series-1); }
+.mk7-chart .bar.i { fill: var(--k-series-2); }
+.mk7-chart g { transition: opacity .2s; }
+.mk7-chart g.dim { opacity: .45; }
+.mk7-chart .est { fill: none; stroke: var(--k-series-1); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.mk7-legend { display: flex; gap: 20px; margin-bottom: 8px; font-size: 12.5px; color: var(--k-2); }
+.mk7-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.mk7-legend i { width: 10px; height: 10px; border-radius: 2px; }
+.mk7-legend .s1 { background: var(--k-series-1); }
+.mk7-legend .s2 { background: var(--k-series-2); }
+.mk7-chart .hit { fill: transparent; outline: none; }
+.mk7-chart .hit:focus-visible { fill: rgba(14, 15, 15, .05); }
+.mk7-tip { position: absolute; z-index: 2; display: grid; gap: 1px; padding: 8px 10px; border-radius: 4px; background: var(--k-ink); color: #fff; font-size: 12px; line-height: 1.45; white-space: nowrap; pointer-events: none; transform: translate(-50%, calc(-100% - 14px)); }
+.mk7-tip b { font-weight: 500; }
+.mk7-tip span { color: rgba(255, 255, 255, .75); }
+
+/* On-chain record */
+.mk7-events { margin-top: 20px; padding: 0; list-style: none; border-top: 1px solid var(--k-hair); }
+.mk7-events li { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--k-hair); font-size: 13.5px; }
+.mk7-events span { color: var(--k-3); }
+.mk7-events b { font-weight: 400; }
+
+/* Documents */
+.mk7-docs { padding: 0; list-style: none; border-top: 1px solid var(--k-ink); }
+.mk7-docs button { display: grid; grid-template-columns: 20px minmax(0, 1fr) 20px; gap: 14px; align-items: center; width: 100%; padding: 14px 0; border: 0; border-bottom: 1px solid var(--k-hair); background: none; font: inherit; text-align: left; cursor: pointer; }
+.mk7-docs button:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.mk7-docs i { font-size: 18px; color: var(--k-3); }
+.mk7-docs b { display: block; font-weight: 500; }
+.mk7-docs small { display: block; font-size: 12.5px; color: var(--k-3); }
+
+/* Boxes: lending, desk, funding */
+.mk7-box { padding: 24px; border: 1px solid var(--k-hair); border-radius: 4px; background: #fff; }
+.mk7-box.soft { border-color: transparent; background: var(--k-soft); }
+.mk7-box h2 { margin-bottom: 6px; font-weight: 500; font-size: 26px; letter-spacing: -.02em; }
+.mk7-box h3 { margin-bottom: 12px; font-weight: 500; font-size: 22px; letter-spacing: -.02em; }
+.mk7-box > p { margin-bottom: 16px; font-size: 13.5px; line-height: 1.6; color: var(--k-2); }
+.mk7-box .mk7-kv { margin: 16px 0; }
+.mk7-avail { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; color: var(--k-3); }
+.mk7-avail b { font-weight: 500; color: var(--k-ink); }
+.mk7-mine { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 10px 12px; border-radius: 4px; background: var(--k-soft); font-size: 13px; }
+.mk7-mine button { padding: 0; border: 0; background: none; font: inherit; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.mk7-input { display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 16px; border: 1px solid var(--k-line2); border-radius: 4px; transition: border-color .2s; }
+.mk7-input:focus-within { border-color: var(--k-ink); }
+.mk7-input input { flex: 1; width: 0; min-width: 0; border: 0; outline: 0; background: none; font: inherit; font-size: 20px; font-weight: 500; }
+.mk7-input span { font-size: 12.5px; color: var(--k-3); }
+.mk7-quick { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+.mk7-quick button { height: 30px; padding: 0 14px; border: 1px solid var(--k-line2); border-radius: 999px; background: #fff; font: inherit; font-size: 12.5px; cursor: pointer; transition: border-color .2s; }
+.mk7-quick button:hover { border-color: var(--k-ink); }
+.mk7-quick button[aria-pressed="true"] { border-color: var(--k-ink); background: var(--k-ink); color: #fff; }
+.mk7-ack { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0; font-size: 12.5px; color: var(--k-2); cursor: pointer; }
+.mk7-ack input { margin-top: 2px; accent-color: var(--k-ink); }
+.mk7-box .mk7-fine { margin-top: 12px; }
+
+/* Fund account */
+.mk7-fund { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; margin-top: 40px; }
+.mk7-tabs { display: flex; gap: 28px; margin-bottom: 20px; border-bottom: 1px solid var(--k-hair); }
+.mk7-tabs button { position: relative; padding: 10px 0 12px; border: 0; background: none; font: inherit; font-size: 14px; color: var(--k-3); cursor: pointer; }
+.mk7-tabs button:hover, .mk7-tabs button[aria-selected="true"] { color: var(--k-ink); }
+.mk7-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--k-brand); }
+.mk7-fund .mk7-box > .mk7-tkv > div { grid-template-columns: 160px minmax(0, 1fr); }
+/* Swap card for USDC and withdrawals: the original Deposit page's classes (.dtop, .seg, .panel.eform in prototype.css). */
+.mk7-swap { font-size: 15px; line-height: 1.6; }
+.mk7-swap .dtop { margin: 0 0 16px; }
+.mk7-swap .dtop .mk7-note { margin: 0; }
+.mk7-copy { display: inline-flex; align-items: center; gap: 12px; }
+.mk7-copy b { font-family: var(--mono); font-weight: 500; letter-spacing: .04em; }
+.mk7-copy button { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none; font: inherit; font-size: 12.5px; color: var(--k-3); cursor: pointer; }
+.mk7-copy button:hover { color: var(--k-ink); }
+.mk7-flow { margin-top: 8px; padding: 0; list-style: none; counter-reset: flow; }
+.mk7-flow li { position: relative; padding: 0 0 18px 38px; counter-increment: flow; }
+.mk7-flow li::before { content: counter(flow); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--k-line2); border-radius: 50%; background: #fff; font-size: 11px; color: var(--k-2); }
+.mk7-flow li:not(:last-child)::after { content: ""; position: absolute; left: 12px; top: 28px; bottom: 4px; width: 1px; background: var(--k-line2); }
+.mk7-flow b { display: block; font-weight: 500; }
+.mk7-flow span { display: block; font-size: 13px; color: var(--k-3); }
+
+/* Borrow */
+.mk7-types { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 8px; }
+.mk7-types .mk7-box { padding: 28px; }
+.mk7-types .mk7-note { margin-bottom: 20px; }
+.mk7-process { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; list-style: none; border-top: 1px solid var(--k-ink); }
+.mk7-process li { padding: 20px 24px 24px 0; border-bottom: 1px solid var(--k-hair); }
+.mk7-process li:not(:nth-child(3n + 1)) { padding-left: 24px; border-left: 1px solid var(--k-hair); }
+.mk7-process b { display: block; margin-top: 10px; font-weight: 500; font-size: 15px; }
+.mk7-process p { margin: 6px 0 10px; font-size: 13.5px; line-height: 1.6; color: var(--k-2); }
+.mk7-process small { font-size: 12.5px; font-weight: 500; color: var(--k-3); }
+.mk7-checks { margin-top: 8px; padding: 0; list-style: none; }
+.mk7-checks li { display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid var(--k-hair); font-size: 14px; }
+.mk7-checks i { margin-top: 3px; color: var(--k-brand); }
+.mk7-cta { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-top: 72px; padding: 40px; border-radius: 4px; background: var(--k-ink); color: #f2f3f1; }
+.mk7-cta h2 { font-weight: 500; font-size: 30px; letter-spacing: -.02em; color: #fff; }
+.mk7-cta p { margin-top: 6px; font-size: 14px; color: rgba(242, 243, 241, .7); }
+
+/* Lender-only gate */
+.mk7-gate { max-width: 520px; margin: 40px auto 0; padding: 48px 32px; border: 1px solid var(--k-hair); border-radius: 4px; text-align: center; }
+.mk7-gate i { font-size: 28px; color: var(--k-3); }
+.mk7-gate h2 { margin: 12px 0 8px; font-weight: 500; font-size: 26px; letter-spacing: -.02em; }
+.mk7-gate p { max-width: 420px; margin: 0 auto 20px; font-size: 14px; color: var(--k-2); }
+
+/* Footer */
+.mk7-foot { margin-top: 128px; background: var(--k-forest); color: rgba(241, 245, 242, .72); }
+.mk7-foot .mk7-w { padding-top: 56px; padding-bottom: 40px; }
+.mk7-foot-top { display: flex; justify-content: space-between; align-items: center; gap: 32px; padding-bottom: 36px; border-bottom: 1px solid rgba(241, 245, 242, .14); }
+.mk7-foot .brand { color: #f1f5f2; }
+.mk7-foot nav { display: flex; flex-wrap: wrap; gap: 10px 32px; font-size: 14px; }
+.mk7-foot nav a { color: rgba(241, 245, 242, .72); text-decoration: none; transition: color 200ms ease; }
+.mk7-foot nav a:hover { color: #fff; }
+.mk7-foot-legal { max-width: 760px; margin-top: 32px; font-size: 13px; line-height: 1.6; }
+.mk7-foot-note { margin-top: 20px; font-size: 12px; color: rgba(241, 245, 242, .45); }
+
+@media (max-width: 1200px) {
+}
+
+@media (max-width: 1100px) {
+  .mk7-stats, .mk7-stats.c3, .mk7-stats.c5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mk7-stats > div:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .mk7-stats > div:nth-child(n + 3) { border-top: 1px solid var(--k-hair); }
+  .mk7-dbody { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .mk7-dhead .mk7-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mk7-dhead-grid { grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; }
+  .mk7-daside { position: static; max-width: 560px; margin-top: 40px; }
+  .mk7-fund { grid-template-columns: minmax(0, 1fr); }
+  .mk7-two { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+
+@media (max-width: 960px) {
+  .mk7-hero .mk7-w { padding-top: 56px; }
+  .mk7-stats { margin-top: 56px; }
+  .mk7-types { grid-template-columns: minmax(0, 1fr); }
+  .mk7-process { grid-template-columns: minmax(0, 1fr); }
+  .mk7-process li, .mk7-process li:not(:nth-child(3n + 1)) { padding-left: 0; border-left: 0; }
+}
+
+@media (max-width: 820px) {
+}
+
+@media (max-width: 720px) {
+  .mk7 .mk7-w { padding: 0 16px; }
+  .mk7 .mk7-main { padding-top: 28px; }
+  .xtop.mk7-top { height: auto; flex-wrap: wrap; gap: 0 16px; padding: 12px 16px 0; }
+  .mk7-top .xnav { order: 3; width: 100%; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+  .mk7-top .xnav a { padding: 12px 0; white-space: nowrap; }
+  .mk7-top .xnav a[aria-current]::after { bottom: 0; }
+  .mk7-top .xright { gap: 14px; }
+  .mk7-org { display: none; }
+  .mk7-hero .mk7-w { padding-top: 48px; }
+  .mk7-hero h1 { font-size: 38px; }
+  .mk7-stats > div { padding: 20px 16px 24px; }
+  .mk7-stats > div:nth-child(odd) { padding-left: 0; }
+  .mk7-stats dd { font-size: 28px; }
+  .mk7-sh { flex-direction: column; gap: 6px; }
+  .mk7-row { gap: 12px; padding: 16px 0; }
+  .mk7-fac .mono { display: none; }
+  .mk7-phero .mk7-w { padding-top: 36px; }
+  .mk7-phero-top { flex-direction: column; align-items: flex-start; }
+  .mk7-phero h1, .mk7-phero.compact h1 { font-size: 34px; }
+  /* Charts keep a readable size and scroll sideways. */
+  .mk7-chart { overflow-x: auto; }
+  .mk7-chart-in { min-width: 600px; }
+  .mk7 .mk7-after { padding-top: 40px; }
+  .mk7-tkv > div, .mk7-box .mk7-tkv > div, .mk7-fund .mk7-box > .mk7-tkv > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .mk7-events li { grid-template-columns: 1fr auto; }
+  .mk7-events li span { grid-column: 1 / -1; }
+  .mk7-cta { flex-direction: column; align-items: flex-start; padding: 28px 20px; }
+  .mk7-foot-top { flex-direction: column; align-items: flex-start; }
+}
+
+/* Shared prototype classes used inside the v7 pages: figures at the same weight as the rest of v7. */
+.mk7 :is(.eamt input, .eamt output, .kstats b, .hold-h b, .ad-strip b) { font-weight: 500; letter-spacing: -.01em; }
+
+@media (max-width: 720px) {
+  .mk7-dhead h1 { font-size: 34px; }
+  .mk7-dhead-art { display: none; }
+}
+
+@media (max-width: 1100px) {
+  .mk7-open { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .mk7-open { grid-template-columns: minmax(0, 1fr); }
+  .mk7-oc { padding: 22px 20px; }
+  .mk7-oc-rate b { font-size: 36px; }
+  .mk7-phero.big h1 { font-size: 44px; }
+  .mk7-phero.big .mk7-stats dd { font-size: 30px; }
+  .mk7-phero.big .mk7-ph-act { display: none; }
+  .mk7 .mk7-banner .mk7-stats { margin: 0 20px; }
+  .mk7-banner .mk7-stats > div { padding: 18px 12px 20px; }
+  .mk7-banner .mk7-stats > div:nth-child(odd) { padding-left: 0; }
+  .mk7-banner .mk7-stats > div:nth-child(n + 3) { border-top-color: var(--bn-rule); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk7-banner-art .rack, .mk7-banner-art .light { animation: none; }
+  .mk7-banner-art .draw { stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
+  .mk7-oc { animation-name: mk7-fade; }
+  .mk7-oc-bar i { animation: none; }
+  .mk7-oc:hover { transform: none; }
+  .mk7-oc-more i { transition: none; }
+}
+
+/* Scroll reveal (useReveal in Shell.tsx): sections that start below the fold fade up once. */
+.mk7-rv { opacity: 0; transform: translateY(16px); transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out); }
+.mk7-rv.in { opacity: 1; transform: none; }
+
+@media (max-width: 1100px) {
+  .mk7-blk.split { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .mk7-blk.split .mk7-blk-l { position: static; }
+  .mk7-spec { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mk7-spec > div:nth-child(odd) { padding-left: 0; }
+}
+@media (max-width: 720px) {
+  .mk7-sh h2 { font-size: 34px; }
+  .mk7-blk .mk7-sh h2, .mk7-blk.split .mk7-sh h2 { font-size: 28px; }
+  .mk7-sec { padding-top: 72px; }
+  .mk7-blk { padding-top: 56px; }
+  .mk7-blk.split .mk7-tkv > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk7-rv { transform: none; transition: opacity 400ms ease; }
+}
+@media (max-width: 960px) {
+  .mk7-dhead-grid { grid-template-columns: minmax(0, 1fr); }
+  .mk7-dhead-art .srv3d { max-width: 420px; }
+}
+
+/* The lending (or position) box carries the most weight in the side column: a header in the Loans strip's gradient,
+   a firmer border and a soft green-tinted shadow. The desk box below stays light. */
+.mk7-daside > .mk7-box:first-child { overflow: hidden; border-color: rgba(14, 15, 15, .16); border-radius: 6px; box-shadow: 0 28px 56px -32px rgba(19, 38, 30, .4); }
+.mk7-daside > .mk7-box:first-child > h3 { margin: -24px -24px 20px; padding: 22px 24px 20px; background: var(--k-grad); font-size: 22px; color: var(--k-ink); }

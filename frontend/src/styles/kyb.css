@@ -1,0 +1,146 @@
+/* Business verification (KYB) pages. Not in the prototype: built in its style for review.
+   Form, list and progress rules are copied from the issuer console (v2-exchange/app/issuer, "New application"
+   and release tasks), scoped to .kybf so they cannot affect other exchange pages. A few new rules are marked. */
+
+.kybf .dbody{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;margin-top:28px;align-items:start}
+.kybf .aside{position:sticky;top:32px;display:grid;gap:14px}
+
+/* From the issuer console's application form */
+.kybf .apf{padding:8px 28px 28px}
+.kybf .apf fieldset{border:0;margin:0;padding:20px 0 4px;border-bottom:1px solid var(--line)}
+.kybf .apf fieldset:last-of-type{border-bottom:0;margin-bottom:12px}
+.kybf .apf legend{font-family:var(--serif);font-size:20px;padding:0;margin-bottom:14px}
+.kybf .field{display:grid;gap:7px;margin-bottom:16px}
+.kybf .field label{font-size:13px;font-weight:500;color:var(--ink)}
+.kybf .field label em{font-style:normal;font-weight:400;color:var(--ink-3);margin-left:6px;font-size:12px}
+.kybf .field input,.kybf .field select{height:46px;border:1px solid var(--line-2);border-radius:12px;padding:0 14px;font:inherit;font-size:14.5px;color:var(--ink);background:var(--paper);transition:border-color .2s,box-shadow .2s}
+.kybf .field input::placeholder{color:#9a9e9b}
+.kybf .field input:hover,.kybf .field select:hover{border-color:rgba(14,15,15,.3)}
+.kybf .field input:focus,.kybf .field select:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px rgba(14,15,15,.06)}
+.kybf .field input[readonly]{background:var(--bg);color:var(--ink-2)}
+.kybf .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kybf .elig{list-style:none;margin:0;padding:0}
+.kybf .elig li{display:grid;grid-template-columns:20px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px}
+.kybf .elig li:first-child{border-top:0;padding-top:0}
+.kybf .elig .ph{font-size:18px;color:var(--ink-3);margin-top:1px}
+.kybf .elig li.ok .ph{color:var(--accent)}
+.kybf .elig b{display:block;font-weight:500}
+.kybf .elig small{display:block;font-size:12.5px;color:var(--ink-3)}
+.kybf .files{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px}
+.kybf .files li{display:flex;align-items:center;gap:10px;font-size:13px;padding:8px 12px;border-radius:10px;background:var(--bg)}
+.kybf .files li span{margin-left:auto;font-size:12px}
+.kybf .sig{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;border-radius:999px;padding:3px 10px;background:var(--paper);border:1px solid var(--line);white-space:nowrap}
+.kybf .sig .ph{font-size:13px}
+.kybf .sig.ok .ph{color:var(--accent)}
+.kybf .sig.wait{color:var(--amber);border-color:var(--amber-line)}
+
+/* New: step body and actions */
+.kybf .kstep{padding:26px 28px 28px}
+.kybf .kstep h2{font-family:var(--serif);font-weight:400;font-size:22px;letter-spacing:-.01em;margin:0 0 6px}
+.kybf .kstep>p{margin:0 0 20px;font-size:13.5px;color:var(--ink-2);max-width:42em}
+.kybf .kacts{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.kybf .kacts .r{display:flex;gap:8px;margin-left:auto}
+/* New: why Continue is disabled, right next to it */
+.kybf .ktodo{margin-left:auto;font-size:12.5px;color:var(--amber);text-align:right}
+.kybf .ktodo+.r{margin-left:0}
+
+/* New: document upload, a dashed drop area like the prototype's empty states */
+.kybf .kup{display:flex;align-items:center;gap:14px;padding:18px;border:1px dashed var(--line-2);border-radius:14px;background:var(--bg);cursor:pointer;transition:border-color .2s}
+.kybf .kup:hover{border-color:rgba(14,15,15,.35)}
+.kybf .kup i{font-size:22px;color:var(--ink-3)}
+.kybf .kup b{display:block;font-weight:500;font-size:14px}
+.kybf .kup small{display:block;font-size:12.5px;color:var(--ink-3)}
+.kybf .kup input{display:none}
+.kybf .kup.has{border-style:solid;background:var(--paper)}
+.kybf .kup.has i{color:var(--accent)}
+
+/* New: registry result box, same tint as the deposit page's verified badge */
+.kybf .kres{margin-top:18px;border-radius:14px;background:var(--accent-soft);padding:16px 18px;font-size:13.5px}
+.kybf .kres .kh{display:flex;align-items:center;gap:8px;font-weight:500;margin-bottom:6px}
+.kybf .kres .kh i{color:var(--accent);font-size:18px}
+.kybf .kres .kv{margin-top:6px}
+.kybf .kres .kv div{border-color:var(--accent-line)}
+
+/* New: no registry match, the amber of the prototype's pending badge */
+.kybf .kres.miss{background:var(--amber-soft)}
+.kybf .kres.miss .kh i{color:var(--amber)}
+.kybf .kres.miss p{margin:0 0 12px;color:var(--ink-2)}
+.kybf .kres.miss p{margin-bottom:0}
+.kybf .apf fieldset>.kres{margin-bottom:20px}
+.kybf .kup+.kres{margin-top:14px}
+.kybf .kup:has(input:disabled){cursor:progress}
+
+/* New: a rejected document, and a failed ID check */
+.kybf .kres.bad{background:#f8ebe7}
+.kybf .kres.bad .kh i{color:#a3321f}
+.kybf .kres.bad ul{margin:0 0 8px;padding-left:18px;color:var(--ink-2)}
+.kybf .kres.bad p{margin:0;color:var(--ink-2)}
+.kybf .kres .knote{margin:10px 0 0;color:var(--amber);font-size:12.5px}
+.kybf .kid.bad{border-color:#e4b9ad;background:#fbf3f1}
+
+/* New: the provider's ID check in a dialog, on the access dialog's frame */
+.kidd{width:min(560px,calc(100vw - 32px))}
+.kidd iframe{display:block;width:calc(100% - 48px);height:min(680px,calc(100vh - 220px));margin:14px 24px 0;border:1px solid var(--line);border-radius:16px;background:var(--bg)}
+.kidd .kidd-f{margin:10px 24px 20px;font-size:12.5px;color:var(--ink-3)}
+.kidd .kidd-f a{color:var(--ink-2)}
+
+/* New: certificate upload in progress: a bar for the upload, then a spinner while the provider reads it */
+.kybf .kbusy{margin-top:14px;border-radius:14px;background:var(--bg);border:1px solid var(--line);padding:16px 18px;font-size:13.5px}
+.kybf .kbusy .kh{display:flex;align-items:center;gap:10px;font-weight:500}
+.kybf .kbusy p{margin:8px 0 0;color:var(--ink-3);font-size:12.5px}
+.kybf .kbar{height:4px;border-radius:2px;background:var(--line);margin-top:12px;overflow:hidden}
+.kybf .kbar i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width .6s ease}
+.kybf .kspin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--ink);animation:kspin .8s linear infinite;flex:none}
+@keyframes kspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.kybf .kspin{animation-duration:2.4s}.kybf .kbar i{transition:none}}
+
+/* New: inline text button for demo switches */
+.kybf .klink{border:0;background:none;padding:0;font:inherit;color:var(--ink-2);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+
+/* New: short lead under a legend, and a checkbox sitting on a field's input line */
+.kybf .kintro{margin:-6px 0 16px;font-size:13.5px;color:var(--ink-2)}
+.kybf .kck{height:46px;align-items:center;margin:0}
+.kybf .kck input{margin:0}
+
+/* New: the applicant's ID check, a card like the upload area */
+.kybf .kid{display:flex;align-items:center;gap:14px;padding:18px;border:1px solid var(--line-2);border-radius:14px;background:var(--paper);margin-bottom:16px}
+.kybf .kid>i{font-size:24px;color:var(--ink-3)}
+.kybf .kid b{display:block;font-weight:500;font-size:14px}
+.kybf .kid small{display:block;font-size:12.5px;color:var(--ink-3)}
+.kybf .kid .btn{margin-left:auto;flex:none}
+.kybf .kid.ok{background:var(--accent-soft);border-color:var(--accent-line)}
+.kybf .kid.ok>i{color:var(--accent)}
+
+/* New: one card per director or owner */
+.kybf .kown{display:grid;gap:10px}
+.kybf .kper{border:1px solid var(--line-2);border-radius:14px;padding:14px 18px 16px;background:var(--paper)}
+.kybf .kper.me{padding:14px 18px;background:var(--bg)}
+.kybf .kph{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.kybf .kper:not(.me) .kph{margin-bottom:12px}
+.kybf .kph b{font-weight:500;font-size:14.5px;margin-right:4px}
+.kybf .kph .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.kybf .kph .kname{height:38px;flex:1;min-width:180px;max-width:320px;border:1px solid var(--line-2);border-radius:10px;padding:0 12px;font:inherit;font-size:14px;background:var(--paper)}
+.kybf .kph .kname:focus{outline:none;border-color:var(--ink)}
+.kybf .row4{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:12px}
+.kybf .kper .field{margin-bottom:0}
+.kybf .kper .field input{height:40px;font-size:14px}
+.kybf .kper .kck{height:40px}
+.kybf .kper .kerr{margin:10px 0 0}
+.kybf .tacts .ph{font-size:14px}
+
+/* New: wallet choice, a selectable card per address */
+.kybf .kwal{display:grid;gap:8px}
+.kybf .kwal label{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px;border:1px solid var(--line-2);border-radius:14px;cursor:pointer;font-size:13.5px;background:var(--paper)}
+.kybf .kwal label:has(input:checked){border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.kybf .kwal label.off{cursor:not-allowed;opacity:.55}
+.kybf .kwal input{accent-color:var(--accent);margin:0}
+.kybf .kwal .mono{font-size:13px}
+.kybf .kwal small{display:block;color:var(--ink-3);font-size:12px}
+.kybf .kerr{font-size:12.5px;color:#a3321f;margin-top:-8px;margin-bottom:12px}
+
+@media (max-width:1100px){.kybf .dbody{grid-template-columns:1fr}.kybf .aside{position:static}}
+@media (max-width:700px){.kybf .row2,.kybf .row4{grid-template-columns:1fr}.kybf .kid{flex-wrap:wrap}.kybf .kid .btn{margin-left:0}}
+
+/* New: the step bar reuses the new-issue progress steps (.ip-steps) inside a plain progress panel */
+.kybf .ad-prog .ip-steps{margin:6px 0 4px}
+@media (min-width:1001px){.kybf .ad-prog .ip-steps{grid-template-columns:repeat(6,1fr)}}

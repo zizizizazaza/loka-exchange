@@ -1,0 +1,1137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loka</title>
+<meta name="description" content="Equipment financing repaid from GPU compute rent. Investors back individual projects; compute operators finance GPUs against signed offtake contracts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@200;300;400;500;600&family=Geist+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>
+/* 视觉：仰拍玻璃幕墙的深色首屏 + 中文宋体标题 + 胶囊按钮 + 细线分隔 + 大号细体数字。
+   颜色以黑、白、石灰为主，强调色（鼠尾草绿）只用在状态点、图表和焦点上，按钮不用彩色。
+   首屏视频：video/hero-towers.mp4，来自 Mixkit（素材 4170，Mixkit Stock Video Free License）；备选 video/hero-city.mp4（素材 42342）。sky-glass.jpg 为 Wikimedia Commons 上的 CC0 照片。
+   首屏 Logo 与 loka.cash 一致：研究人员与合作者所在机构，标注沿用 loka.cash 的「Researchers & collaborators from」。 */
+:root{
+  --bg:#f4f4f2;
+  --paper:#ffffff;
+  --mist:#ecedea;
+  --line:rgba(14,15,15,.09);
+  --line-2:rgba(14,15,15,.16);
+  --ink:#0e0f0f;
+  --ink-2:#4a4f4d;
+  --ink-3:#848986;
+  --night:#0a0b0b;
+  --on-night:#f2f3f1;
+  --on-night-2:rgba(242,243,241,.64);
+  --on-night-3:rgba(242,243,241,.42);
+  --night-line:rgba(255,255,255,.14);
+  --accent:#3d6f5b;
+  --accent-soft:#e3ece7;
+  --accent-light:#9fd1b9;
+  --r-card:24px;
+  --r-ctl:999px;
+  --maxw:1240px;
+  --gutter:48px;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cn:"Geist",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--cn);font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+section{scroll-margin-top:96px}
+.num{font-family:"Geist",var(--sans);font-variant-numeric:tabular-nums}
+.ph,.ph-light{line-height:1}
+
+/* ---------- 按钮：胶囊形，黑白为主 ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;height:52px;padding:0 8px 0 26px;border-radius:var(--r-ctl);border:1px solid transparent;font-family:var(--cn);font-size:15px;font-weight:500;letter-spacing:.01em;white-space:nowrap;cursor:pointer;text-decoration:none;transition:background-color .3s var(--ease),border-color .3s var(--ease),color .3s,transform .15s var(--ease)}
+.btn:active{transform:scale(.985)}
+.btn .go{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:15px;transition:transform .35s var(--ease),background-color .3s}
+.btn:hover .go{transform:rotate(-45deg)}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary .go{background:rgba(255,255,255,.14)}
+.btn-primary:hover{background:#262928}
+.btn-ghost{padding:0 26px;background:transparent;border-color:var(--line-2);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--ink)}
+.on-dark .btn-primary{background:var(--on-night);color:var(--ink)}
+.on-dark .btn-primary .go{background:var(--ink);color:#fff}
+.on-dark .btn-primary:hover{background:#fff}
+.on-dark .btn-ghost{border-color:rgba(255,255,255,.28);color:#fff;background:rgba(255,255,255,.06);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.on-dark .btn-ghost:hover{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.1)}
+.btn-sm{height:40px;padding:0 18px;font-size:14px}
+.btn[aria-busy="true"]{opacity:.6;pointer-events:none}
+
+/* ---------- 导航：悬浮胶囊 ---------- */
+.nav{position:fixed;top:16px;left:0;right:0;z-index:30;padding:0 24px;pointer-events:none}
+.nav-bar{pointer-events:auto;max-width:1192px;margin:0 auto;height:60px;border-radius:999px;display:flex;align-items:center;gap:28px;padding:0 10px 0 24px;color:#fff;background:rgba(10,11,11,.28);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);transition:background-color .35s var(--ease),color .35s,border-color .35s,box-shadow .35s}
+.nav.solid .nav-bar{background:rgba(255,255,255,.78);color:var(--ink);border-color:var(--line);box-shadow:0 10px 30px -18px rgba(14,15,15,.25)}
+.brand{font-family:var(--cn);font-weight:500;font-size:16px;letter-spacing:.02em;text-decoration:none;display:flex;align-items:center;gap:10px}
+.brand-mark{width:22px;height:22px;border-radius:6px;border:1.5px solid currentColor;position:relative}
+.brand-mark::after{content:"";position:absolute;inset:5px;border-radius:2px;background:currentColor;opacity:.9}
+.nav-links{display:flex;gap:28px;margin:0 auto;padding:0;list-style:none}
+.nav-links a{font-size:14px;text-decoration:none;opacity:.85;transition:opacity .2s}
+.nav-links a:hover,.nav-links a.active{opacity:1}
+.nav-cta{display:flex;gap:8px;align-items:center}
+.nav .btn-primary{background:#fff;color:var(--ink)}
+.nav.solid .btn-primary{background:var(--ink);color:#fff}
+.nav .btn-ghost{border-color:rgba(255,255,255,.26);color:#fff;background:transparent}
+.nav.solid .btn-ghost{border-color:var(--line-2);color:var(--ink)}
+.menu-btn{display:none;background:none;border:0;width:40px;height:40px;cursor:pointer;border-radius:50%}
+.menu-btn span{display:block;width:16px;height:1.5px;background:currentColor;margin:4px auto}
+.menu{display:none}
+
+/* ---------- 首屏 ---------- */
+.hero{position:relative;min-height:clamp(720px,100dvh,960px);display:flex;flex-direction:column;justify-content:flex-end;color:var(--on-night);background:var(--night);overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg video,.hero-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;filter:saturate(.68) contrast(1.02) brightness(.93);transform:scale(1.04);transition:transform 2.2s var(--ease)}
+.hero.in .hero-bg video,.hero.in .hero-bg img{transform:scale(1)}
+/* 蒙版：一层很淡的深色，整体压暗，不做模糊，保留画面清晰度。浅色雾面的写法：rgba(226,230,228,.07) */
+.hero-bg::before{content:"";position:absolute;inset:0;z-index:1;background:rgba(10,11,11,.22)}
+.hero-bg::after{content:"";position:absolute;inset:0;z-index:2;background:
+  radial-gradient(95% 75% at 10% 80%,rgba(10,11,11,.82) 0%,rgba(10,11,11,.5) 45%,rgba(10,11,11,.05) 80%),
+  linear-gradient(180deg,rgba(10,11,11,.45) 0%,rgba(10,11,11,0) 22%,rgba(10,11,11,0) 60%,rgba(10,11,11,.7) 100%)}
+.hero-main{position:relative;z-index:1;width:100%;padding-top:160px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;height:32px;padding:0 14px 0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:13px;color:var(--on-night-2);margin-bottom:32px}
+.eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--accent-light);box-shadow:0 0 0 4px rgba(159,209,185,.16)}
+.hero h1{color:#fff;text-shadow:0 2px 24px rgba(10,11,11,.25);font-family:var(--serif);font-size:80px;line-height:1.02;letter-spacing:-.025em;font-weight:400;margin:0 0 28px;max-width:14em}
+.hero .sub{font-size:18px;line-height:1.75;color:rgba(255,255,255,.88);text-shadow:0 1px 12px rgba(10,11,11,.3);margin:0 0 44px;max-width:36em;text-wrap:pretty}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+/* 首屏底部：研究人员与合作者所在机构的 Logo 滚动条 */
+.logos{margin:96px 0 40px;padding-top:26px;border-top:1px solid rgba(255,255,255,.22)}
+.logos-label{flex:none;font-size:13px;color:var(--on-night-2);max-width:9em;line-height:1.5}
+.logo-window{flex:1;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.logo-track{display:flex;align-items:center;gap:56px;width:max-content;animation:logos 48s linear infinite}
+.logo-track img{display:block;height:20px;width:auto;filter:grayscale(1) brightness(1.25) contrast(1.05);opacity:.92}
+/* 方形校徽字小，单独放大；很宽的字标单独缩小，让视觉分量接近 */
+.logo-track img.sq{height:30px}
+.logo-track img.wide{height:16px}
+@keyframes logos{to{transform:translateX(-50%)}}
+/* 条款速览：首屏下方单独一条 */
+.terms-band{padding:72px 0 0}
+.terms{position:relative;border-radius:20px;border:1px solid var(--line);background:var(--paper);display:grid;grid-template-columns:repeat(4,1fr)}
+.term{padding:26px 28px 24px}
+.term+.term{border-left:1px solid var(--line)}
+.term b{display:block;font-family:"Geist",var(--sans);font-weight:200;font-size:44px;line-height:1.05;letter-spacing:-.03em;color:var(--ink)}
+.term b small{font-family:var(--cn);font-size:14px;font-weight:400;letter-spacing:0;margin-left:6px;color:var(--ink-3)}
+.term span{display:block;margin-top:10px;font-size:13.5px;color:var(--ink-2)}
+.terms-note{margin:12px 4px 0;text-align:right;font-size:12px;color:var(--ink-3)}
+
+/* ---------- 屏通用 ---------- */
+.sec{padding:168px 0 0}
+.sec-head{margin-bottom:64px;max-width:920px}
+.label{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:24px}
+.label::before{content:"";width:18px;height:1px;background:currentColor}
+.sec-head h2{font-family:var(--serif);font-size:56px;line-height:1.08;letter-spacing:-.02em;font-weight:400;margin:0;text-wrap:balance}
+.sec-head p{font-size:17px;color:var(--ink-2);margin:22px 0 0;max-width:36em;text-wrap:pretty}
+
+/* ---------- 功能：不等分格子 ---------- */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.tile{position:relative;border-radius:var(--r-card);background:var(--paper);border:1px solid var(--line);padding:34px;display:flex;flex-direction:column;overflow:hidden;transition:border-color .3s var(--ease)}
+.tile:hover{border-color:var(--line-2)}
+.tile h3{font-size:19px;line-height:1.45;font-weight:500;margin:0 0 10px;letter-spacing:.005em}
+.tile p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.8;max-width:30em;text-wrap:pretty}
+.tile .ico{font-size:30px;color:var(--ink);margin-bottom:34px}
+.tile-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.t-water{grid-column:span 7;grid-row:span 2;background:var(--night);color:var(--on-night);border-color:var(--night);isolation:isolate}
+.t-water::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(80% 60% at 100% 0%,rgba(159,209,185,.10) 0%,rgba(159,209,185,0) 60%),radial-gradient(60% 50% at 0% 100%,rgba(255,255,255,.05) 0%,rgba(255,255,255,0) 70%)}
+.t-water:hover{border-color:var(--night)}
+.t-water p{color:var(--on-night-2)}
+.t-water .ico{color:var(--on-night)}
+.t-first,.t-reserve{grid-column:span 5}
+.t-project,.t-vendor,.t-disclose{grid-column:span 4}
+.big{font-family:"Geist",var(--sans);font-weight:200;font-size:88px;line-height:.95;letter-spacing:-.045em;margin:0 0 22px}
+.big small{font-family:var(--cn);font-size:16px;font-weight:400;letter-spacing:0;margin-left:8px;color:var(--ink-3)}
+.fall{margin-top:auto;padding-top:40px;display:grid;gap:8px}
+.fall-in{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--on-night-3);padding:0 4px 8px;border-bottom:1px solid var(--night-line);margin-bottom:6px}
+.fall-in b{font-weight:400;color:var(--on-night-2)}
+.fall-row{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:16px;padding:18px 20px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--night-line);font-size:15px}
+.fall-row .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:12.5px;border:1px solid var(--night-line);color:var(--on-night-2)}
+.fall-row em{font-style:normal;font-size:13px;color:var(--on-night-3)}
+.fall-row.first{background:rgba(159,209,185,.08);border-color:rgba(159,209,185,.32)}
+.fall-row.first .n{border-color:var(--accent-light);color:var(--accent-light)}
+.fall-note{font-size:12.5px;color:var(--on-night-3);margin:8px 4px 0}
+.split{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--mist)}
+.split i{display:block;height:100%}
+.split .a{width:20%;background:var(--ink)}
+.split .b{flex:1;background:repeating-linear-gradient(135deg,#dfe1dd 0 5px,#eceeea 5px 10px)}
+.bar-lab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-3);margin-top:12px}
+.months{display:flex;gap:6px}
+.months i{flex:1;height:34px;border-radius:10px;background:var(--accent-soft);border:1px solid #cfe0d7}
+.months i:nth-child(n+4){background:transparent;border:1px dashed var(--line-2)}
+.foot-vis{margin-top:auto;padding-top:28px}
+.chip{display:flex;align-items:center;gap:10px;margin-top:auto;padding:12px 16px;border-radius:14px;background:var(--bg);font-size:13.5px;color:var(--ink-2)}
+.chip .ph-light{font-size:17px;color:var(--ink)}
+.chip code{font-family:var(--mono);font-size:12px;color:var(--ink);margin-left:auto}
+.spark{display:flex;align-items:flex-end;gap:7px;height:56px}
+.spark span{flex:1;display:flex;gap:2px;align-items:flex-end;height:100%}
+.spark span i{flex:1;border-radius:4px 4px 1px 1px;background:#dcdfdb}
+.spark span i+i{background:var(--accent)}
+.legend{display:flex;gap:16px;font-size:12.5px;color:var(--ink-3);margin-top:12px}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px}
+.tag{display:inline-flex;align-items:center;height:24px;font-size:12px;color:var(--ink-3);border:1px solid var(--line-2);border-radius:999px;padding:0 10px;white-space:nowrap}
+.t-water .tag{color:var(--on-night-3);border-color:var(--night-line)}
+
+/* ---------- 为什么用我们：核对演示 ---------- */
+.status{display:inline-flex;align-items:center;gap:8px;height:28px;font-size:13px;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:0 12px;white-space:nowrap}
+.status::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{font-weight:400;font-size:12.5px;color:var(--ink-3);text-align:right;padding:0 0 10px}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{padding:12px 0;border-top:1px solid var(--line);text-align:right;font-family:var(--mono);font-size:13.5px}
+.tbl td:first-child{font-family:var(--cn)}
+.neg{color:#8c5634}
+.benefits{display:grid;grid-template-columns:repeat(3,1fr);margin-top:72px;border-top:1px solid var(--line)}
+.benefit{padding:36px 36px 0 0}
+.benefit+.benefit{padding-left:36px;border-left:1px solid var(--line)}
+.benefit .ph-light{font-size:28px}
+.benefit h3{font-size:19px;font-weight:500;margin:22px 0 10px}
+.benefit p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.8}
+
+/* ---------- 流程 ---------- */
+
+/* ---------- 常见问题 ---------- */
+.faq{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:start}
+.faq-side{grid-column:1 / span 4;position:sticky;top:120px}
+.faq-side .sec-head{margin-bottom:24px}
+.faq-side p{margin:0;color:var(--ink-2)}
+.linkbtn{background:none;border:0;padding:0;color:var(--ink);font-weight:500;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:4px;transition:text-decoration-color .2s}
+.linkbtn:hover{text-decoration-color:var(--ink)}
+.faq-list{grid-column:6 / span 7;border-top:1px solid var(--ink)}
+.qa{border-bottom:1px solid var(--line)}
+.qa h3{margin:0;font-size:inherit}
+.qa button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:24px;background:none;border:0;padding:26px 0;text-align:left;font-size:17px;font-weight:500;cursor:pointer}
+.plus{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line-2);position:relative;transition:transform .35s var(--ease),background-color .3s,border-color .3s}
+.plus::before,.plus::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:1.3px;background:var(--ink);transform:translate(-50%,-50%)}
+.plus::after{transform:translate(-50%,-50%) rotate(90deg)}
+.qa button:hover .plus{border-color:var(--ink)}
+.qa button[aria-expanded="true"] .plus{transform:rotate(45deg);background:var(--ink);border-color:var(--ink)}
+.qa button[aria-expanded="true"] .plus::before,.qa button[aria-expanded="true"] .plus::after{background:#fff}
+.qa-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ease)}
+.qa-body>div{overflow:hidden}
+.qa-body p{margin:0 0 26px;color:var(--ink-2);max-width:36em}
+.qa.open .qa-body{grid-template-rows:1fr}
+.risk{font-size:13.5px;color:var(--ink-3);margin:26px 0 0;max-width:40em}
+
+/* ---------- 底部行动区 ---------- */
+.cta{position:relative;margin:168px 24px 0;border-radius:32px;overflow:hidden;background:var(--mist)}
+.cta-bg{position:absolute;inset:0}
+.cta-bg img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;filter:grayscale(.4) contrast(1.02) brightness(1.04)}
+.cta-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(244,244,242,.97) 0%,rgba(244,244,242,.86) 42%,rgba(244,244,242,.2) 80%,rgba(244,244,242,0) 100%)}
+.cta .wrap{position:relative;padding-top:120px;padding-bottom:120px}
+.cta h2{font-family:var(--serif);font-size:56px;line-height:1.08;font-weight:400;letter-spacing:-.02em;margin:0 0 20px;max-width:12em}
+.cta p{margin:0 0 40px;color:var(--ink-2);max-width:30em}
+.foot{padding:64px 0 48px;font-size:14px;color:var(--ink-3)}
+.foot-top{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-bottom:28px;border-bottom:1px solid var(--line)}
+.foot .brand{color:var(--ink)}
+.foot-links{display:flex;flex-wrap:wrap;gap:12px 28px;list-style:none;margin:0;padding:0}
+.foot-links a{text-decoration:none}
+.foot-links a:hover{color:var(--ink)}
+.foot-legal{margin:22px 0 0;max-width:60em;font-size:13px}
+
+/* ---------- 抽屉表单 ---------- */
+.scrim{position:fixed;inset:0;background:rgba(10,11,11,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s var(--ease);z-index:40}
+.drawer{position:fixed;top:12px;right:12px;bottom:12px;width:500px;max-width:calc(100% - 24px);border-radius:24px;background:var(--paper);box-shadow:0 30px 80px -30px rgba(10,11,11,.45);transform:translateX(calc(100% + 24px));visibility:hidden;transition:transform .45s var(--ease),visibility 0s linear .45s;z-index:50;display:flex;flex-direction:column;overflow:hidden}
+.is-open .scrim{opacity:1;pointer-events:auto}
+.is-open .drawer{transform:none;visibility:visible;transition-delay:0s}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:24px 28px 20px}
+.drawer-head h2{font-family:var(--serif);font-size:26px;font-weight:400;letter-spacing:-.01em;margin:0}
+.x{width:38px;height:38px;border:1px solid var(--line-2);background:none;border-radius:50%;cursor:pointer;font-size:16px;display:grid;place-items:center;transition:border-color .2s}
+.x:hover{border-color:var(--ink)}
+.drawer-body{padding:4px 28px 28px;overflow:auto;flex:1}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:999px;padding:4px;margin-bottom:28px}
+.seg button{border:0;background:none;height:40px;border-radius:999px;font-size:14px;font-weight:500;color:var(--ink-3);cursor:pointer;transition:background-color .25s,color .25s,box-shadow .25s}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(14,15,15,.08),0 0 0 1px var(--line)}
+.field{display:grid;gap:8px;margin-bottom:18px}
+.field label{font-size:13.5px;font-weight:500;color:var(--ink)}
+.field label em{font-style:normal;font-weight:400;color:var(--ink-3);margin-left:6px;font-size:12.5px}
+.field input,.field select{height:48px;border:1px solid var(--line-2);border-radius:14px;padding:0 16px;font:inherit;font-size:15px;color:var(--ink);background:var(--paper);transition:border-color .2s,box-shadow .2s}
+.field input::placeholder{color:#8e938f}
+.field input:hover,.field select:hover{border-color:rgba(14,15,15,.3)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px rgba(14,15,15,.06)}
+.field .err{font-size:13px;color:#a3321f}
+.field.bad input,.field.bad select{border-color:#a3321f}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-note{font-size:13px;color:var(--ink-3);margin:6px 0 20px}
+.form-error{display:none;background:#fbeeea;color:#7d2717;border-radius:14px;padding:12px 14px;font-size:14px;margin-bottom:12px}
+.form-error.show{display:block}
+.btn-block{width:100%;justify-content:space-between}
+.done{display:none;padding:8px 0}
+.done .ph-light{font-size:40px}
+.done h3{font-family:var(--serif);font-size:28px;font-weight:400;margin:18px 0 8px}
+.done p{color:var(--ink-2);margin:0 0 28px}
+.drawer.sent form,.drawer.sent .seg{display:none}
+.drawer.sent .done{display:block}
+
+/* ---------- 进场与出现 ---------- */
+.rise{opacity:0;transform:translateY(18px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rise.in{opacity:1;transform:none}
+
+/* ---------- 滚动动效：只在没关闭动效时生效；每块进视口时加 .in，子项按 --i 依次出现 ---------- */
+@media (prefers-reduced-motion:no-preference){
+  /* 标题：引导线画出，大标题从下往上露出 */
+  .sec-head .label::before{transform:scaleX(0);transform-origin:left;transition:transform .9s var(--ease) .1s}
+  .sec-head h2{clip-path:inset(-.2em -.2em 100% -.2em);transform:translateY(.35em);transition:clip-path 1.1s var(--ease) .15s,transform 1.1s var(--ease) .15s}
+  .sec-head p,.sec-head .btn{opacity:0;transform:translateY(12px);transition:opacity .9s var(--ease) .4s,transform .9s var(--ease) .4s,background-color .3s}
+  .sec-head.in .label::before{transform:none}
+  .sec-head.in h2{clip-path:inset(-.2em -.2em -.2em -.2em);transform:none}
+  .sec-head.in p,.sec-head.in .btn{opacity:1;transform:none}
+
+  /* 依次出现的一组 */
+  .stg>*{opacity:0;transform:translateY(16px);transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:calc(var(--i,0) * 90ms + var(--d,0ms))}
+  .stg.in>*{opacity:1;transform:none}
+
+  /* 功能卡里的小图：行滑入、勾选弹出、柱子长高 */
+  .fall-row{opacity:0;transform:translateX(-14px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0) * 90ms + 350ms)}
+  .tile.in .fall-row{opacity:1;transform:none}
+  .checks li{opacity:0;transform:translateY(8px);transition:opacity .6s var(--ease),transform .6s var(--ease);transition-delay:calc(var(--i,0) * 80ms + 300ms)}
+  .checks .ph{transform:scale(0);transition:transform .5s var(--ease);transition-delay:calc(var(--i,0) * 80ms + 450ms)}
+  .tile.in .checks li{opacity:1;transform:none}
+  .tile.in .checks .ph{transform:none}
+  .lossbar span{transform:scaleX(0);transform-origin:left;transition:transform .8s var(--ease);transition-delay:calc(var(--i,0) * 180ms + 300ms)}
+  .tile.in .lossbar span{transform:none}
+  .spark span i{transform:scaleY(0);transform-origin:bottom;transition:transform .9s var(--ease);transition-delay:calc(var(--i,0) * 60ms + 300ms)}
+  .tile.in .spark span i{transform:none}
+
+  /* 收益链路：节点依次点亮，轨道从左往右画出 */
+  .ytrack{transform:scaleX(0);transform-origin:left;transition:transform 1.6s var(--ease) .3s}
+  .ypanel.in .ytrack{transform:none}
+  .ynode{opacity:0;transform:translateY(14px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0) * 320ms + 250ms)}
+  .ypanel.in .ynode{opacity:1;transform:none}
+  .ycalc{opacity:0;transform:translateY(14px);transition:opacity .8s var(--ease) 1.5s,transform .8s var(--ease) 1.5s}
+  .ypanel.in .ycalc{opacity:1;transform:none}
+  /* 核对演示：从倾斜放平 */
+  .vfy{transform:perspective(1600px) rotateX(8deg) translateY(48px) scale(.97);transform-origin:50% 0;transition:opacity 1.2s var(--ease),transform 1.4s var(--ease)}
+  .vfy.in{transform:none}
+  /* 流程：节点依次点亮，虚线往下画，文字跟着出现 */
+  .fsteps li::before{opacity:0;transform:scale(.4);transition:opacity .5s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0) * 300ms + 200ms)}
+  .fsteps li:not(:last-child)::after{transform:scaleY(0);transform-origin:top;transition:transform .55s var(--ease);transition-delay:calc(var(--i,0) * 300ms + 380ms)}
+  .fsteps h4,.fsteps p{opacity:0;transform:translateX(-8px);transition:opacity .6s var(--ease),transform .6s var(--ease);transition-delay:calc(var(--i,0) * 300ms + 280ms)}
+  .fsteps p{transition-delay:calc(var(--i,0) * 300ms + 340ms)}
+  .flow-cta{opacity:0;transform:translateY(8px);transition:opacity .6s var(--ease),transform .6s var(--ease);transition-delay:calc(var(--n,3) * 300ms + 250ms)}
+  .flow.in .fsteps li::before,.flow.in .fsteps h4,.flow.in .fsteps p,.flow.in .flow-cta{opacity:1;transform:none}
+  .flow.in .fsteps li::after{transform:none}
+  .flow.in .fsteps li:last-child::before{animation:ring 1.6s var(--ease) calc(var(--i,0) * 300ms + 650ms) 1}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(61,111,91,.35)}100%{box-shadow:0 0 0 14px rgba(61,111,91,0)}}
+
+  /* 底部行动区：背景图慢慢归位 */
+  .cta-bg img{transform:scale(1.08);transition:transform 2.4s var(--ease)}
+  .cta.in .cta-bg img{transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  .rise{opacity:1;transform:none}
+  .hero-bg video,.hero-bg img{transform:none}
+  .logo-track{animation:none}
+}
+
+/* ---------- 窄屏：先保证不坏，细调以后做 ---------- */
+@media (max-width:1100px){
+  .nav-links{display:none}
+  .nav-cta .btn-ghost{display:none}
+  .nav-bar{justify-content:space-between}
+  .menu-btn{display:block}
+  .menu{pointer-events:auto;max-width:1192px;margin:8px auto 0;border-radius:24px;background:rgba(255,255,255,.96);color:var(--ink);border:1px solid var(--line);padding:8px 24px 20px}
+  .menu.show{display:block}
+  .menu a{display:block;padding:14px 0;text-decoration:none;border-bottom:1px solid var(--line)}
+  .menu .btn{margin-top:16px;width:100%}
+  .t-water{grid-column:span 12;grid-row:auto}
+  .t-first,.t-reserve,.t-project,.t-vendor{grid-column:span 6}
+  .t-disclose{grid-column:span 12}
+  .pv{grid-template-columns:1fr}
+  .pv-main{border-right:0;border-bottom:1px solid var(--line)}
+  .terms{grid-template-columns:1fr 1fr}
+  .term:nth-child(3){border-left:0}
+  .term:nth-child(n+3){border-top:1px solid var(--night-line)}
+}
+@media (max-width:767px){
+  :root{--gutter:20px}
+  .nav{padding:0 12px;top:12px}
+  .hero-main{padding-top:120px}
+  .hero h1{font-size:42px}
+  .hero .sub{font-size:16px}
+  .hero-cta .btn{flex:1 1 100%;justify-content:space-between}
+  .hero-cta .btn-ghost{justify-content:center}
+  .terms{margin-top:56px}
+  .term{padding:18px 18px 16px}
+  .term b{font-size:32px}
+  .sec{padding-top:104px}
+  .sec-head h2,.cta h2{font-size:34px}
+  .bento{display:flex;flex-direction:column}
+  .big{font-size:68px}
+  .benefits{grid-template-columns:1fr}
+  .benefit,.benefit+.benefit{padding:28px 0;border-left:0;border-top:1px solid var(--line)}
+  .benefit:first-child{border-top:0}
+  .faq{display:block}
+  .faq-side{position:static;margin-bottom:12px}
+  .cta{margin:104px 12px 0;border-radius:24px}
+  .cta .wrap{padding-top:72px;padding-bottom:72px}
+  .drawer{top:auto;left:8px;right:8px;bottom:8px;width:auto;max-width:none;height:90dvh;transform:translateY(calc(100% + 16px))}
+  .row2{grid-template-columns:1fr}
+}
+
+/* ---------- v0.5 交易所版：资产类别条、行情示意、发行方屏、两条流程 ---------- */
+.terms.classes .term{display:flex;flex-direction:column;gap:6px}
+.terms.classes .term b{font-family:var(--cn);font-weight:500;font-size:18px;letter-spacing:0;line-height:1.3}
+.terms.classes .term span:last-child{margin-top:0}
+.cls-tag{align-self:flex-start;font-size:11.5px!important;margin:0 0 6px!important;padding:2px 10px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-3)!important}
+.cls-tag.live{border-color:var(--accent-soft);background:var(--accent-soft);color:var(--accent)!important}
+.fall.mk .fall-row span em{font-style:normal;color:var(--on-night-3);margin-left:1px}
+.fall.mk .fall-row .n .ph{font-size:13px}
+.fall.mk .fall-row.dim{opacity:.55}
+.checks{list-style:none;margin:auto 0 0;padding:28px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.checks li{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-2);padding:10px 12px;border-radius:12px;background:var(--bg)}
+.checks .ph{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11px;flex:none}
+.lossbar{display:flex;gap:3px;height:58px}
+.lossbar span{position:relative;flex:0 0 var(--w);display:flex;flex-direction:column;justify-content:flex-end;padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.3;color:var(--ink-2);overflow:hidden}
+.lossbar b{font-family:var(--mono);font-weight:400;font-size:11px;color:var(--ink-3);margin-bottom:2px}
+.lossbar .l1{background:#ecd9c6}.lossbar .l2{background:#f1e7d8}.lossbar .l3{background:var(--accent-soft);color:var(--accent)}
+.lossnote{margin:12px 0 0;font-size:12.5px!important;line-height:1.6!important;color:var(--ink-3)!important}
+.issuer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:64px;align-items:center;padding:56px;border-radius:32px;background:var(--paper);border:1px solid var(--line)}
+.issuer .sec-head{margin:0}
+.issuer .terms{grid-template-columns:1fr 1fr}
+.issuer .term:nth-child(3){border-left:0}
+.issuer .term:nth-child(n+3){border-top:1px solid var(--line)}
+.flows{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+.flow{display:flex;flex-direction:column;padding:40px 40px 36px;border-radius:var(--r-card);background:var(--paper);border:1px solid var(--line)}
+.flow-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding-bottom:28px;margin-bottom:32px;border-bottom:1px solid var(--line)}
+.flow-h h3{margin:0;font-size:22px;font-weight:500;letter-spacing:-.01em}
+.flow-h span{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.fsteps{list-style:none;margin:0;padding:0;counter-reset:fs}
+.fsteps li{position:relative;display:grid;grid-template-columns:36px 1fr;column-gap:20px;padding-bottom:32px;counter-increment:fs}
+.fsteps li:last-child{padding-bottom:0}
+.fsteps li::before{content:counter(fs,decimal-leading-zero);grid-row:1/3;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--paper);border:1px solid var(--line-2);position:relative;z-index:1}
+.fsteps li:not(:last-child)::after{content:"";position:absolute;left:18px;top:40px;bottom:4px;border-left:1px dashed var(--line-2)}
+.fsteps li:last-child::before{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.fsteps h4{margin:7px 0 6px;font-size:17px;font-weight:500}
+.fsteps p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.7;max-width:34em}
+.flow-cta{margin-top:auto;padding-top:36px}
+@media (max-width:900px){.flows{grid-template-columns:1fr}.flow{padding:28px 24px}}
+
+/* ---------- v0.7：首屏数字条、收益链路、计算器、核对演示、对比表 ---------- */
+.hstats{display:flex;flex-wrap:wrap;gap:20px 0;margin:56px 0 0}
+.hstats div{padding-right:40px;margin-right:40px;border-right:1px solid rgba(255,255,255,.2)}
+.hstats div:last-child{border-right:0;margin-right:0;padding-right:0}
+.hstats b{display:block;font-family:"Geist",var(--sans);font-weight:200;font-size:46px;line-height:1;letter-spacing:-.03em;color:#fff}
+.hstats span{display:block;margin-top:12px;font-size:13.5px;line-height:1.5;color:var(--on-night-2)}
+.hero .logos{margin-top:56px}
+.hero h1{margin-bottom:44px}
+
+.ypanel{position:relative;border-radius:32px;background:var(--night);color:var(--on-night);padding:48px 56px 56px;overflow:hidden}
+.ypanel::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 80% at 62% 0%,rgba(61,111,91,.32),rgba(10,11,11,0) 70%);pointer-events:none}
+.ypanel .tag{color:var(--on-night-2);border-color:var(--night-line)}
+.ytop{position:relative;margin-bottom:44px}
+.ytop .tag{white-space:normal;height:auto;min-height:24px;padding:3px 10px;line-height:1.4}
+.ychain{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
+.ytrack{position:absolute;left:28px;right:calc(25% - 52px);top:27px;height:2px;background:repeating-linear-gradient(90deg,rgba(159,209,185,.55) 0 6px,transparent 6px 14px)}
+.ytrack span{position:absolute;inset:0;animation:ytravel 3.4s cubic-bezier(.45,0,.25,1) infinite}
+.ytrack i{position:absolute;left:0;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--accent-light);box-shadow:0 0 0 5px rgba(159,209,185,.18),0 0 18px rgba(159,209,185,.6)}
+@keyframes ytravel{0%{transform:translateX(0);opacity:0}8%{opacity:1}88%{opacity:1}100%{transform:translateX(100%);opacity:0}}
+.ynode{position:relative}
+.ydot{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:#141716;border:1px solid var(--night-line);color:var(--on-night)}
+.ydot.hi{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 8px rgba(61,111,91,.25)}
+.ynode h3{margin:26px 0 10px;font-size:19px;font-weight:500;line-height:1.35;color:#fff}
+.ynode p{margin:0;font-size:14.5px;line-height:1.7;color:var(--on-night-2)}
+.yfig{display:block;margin-top:18px;font-family:var(--mono);font-weight:400;font-size:13px;color:var(--accent-light)}
+.ycalc{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;margin-top:56px;padding-top:48px;border-top:1px solid var(--night-line)}
+.ycalc h3{margin:0 0 22px;font-family:var(--serif);font-weight:400;font-size:32px;letter-spacing:-.01em;color:#fff}
+.yseg{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--night-line);margin-bottom:30px}
+.yseg button{height:36px;padding:0 16px;border:0;border-radius:999px;background:none;color:var(--on-night-2);font-size:13.5px;cursor:pointer;transition:background-color .25s,color .25s}
+.yseg button[aria-pressed="true"]{background:var(--on-night);color:var(--ink)}
+.yamt{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.yamt span{font-size:13.5px;color:var(--on-night-2)}
+.yamt b{font-weight:300;font-size:22px;color:#fff}
+.ycalc input[type=range]{width:100%;height:4px;margin:0;-webkit-appearance:none;appearance:none;border-radius:4px;background:linear-gradient(90deg,var(--accent-light) var(--p,9%),rgba(255,255,255,.14) var(--p,9%));cursor:pointer}
+.ycalc input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:0;box-shadow:0 0 0 6px rgba(159,209,185,.22)}
+.ycalc input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:0}
+.yticks{display:flex;justify-content:space-between;margin-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--on-night-3)}
+.ycalc-out{align-self:end}
+.ycalc-out>span{font-size:14px;color:var(--on-night-2)}
+.ycalc-out>b{display:block;margin:6px 0 20px;font-family:"Geist",var(--sans);font-weight:200;font-size:88px;line-height:1;letter-spacing:-.04em;color:#fff}
+.yrows{display:flex;gap:28px;padding:14px 0;border-top:1px solid var(--night-line);border-bottom:1px solid var(--night-line);font-size:14px;color:var(--on-night-2)}
+.yrows b{font-weight:500;color:#fff;margin-left:6px}
+.ycalc-out p{margin:14px 0 0;font-size:12px;line-height:1.6;color:var(--on-night-3)}
+
+.vfy{position:relative;display:grid;grid-template-columns:340px minmax(0,1fr);border-radius:22px;background:var(--paper);border:1px solid var(--line);box-shadow:0 60px 120px -60px rgba(14,15,15,.3),0 20px 40px -30px rgba(14,15,15,.16);overflow:hidden}
+.vfy-tag{position:absolute;top:20px;right:22px}
+.vfy-side{padding:28px 20px 24px;background:#fafaf8;border-right:1px solid var(--line)}
+.vfy-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:0 10px 20px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.vfy-h b{display:block;font-family:var(--serif);font-weight:400;font-size:24px;line-height:1.1}
+.vfy-h small{font-size:13px;color:var(--ink-3)}
+.vfy-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.vfy-list button{position:relative;width:100%;display:grid;grid-template-columns:24px 1fr;gap:12px;align-items:center;padding:12px 10px;border:0;border-radius:12px;background:none;text-align:left;font-size:14px;color:var(--ink-2);cursor:pointer;overflow:hidden;transition:background-color .25s,color .25s}
+.vfy-list button:hover{background:var(--bg)}
+.vfy-list button[aria-selected="true"]{background:var(--paper);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 6px 16px -10px rgba(14,15,15,.25)}
+.vfy-list .ph{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11px}
+.vfy-list button i.bar{position:absolute;left:10px;right:10px;bottom:4px;height:2px;border-radius:2px;background:var(--accent);transform:scaleX(0);transform-origin:left}
+.vfy-list button[aria-selected="true"] i.bar.run{animation:vbar 4.2s linear forwards}
+@keyframes vbar{to{transform:scaleX(1)}}
+.vfy-main{padding:44px 48px 40px;min-height:420px}
+.vfy-main .k{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.vfy-main h3{margin:12px 0 10px;font-family:var(--serif);font-weight:400;font-size:34px;letter-spacing:-.01em;line-height:1.15}
+.vfy-main>p{margin:0 0 28px;color:var(--ink-2);max-width:34em}
+.vfy-dl{display:grid;grid-template-columns:150px 1fr;margin:0;border-top:1px solid var(--line)}
+.vfy-dl dt,.vfy-dl dd{margin:0;padding:14px 0;border-bottom:1px solid var(--line);font-size:14px}
+.vfy-dl dt{color:var(--ink-3)}
+.vfy-dl dd.mono{font-family:var(--mono);font-size:13px}
+.vfy-dl dd .ok{color:var(--accent);font-weight:500}
+.vfy-main .fade{animation:vfade .45s var(--ease)}
+@keyframes vfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+
+@media (max-width:1100px){.ychain{grid-template-columns:1fr 1fr}.ytrack{display:none}.ycalc{grid-template-columns:1fr;gap:32px}.vfy{grid-template-columns:1fr}.vfy-side{border-right:0;border-bottom:1px solid var(--line)}}
+@media (max-width:767px){.hstats div{padding-right:20px;margin-right:20px}.hstats b{font-size:32px}.ypanel{padding:28px 22px 32px;border-radius:24px}.ychain{grid-template-columns:1fr}.ycalc-out>b{font-size:64px}.vfy-main{padding:28px 22px;min-height:0}.vfy-main h3{font-size:26px}.vfy-dl{grid-template-columns:110px 1fr}.vfy-tag{display:none}}
+@media (max-width:1100px){.issuer{grid-template-columns:1fr;padding:32px}.checks{grid-template-columns:1fr}}
+/* ---------- 导航：Products 下拉（交易所为主，Atara、Loka World 为同公司的其他产品） ---------- */
+.nav-links{gap:26px}
+.pd{position:relative}
+.pd>button{display:inline-flex;align-items:center;gap:5px;padding:0;border:0;background:none;color:inherit;font:inherit;font-size:14px;opacity:.85;cursor:pointer;transition:opacity .2s}
+.pd>button:hover,.pd.open>button{opacity:1}
+.pd>button i{font-size:11px;transition:transform .25s var(--ease)}
+.pd.open>button i{transform:rotate(180deg)}
+.pmenu{position:absolute;top:calc(100% + 26px);left:-28px;width:500px;padding:8px;border-radius:22px;background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:0 24px 60px rgba(14,15,15,.14);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .2s,transform .25s var(--ease)}
+.pd.open .pmenu{opacity:1;transform:none;pointer-events:auto}
+.pmenu::before{content:"";position:absolute;left:0;right:0;top:-26px;height:26px}
+.pm{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 14px;border-radius:14px;text-decoration:none;color:inherit;transition:background-color .2s}
+.pm:hover,.pm:focus-visible{background:rgba(14,15,15,.045)}
+.pm-ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:17px;border:1px solid var(--line-2);color:var(--ink-2)}
+.pm b{display:flex;align-items:baseline;gap:8px;font-weight:500;font-size:14.5px}
+.pm small{display:block;color:var(--ink-3);font-size:13px;line-height:1.45;margin-top:2px}
+.pm-go{color:var(--ink-3);font-size:15px;transition:transform .25s var(--ease)}
+.pm:hover .pm-go{transform:translateX(2px);color:var(--ink)}
+.pm-l{margin:4px 14px 2px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-3)}
+.pm-tag{font-style:normal;font-size:12.5px;font-weight:400;color:var(--ink-3)}
+.pm-tag::before{content:"· ";}
+/* 首屏：导航是深色半透明，下拉跟着用深色毛玻璃 */
+.nav:not(.solid) .pmenu{background:rgba(18,19,19,.93);color:#f2f3f1;border-color:rgba(255,255,255,.14);box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.nav:not(.solid) .pm:hover,.nav:not(.solid) .pm:focus-visible{background:rgba(255,255,255,.07)}
+.nav:not(.solid) .pm-ic{border-color:rgba(255,255,255,.18);color:rgba(242,243,241,.8)}
+.nav:not(.solid) .pm small,.nav:not(.solid) .pm-tag,.nav:not(.solid) .pm-go,.nav:not(.solid) .pm-l{color:rgba(242,243,241,.55)}
+.nav:not(.solid) .pm-l{border-color:rgba(255,255,255,.12)}
+.nav:not(.solid) .pm:hover .pm-go{color:#fff}
+.menu-l{display:block;padding:18px 0 4px;font-size:12px;color:var(--ink-3)}
+/* More from Loka */
+.more2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.mcard{display:flex;flex-direction:column;border-radius:var(--r-card);overflow:hidden;background:var(--paper);border:1px solid var(--line);text-decoration:none;color:var(--ink);transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.mcard:hover{transform:translateY(-3px);box-shadow:0 24px 50px rgba(14,15,15,.1)}
+.mcard-i{height:240px;overflow:hidden;border-bottom:1px solid var(--line)}
+.mcard-i img{width:100%;height:100%;object-fit:cover;object-position:top left;transition:transform .8s var(--ease)}
+.mcard:hover .mcard-i img{transform:scale(1.03)}
+.mcard-t{padding:26px 30px 30px;display:flex;flex-direction:column;flex:1}
+.mcard-k{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink-2)}
+.mcard h3{margin:16px 0 8px;font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.15;letter-spacing:-.01em}
+.mcard p{margin:0;color:var(--ink-2);font-size:15px;max-width:46ch}
+.mcard-go{margin-top:22px;display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:500}
+@media (max-width:1100px){.more2{grid-template-columns:1fr}.pmenu{display:none}}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="nav-bar">
+    <a class="brand" href="#top" aria-label="Loka, back to top"><span class="brand-mark" aria-hidden="true"></span>Loka</a>
+    <ul class="nav-links">
+      <li class="pd" id="pd"><button type="button" aria-expanded="false" aria-controls="pmenu">Products<i class="ph ph-caret-down" aria-hidden="true"></i></button>
+        <div class="pmenu" id="pmenu">
+          <a class="pm pm-main" href="app/index.html#/v7/facilities">
+            <span class="pm-ic"><i class="ph ph-chart-line-up"></i></span>
+            <span><b>Loka Exchange</b><small>List, fund and trade assets. First listings: GPU financing.</small></span><i class="ph ph-arrow-right pm-go"></i></a>
+          <a class="pm" href="https://www.loka.cash/" target="_blank" rel="noopener">
+            <span class="pm-ic"><i class="ph ph-arrows-left-right"></i></span>
+            <span><b>Atara <em class="pm-tag">Payments</em></b><small>Payments that release only when the agreed condition is met.</small></span><i class="ph ph-arrow-up-right pm-go"></i></a>
+          <a class="pm" href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">
+            <span class="pm-ic"><i class="ph ph-globe-hemisphere-west"></i></span>
+            <span><b>Loka World <em class="pm-tag">Simulation</em></b><small>An economic simulation where organizations compete on real questions.</small></span><i class="ph ph-arrow-up-right pm-go"></i></a>
+        </div></li>
+      <li><a href="#yield">Yield</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#why">Why us</a></li>
+      <li><a href="#issuers">Issuers</a></li>
+      <li><a href="#process">How it works</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav-cta">
+      <button class="btn btn-ghost btn-sm" data-open="center">List an asset</button>
+      <a class="btn btn-primary btn-sm" href="app/index.html#/v7/facilities">Launch app</a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span><span></span></button>
+    </div>
+  </div>
+  <nav class="menu" id="menu" aria-label="Page navigation">
+    <a href="#yield">Yield</a><a href="#features">Features</a><a href="#why">Why us</a><a href="#issuers">Issuers</a><a href="#process">How it works</a><a href="#faq">FAQ</a>
+    <span class="menu-l">More from Loka</span><a href="https://www.loka.cash/" target="_blank" rel="noopener">Atara · Payments</a><a href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">Loka World · Simulation</a>
+    <a class="btn btn-primary" href="app/index.html#/v7/facilities">Launch app</a>
+    <button class="btn btn-ghost" data-open="center">List an asset</button>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- ========== 首屏 ========== -->
+<section class="hero on-dark" id="hero">
+  <div class="hero-bg" aria-hidden="true"><video id="heroVideo" src="/assets/video/hero-towers.mp4" poster="/assets/video/hero-towers-poster.jpg" autoplay muted loop playsinline preload="auto"></video></div>
+  <div class="wrap hero-main">
+    <h1 class="rise">Earn the rent AI companies<br>pay for GPUs</h1>
+    <div class="hero-cta rise">
+      <a class="btn btn-primary" href="app/index.html#/v7/facilities">Launch app<span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></a>
+      <button class="btn btn-ghost" data-open="center">List an asset</button>
+    </div>
+    <div class="hstats rise" aria-label="Sample listing NH200-1">
+      <div><b class="num">11.2%</b><span>Sample yield to maturity</span></div>
+      <div><b>Monthly</b><span>Rent paid to holders first</span></div>
+      <div><b class="num">6/6</b><span>Proofs on-chain before funds move</span></div>
+      <div><b class="num">&le;80%</b><span>Loan-to-value on the GPUs</span></div>
+    </div>
+    <div class="logos rise">
+      <div class="logo-window"><div class="logo-track" aria-hidden="true"><img src="/assets/logos/adv-mit.png" alt="" loading="lazy"><img src="/assets/logos/adv-harvard.png" alt="" loading="lazy"><img src="/assets/logos/adv-princeton.png" alt="" loading="lazy"><img src="/assets/logos/adv-columbia.png" class="sq" alt="" loading="lazy"><img src="/assets/logos/adv-berkeley.png" alt="" loading="lazy"><img src="/assets/logos/adv-yale.png" class="sq" alt="" loading="lazy"><img src="/assets/logos/adv-nus.png" class="sq" alt="" loading="lazy"><img src="/assets/logos/adv-ethz.png" class="wide" alt="" loading="lazy"><img src="/assets/logos/adv-stanford.png" class="sq" alt="" loading="lazy"><img src="/assets/logos/adv-mit.png" alt="" loading="lazy"><img src="/assets/logos/adv-harvard.png" alt="" loading="lazy"><img src="/assets/logos/adv-princeton.png" alt="" loading="lazy"><img src="/assets/logos/adv-columbia.png" class="sq" alt="" loading="lazy"><img src="/assets/logos/adv-berkeley.png" alt="" loading="lazy"><img src="/assets/logos/adv-yale.png" class="sq" alt="" loading="lazy"><img src="/assets/logos/adv-nus.png" class="sq" alt="" loading="lazy"><img src="/assets/logos/adv-ethz.png" class="wide" alt="" loading="lazy"><img src="/assets/logos/adv-stanford.png" class="sq" alt="" loading="lazy"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 资产类别：交易所里有哪些市场。上线前不放任何成交和规模数字 -->
+<div class="terms-band"><div class="wrap">
+  <div class="terms classes rise" aria-label="Asset classes">
+    <div class="term"><span class="cls-tag live">At launch</span><b>Compute credit</b><span>Loans backed by GPU rent, and a vault that holds them</span></div>
+    <div class="term"><span class="cls-tag">Coming</span><b>Compute price</b><span>Perpetuals on GPU rental price indexes</span></div>
+    <div class="term"><span class="cls-tag">Planned</span><b>Energy receivables</b><span>Payments owed under power purchase agreements</span></div>
+    <div class="term"><span class="cls-tag">Planned</span><b>Equipment leases</b><span>Lease payments on other productive equipment</span></div>
+  </div>
+</div></div>
+
+<!-- ========== 收益从哪来：以下数字全部是示例 ========== -->
+<section class="sec" id="yield" aria-labelledby="t-yield">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <div class="label">Yield</div>
+      <h2 id="t-yield">Where your yield comes from</h2>
+      <p>An AI company rents the GPUs and pays every month. The rent goes into a contract that pays holders before anyone else.</p>
+    </div>
+    <div class="ypanel rise">
+      <div class="ytop"><span class="tag">Sample listing · NH200-1 · 256 × NVIDIA H200 · Oslo</span></div>
+      <div class="ychain">
+        <div class="ytrack" aria-hidden="true"><span><i></i></span></div>
+        <div class="ynode"><div class="ydot"><i class="ph-light ph-buildings" aria-hidden="true"></i></div><h3>An AI company rents the GPUs</h3><p>Under a signed offtake contract with 23 months left.</p><b class="yfig">$318,000 / month</b></div>
+        <div class="ynode"><div class="ydot"><i class="ph-light ph-vault" aria-hidden="true"></i></div><h3>Rent lands in a contract</h3><p>Not with the operator. Three months of payments are held in reserve.</p><b class="yfig">1.30× coverage</b></div>
+        <div class="ynode"><div class="ydot hi"><i class="ph-light ph-user" aria-hidden="true"></i></div><h3>You are paid first</h3><p>Holders get their share before the service fee and before the operator.</p><b class="yfig">11.2% sample yield</b></div>
+        <div class="ynode"><div class="ydot"><i class="ph-light ph-cpu" aria-hidden="true"></i></div><h3>The operator keeps the rest</h3><p>If rent falls below 1.15× coverage, a 30-day cure period starts.</p><b class="yfig">After holders and fees</b></div>
+      </div>
+      <div class="ycalc">
+        <div class="ycalc-in">
+          <h3>See what a position pays</h3>
+          <div class="yseg" role="group" aria-label="Sample listing">
+            <button type="button" data-y="0.112" data-kind="loan" aria-pressed="true">NH200-1 · 11.2%</button>
+            <button type="button" data-y="0.062" data-kind="vault" aria-pressed="false">CCV vault · 6.2%</button>
+          </div>
+          <label class="yamt" for="yAmt"><span>Amount</span><b class="num" id="yAmtV">$100,000</b></label>
+          <input type="range" id="yAmt" min="10000" max="1000000" step="10000" value="100000">
+          <div class="yticks"><span>$10K</span><span>$1M</span></div>
+        </div>
+        <div class="ycalc-out" aria-live="polite">
+          <span id="yOutL">Paid to you each month</span>
+          <b class="num" id="yOut">$933</b>
+          <div class="yrows"><span>Per year <b class="num" id="yYear">$11,200</b></span><span>Settled in <b>AIUSD</b></span></div>
+          <p>Illustration with sample listing data: simple interest, before fees. Not a forecast. Listed assets can lose value.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 功能 ========== -->
+<section class="sec" id="features" aria-labelledby="t-features">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <div class="label">Protection</div>
+      <h2 id="t-features">How your money is protected</h2>
+      <p>Six safeguards, each enforced by a contract, a signed record or a legal claim on the GPUs.</p>
+    </div>
+    <div class="bento">
+      <article class="tile t-water rise">
+        <div class="tile-top"><i class="ph-light ph-arrows-split ico" aria-hidden="true"></i><span class="tag">Sample listing NH200-1</span></div>
+        <h3>Rent never touches the borrower</h3>
+        <p>The AI company pays rent into a controlled account that can only send it on-chain. The collection contract pays out in an order fixed at listing, and nobody can change it afterwards.</p>
+        <div class="fall" aria-label="Monthly payout order, sample">
+          <div class="fall-in"><span>Each month</span><b>$318,000 rent in</b></div>
+          <div class="fall-row first"><span class="n">1</span><span>Holders: principal and interest</span><em>$245,000</em></div>
+          <div class="fall-row"><span class="n">2</span><span>Service fee</span><em>Set at listing</em></div>
+          <div class="fall-row"><span class="n">3</span><span>Operator</span><em>What is left</em></div>
+          <p class="fall-note">Rent covers what holders are owed 1.30 times. Below 1.15 times, a 30-day cure period starts.</p>
+        </div>
+      </article>
+
+      <article class="tile t-first rise">
+        <h3>Six proofs before a dollar moves</h3>
+        <p>Your money waits in escrow until six conditions are signed by named parties and recorded on-chain. If one is missing at the deadline, everyone is refunded.</p>
+        <ul class="checks" aria-label="Release conditions">
+          <li><i class="ph ph-check"></i>Fully subscribed</li><li><i class="ph ph-check"></i>SPV formed, GPUs pledged</li><li><i class="ph ph-check"></i>Lien filed</li>
+          <li><i class="ph ph-check"></i>Rent routed to contract</li><li><i class="ph ph-check"></i>GPUs verified online</li><li><i class="ph ph-check"></i>Loan &le; 80% of appraisal</li>
+        </ul>
+      </article>
+
+      <article class="tile t-reserve rise">
+        <h3>Losses hit the operator first</h3>
+        <p>Loans are capped at 80% of an independent appraisal, so the operator&rsquo;s own 20% absorbs a fall in value first. Three months of payments are held in reserve from day one.</p>
+        <div class="foot-vis">
+          <div class="lossbar" aria-label="Order in which losses are absorbed">
+            <span class="l1" style="--w:20%"><b>1</b>Operator equity</span>
+            <span class="l2" style="--w:15%"><b>2</b>Reserve</span>
+            <span class="l3" style="--w:65%"><b>3</b>Holders</span>
+          </div>
+          <p class="lossnote">If the cure period fails, the lien is enforced and the GPUs are re-rented or sold. Proceeds go to holders first.</p>
+        </div>
+      </article>
+
+      <article class="tile t-project rise">
+        <i class="ph-light ph-lock-key ico" aria-hidden="true"></i>
+        <h3>We can&rsquo;t move your money</h3>
+        <p>No pooled funds sit with the platform. Escrow and payouts run on contracts, vaults are run by licensed third parties, and the platform cannot redirect funds.</p>
+      </article>
+
+      <article class="tile t-vendor rise">
+        <i class="ph-light ph-arrows-left-right ico" aria-hidden="true"></i>
+        <h3>Exit without waiting</h3>
+        <p>Sell your position on the order book at any time instead of waiting for the loan to end. Market makers quote both sides; prices can be below par.</p>
+      </article>
+
+      <article class="tile t-disclose rise">
+        <div class="tile-top"><i class="ph-light ph-seal-check ico" aria-hidden="true"></i><span class="tag">Example</span></div>
+        <h3>Signed data, every month</h3>
+        <p>Rent received, uptime and coverage for every loan. Uptime is signed by monitoring nodes and every payment is on-chain.</p>
+        <div class="foot-vis">
+          <div class="spark" aria-hidden="true">
+            <span><i style="height:78%"></i><i style="height:76%"></i></span>
+            <span><i style="height:82%"></i><i style="height:84%"></i></span>
+            <span><i style="height:86%"></i><i style="height:80%"></i></span>
+            <span><i style="height:90%"></i><i style="height:91%"></i></span>
+            <span><i style="height:92%"></i><i style="height:88%"></i></span>
+            <span><i style="height:96%"></i><i style="height:95%"></i></span>
+          </div>
+          <div class="legend"><span><i style="background:#dcdfdb"></i>Rent due</span><span><i style="background:var(--accent)"></i>Rent received</span></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 为什么用我们 ========== -->
+<section class="sec" id="why" aria-labelledby="t-why">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <div class="label">Why us</div>
+      <h2 id="t-why">Check every loan yourself</h2>
+      <p>Before any dollar leaves escrow, six conditions are signed by named parties and recorded on-chain. Pick one to see what it proves.</p>
+    </div>
+
+    <!-- 核对演示：以下全部为示例数据 -->
+    <div class="vfy rise">
+      <div class="vfy-side">
+        <div class="vfy-h"><div><b>NH200-1</b><small>Nordic H200 Cluster I</small></div><span class="status">6/6 recorded</span></div>
+        <ol class="vfy-list" role="tablist" aria-label="Release conditions"></ol>
+      </div>
+      <div class="vfy-main" role="tabpanel" id="vfyPanel" aria-live="polite"></div>
+      <span class="tag vfy-tag">Sample data</span>
+    </div>
+
+    <div class="benefits">
+      <div class="benefit rise"><i class="ph-light ph-calendar-check" aria-hidden="true"></i><h3>Monthly numbers, not quarterly reports</h3><p>Rent received, uptime and coverage for every loan, published each month and linked to the payments.</p></div>
+      <div class="benefit rise"><i class="ph-light ph-file-lock" aria-hidden="true"></i><h3>Rules are fixed at listing</h3><p>Release conditions and the payout order are written into the contract. The platform confirms conditions; it cannot redirect funds.</p></div>
+      <div class="benefit rise"><i class="ph-light ph-arrows-left-right" aria-hidden="true"></i><h3>Exit before maturity</h3><p>Sell on the order book instead of waiting for the last payment.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 给发行方 ========== -->
+<section class="sec" id="issuers" aria-labelledby="t-issuers">
+  <div class="wrap">
+    <div class="issuer rise">
+      <div class="sec-head">
+        <div class="label">For issuers</div>
+        <h2 id="t-issuers">List your GPUs, get funded</h2>
+        <p>For compute operators with GPUs already installed and rented out. Financing is repaid from offtake rent, and you keep your equity.</p>
+        <button class="btn btn-primary" style="margin-top:32px" data-open="center">List an asset<span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></button>
+      </div>
+      <div>
+        <div class="terms" aria-label="Indicative terms">
+          <div class="term"><b class="num">24<small>months+</small></b><span>Remaining offtake term</span></div>
+          <div class="term"><b class="num">80%<small>maximum</small></b><span>Loan-to-value on equipment</span></div>
+          <div class="term"><b class="num">3<small>months</small></b><span>Reserve at funding</span></div>
+          <div class="term"><b class="num">1.15×</b><span>Coverage floor before a cure period</span></div>
+        </div>
+        <p class="terms-note">Indicative terms. Each listing&rsquo;s legal documents govern.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 流程 ========== -->
+<section class="sec" id="process" aria-labelledby="t-process">
+  <div class="wrap">
+    <div class="sec-head rise"><div class="label">Process</div><h2 id="t-process">How it works</h2></div>
+    <div class="flows">
+      <div class="flow rise">
+        <div class="flow-h"><h3>For traders</h3><span>3 steps</span></div>
+        <ol class="fsteps">
+          <li><h4>Deposit</h4><p>USDC is minted 1:1 into AIUSD, the account currency.</p></li>
+          <li><h4>Trade or earn</h4><p>Buy assets on the order book, or deposit into a vault.</p></li>
+          <li><h4>Get paid or sell</h4><p>Receive monthly repayments, or sell before maturity.</p></li>
+        </ol>
+        <div class="flow-cta"><a class="btn btn-primary btn-sm" href="app/index.html#/v7/facilities">Launch app</a></div>
+      </div>
+      <div class="flow rise">
+        <div class="flow-h"><h3>For issuers</h3><span>4 steps</span></div>
+        <ol class="fsteps">
+          <li><h4>Apply</h4><p>Submit the equipment and the signed offtake contract.</p></li>
+          <li><h4>List</h4><p>After review and appraisal, the asset lists and investors subscribe into escrow.</p></li>
+          <li><h4>Release</h4><p>Once all six conditions are on-chain, funds go to your SPV.</p></li>
+          <li><h4>Repay</h4><p>Rent repays holders each month; the rest comes to you.</p></li>
+        </ol>
+        <div class="flow-cta"><button class="btn btn-ghost btn-sm" data-open="center">List an asset</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 同一家公司的其他产品：独立产品，不写和交易所的关系 ========== -->
+<section class="sec" id="more" aria-labelledby="t-more">
+  <div class="wrap">
+    <div class="sec-head rise"><div class="label">Also from Loka</div><h2 id="t-more">Beyond the exchange</h2></div>
+    <div class="more2">
+      <a class="mcard rise" href="https://www.loka.cash/" target="_blank" rel="noopener">
+        <div class="mcard-i"><img src="/assets/img/product-atara.png" alt="Atara website" width="1440" height="900" loading="lazy"></div>
+        <div class="mcard-t"><div class="mcard-k">Atara<em class="pm-tag">Payments</em></div>
+          <h3>Let agents pay on delivery</h3>
+          <p>Atara holds a payment in a contract and releases it when the evidence shows the work was done. The payer posts a fraction up front, not the whole sum.</p>
+          <span class="mcard-go">Visit Atara <i class="ph ph-arrow-up-right"></i></span></div>
+      </a>
+      <a class="mcard rise" href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">
+        <div class="mcard-i"><img src="/assets/img/product-world.png" alt="Loka World map" width="1440" height="900" loading="lazy"></div>
+        <div class="mcard-t"><div class="mcard-k">Loka World<em class="pm-tag">Simulation</em></div>
+          <h3>Build a fund and see if your calls hold up</h3>
+          <p>An economic simulation. Funds, traders and research houses take positions on real questions each round, and the real outcome decides who was right.</p>
+          <span class="mcard-go">Enter Loka World <i class="ph ph-arrow-up-right"></i></span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 常见问题 ========== -->
+<section class="sec" id="faq" aria-labelledby="t-faq">
+  <div class="wrap faq">
+    <div class="faq-side">
+      <div class="sec-head"><h2 id="t-faq">Questions</h2></div>
+      <p>Can&rsquo;t find an answer? <button class="linkbtn" data-open="investor">Contact us directly</button>.</p>
+    </div>
+    <div class="faq-list">
+      <div class="qa" id="q-trade"><h3><button aria-expanded="false" aria-controls="a1" id="b1">What can I trade?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a1" role="region" aria-labelledby="b1"><div><p>Assets backed by compute loans, and the Compute Credit Vault, all quoted in AIUSD. Compute price perpetuals and other asset classes will follow.</p></div></div></div>
+      <div class="qa" id="q-aiusd"><h3><button aria-expanded="false" aria-controls="a2" id="b2">What is AIUSD?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a2" role="region" aria-labelledby="b2"><div><p>The account currency. It is minted 1:1 from USDC, can always be redeemed 1:1, and pays no interest. Returns come from the assets you hold.</p></div></div></div>
+      <div class="qa" id="q-price"><h3><button aria-expanded="false" aria-controls="a3" id="b3">How are prices set?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a3" role="region" aria-labelledby="b3"><div><p>On order books. A liquidity vault quotes both sides. Prices can be above or below the vault&rsquo;s NAV or a loan&rsquo;s par value.</p></div></div></div>
+      <div class="qa" id="q-yield"><h3><button aria-expanded="false" aria-controls="a4" id="b4">Where do returns come from?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a4" role="region" aria-labelledby="b4"><div><p>From rent the offtaker pays each month. The credit vault earns from the loans it holds; the liquidity vault earns from spreads.</p></div></div></div>
+      <div class="qa" id="q-lend"><h3><button aria-expanded="false" aria-controls="a5" id="b5">Does the platform lend?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a5" role="region" aria-labelledby="b5"><div><p>No. Funds move from investors through the escrow contract to the borrower SPV. The platform never holds them.</p></div></div></div>
+      <div class="qa" id="q-who"><h3><button aria-expanded="false" aria-controls="a6" id="b6">Which operators can list?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a6" role="region" aria-labelledby="b6"><div><p>Operators with GPUs already installed and rented out under a signed offtake contract with at least 24 months remaining, borrowing no more than 80% of the appraised value, with equipment connected to monitoring and an offtaker willing to sign the three-party agreement.</p></div></div></div>
+      <div class="qa" id="q-default"><h3><button aria-expanded="false" aria-controls="a7" id="b7">What if an operator&rsquo;s revenue falls or it defaults?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a7" role="region" aria-labelledby="b7"><div><p>Each month, rent received is divided by the amount due. Below 1.15, a 30-day cure period begins. If the cure fails, the servicing partner enforces the lien and sells the equipment; proceeds go to holders first.</p></div></div></div>
+      <div class="qa" id="q-access"><h3><button aria-expanded="false" aria-controls="a8" id="b8">Who can use it?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a8" role="region" aria-labelledby="b8"><div><p>The first version is open only to verified institutional and professional investors.</p></div></div></div>
+      <div class="qa" id="q-fee"><h3><button aria-expanded="false" aria-controls="a9" id="b9">What does it cost?<span class="plus" aria-hidden="true"></span></button></h3>
+        <div class="qa-body" id="a9" role="region" aria-labelledby="b9"><div><p>A trading fee and a service fee. Both will be published here once confirmed.</p></div></div></div>
+      <p class="risk">Listed assets can lose value, including through lower revenue, offtaker default, equipment depreciation and losses on sale. Market prices can be below NAV or par.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 底部行动区 ========== -->
+<section class="cta" aria-labelledby="t-cta">
+  <div class="cta-bg" aria-hidden="true"><img src="/assets/img/sky-glass.jpg" alt="" width="2400" height="1057" loading="lazy"></div>
+  <div class="wrap rise">
+    <h2 id="t-cta">Trade compute credit,<br>or list your GPUs</h2>
+    <p>The first version is open only to verified institutional and professional investors. Operators who apply to list will hear from us.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="app/index.html#/v7/facilities">Launch app<span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></a>
+      <button class="btn btn-ghost" data-open="center">List an asset</button>
+    </div>
+  </div>
+</section>
+</main>
+
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Loka</a>
+      <ul class="foot-links">
+        <li><a href="#yield">Yield</a></li><li><a href="#features">Features</a></li><li><a href="#why">Why us</a></li><li><a href="#issuers">Issuers</a></li><li><a href="#process">How it works</a></li><li><a href="#faq">FAQ</a></li>
+        <li><a href="https://www.loka.cash/" target="_blank" rel="noopener">Atara</a></li><li><a href="https://lokaworld.vercel.app/prototypes/lokaworld-v5-lite/map.html" target="_blank" rel="noopener">Loka World</a></li>
+      </ul>
+    </div>
+    <!-- 风险提示与法律声明：等法律意见，先留位置 -->
+    <p class="foot-legal">This page describes a product design. Each listing&rsquo;s terms are governed by its legal documents. Risk disclosures and legal notices to follow.</p>
+  </div>
+</footer>
+
+<!-- ========== 抽屉表单 ========== -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true">
+  <div class="drawer-head"><h2 id="dTitle">Request access</h2><button class="x" id="dClose" aria-label="Close"><i class="ph-light ph-x" aria-hidden="true"></i></button></div>
+  <div class="drawer-body">
+    <div class="seg" role="group" aria-label="Choose your role">
+      <button type="button" data-role="investor" aria-pressed="true">I&rsquo;m an investor</button>
+      <button type="button" data-role="center" aria-pressed="false">I&rsquo;m a compute operator</button>
+    </div>
+    <form id="form" novalidate>
+      <div class="field"><label for="f-org"><span data-for="investor">Institution</span><span data-for="center" hidden>Company</span><em>Required</em></label><input id="f-org" name="org" autocomplete="organization" required><span class="err" aria-live="polite"></span></div>
+      <div class="row2">
+        <div class="field"><label for="f-name">Contact name<em>Required</em></label><input id="f-name" name="name" autocomplete="name" required><span class="err" aria-live="polite"></span></div>
+        <div class="field"><label for="f-contact">Work email<em>Required</em></label><input id="f-contact" name="email" type="email" autocomplete="email" required><span class="err" aria-live="polite"></span></div>
+      </div>
+      <div data-for="investor">
+        <div class="field"><label for="f-type">Institution type<em>Required</em></label>
+          <select id="f-type" name="type" required><option value="">Select</option><option>Private credit fund</option><option>Bank</option><option>Asset manager</option><option>Family office</option><option>Other professional investor</option></select><span class="err" aria-live="polite"></span></div>
+        <div class="row2">
+          <div class="field"><label for="f-region">Country or region<em>Required</em></label><input id="f-region" name="region" required><span class="err" aria-live="polite"></span></div>
+          <div class="field"><label for="f-size">Planned allocation</label><input id="f-size" name="size" placeholder="e.g. $5M"><span class="err"></span></div>
+        </div>
+      </div>
+      <div data-for="center" hidden>
+        <div class="row2">
+          <div class="field"><label for="f-amt">Amount sought<em>Required</em></label><input id="f-amt" name="amount" required><span class="err" aria-live="polite"></span></div>
+          <div class="field"><label for="f-down">Appraised equipment value</label><input id="f-down" name="value"><span class="err"></span></div>
+        </div>
+        <div class="field"><label for="f-gpu">GPU model and quantity<em>Required</em></label><input id="f-gpu" name="gpu" required><span class="err" aria-live="polite"></span></div>
+        <div class="field"><label for="f-dc">Data center location<em>Required</em></label><input id="f-dc" name="dc" required><span class="err" aria-live="polite"></span></div>
+        <div class="field"><label for="f-buyer">Offtaker type<em>Required</em></label><input id="f-buyer" name="buyer" required><span class="err" aria-live="polite"></span></div>
+        <div class="row2">
+          <div class="field"><label for="f-term">Offtake term (months)<em>Required</em></label><input id="f-term" name="term" inputmode="numeric" required><span class="err" aria-live="polite"></span></div>
+          <div class="field"><label for="f-rent">Monthly rent</label><input id="f-rent" name="rent"><span class="err"></span></div>
+        </div>
+      </div>
+      <p class="form-note" data-for="investor">The first version is open only to verified institutional and professional investors.</p>
+      <p class="form-note" data-for="center" hidden>Assets are listed by the platform in the first version. We will contact you after you submit.</p>
+      <div class="form-error" id="formError" role="alert">Your request didn&rsquo;t go through. Please try again; what you entered has been kept.</div>
+      <button class="btn btn-primary btn-block" type="submit" id="submit"><span id="submitText">Submit</span><span class="go"><i class="ph-light ph-arrow-right" aria-hidden="true"></i></span></button>
+    </form>
+    <div class="done" id="done" tabindex="-1">
+      <i class="ph-light ph-check-circle" aria-hidden="true"></i>
+      <h3>Received</h3>
+      <!-- 回复时限等流程定了再填（内容稿「上线前要定的」第 8 条） -->
+      <p>We&rsquo;ll be in touch soon.</p>
+      <button class="btn btn-ghost" id="doneClose">Close</button>
+    </div>
+  </div>
+</aside>
+
+<script>
+/* Products 下拉：点击开合，鼠标悬停也能打开；Esc 或点外面关闭 */
+(()=>{const pd=document.getElementById('pd'); if(!pd) return; const b=pd.querySelector('button'); let t;
+  const set=o=>{pd.classList.toggle('open',o);b.setAttribute('aria-expanded',o)};
+  b.addEventListener('click',e=>{e.stopPropagation();set(!pd.classList.contains('open'))});
+  const hov=matchMedia('(hover:hover)');
+  pd.addEventListener('mouseenter',()=>{if(hov.matches){clearTimeout(t);set(true)}});
+  pd.addEventListener('mouseleave',()=>{if(hov.matches) t=setTimeout(()=>set(false),200)});
+  document.addEventListener('click',e=>{if(!pd.contains(e.target)) set(false)});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&pd.classList.contains('open')){set(false);b.focus()}});
+})();
+
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 导航：离开首屏后换成浅色玻璃 */
+  const nav = document.getElementById('nav'), hero = document.getElementById('hero');
+  new IntersectionObserver(([e]) => nav.classList.toggle('solid', !e.isIntersecting), {rootMargin: '-90px 0px 0px 0px', threshold: 0}).observe(hero);
+  const links = [...document.querySelectorAll('.nav-links a')];
+  const spy = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting) links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id));
+  }), {rootMargin: '-45% 0px -50% 0px'});
+  document.querySelectorAll('main section[id]').forEach(s => spy.observe(s));
+
+  /* 窄屏菜单 */
+  const menuBtn = document.getElementById('menuBtn'), menu = document.getElementById('menu');
+  const setMenu = open => { menu.classList.toggle('show', open); menuBtn.setAttribute('aria-expanded', open); menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); };
+  menuBtn.addEventListener('click', () => setMenu(!menu.classList.contains('show')));
+  menu.addEventListener('click', e => { if (e.target.closest('a,button')) setMenu(false); });
+
+  /* 进场：首屏图片缓慢归位，文字依次出现；其他块滚动到视口时出现一次 */
+  requestAnimationFrame(() => hero.classList.add('in'));
+  [...hero.querySelectorAll('.rise')].forEach((el, i) => setTimeout(() => el.classList.add('in'), reduce ? 0 : 200 + i * 110));
+  if (!reduce) setTimeout(() => hero.querySelectorAll('.hstats b.num').forEach(b => count(b)), 700);
+  const once = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); once.unobserve(e.target); }
+  }), {threshold: .12});
+  document.querySelectorAll('main .rise').forEach(el => { if (!hero.contains(el)) once.observe(el); });
+  document.querySelectorAll('.bento .tile, .benefits .benefit').forEach(el => {
+    const i = [...el.parentNode.children].indexOf(el); el.style.transitionDelay = (reduce ? 0 : i * 80) + 'ms';
+  });
+
+
+  /* 滚动动效：给组内子项编号，进视口加 .in；数字从 0 数上去 */
+  const idx = (sel, scope = document) => scope.querySelectorAll(sel).forEach(g => [...g.children].forEach((c, i) => c.style.setProperty('--i', i)));
+  document.querySelectorAll('.terms.classes, .issuer .terms, .faq-list').forEach(g => g.classList.add('stg'));
+  idx('.stg'); idx('.checks'); idx('.ychain'); idx('.fsteps');
+  document.querySelectorAll('.fall').forEach(f => f.querySelectorAll('.fall-row').forEach((r, i) => r.style.setProperty('--i', i)));
+  document.querySelectorAll('.lossbar').forEach(b => [...b.children].forEach((s, i) => s.style.setProperty('--i', i)));
+  document.querySelectorAll('.spark i').forEach((s, i) => s.style.setProperty('--i', i));
+  document.querySelectorAll('.flow').forEach(f => f.style.setProperty('--n', f.querySelectorAll('.fsteps li').length));
+  const count = el => {
+    const t = [...el.childNodes].find(n => n.nodeType === 3 && /\d/.test(n.textContent)); if (!t) return;
+    const m = t.textContent.match(/^(\D*)([\d.]+)(.*)$/s); if (!m) return;
+    const to = parseFloat(m[2]), dec = (m[2].split('.')[1] || '').length, t0 = performance.now(), dur = 1300;
+    const step = now => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 4);
+      t.textContent = m[1] + (to * e).toFixed(dec) + m[3]; if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  };
+  const show = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return; const el = e.target; el.classList.add('in'); show.unobserve(el);
+    if (!reduce) el.querySelectorAll('.term b.num').forEach(count);
+  }), {threshold: .18, rootMargin: '0px 0px -6% 0px'});
+  document.querySelectorAll('.sec-head, .stg, .tile, .ypanel, .vfy, .flow, .cta').forEach(el => show.observe(el));
+
+  /* 首屏视差：背景比内容滚得慢，内容往上走时渐隐 */
+  if (!reduce) {
+    const bg = hero.querySelector('.hero-bg'), main = hero.querySelector('.hero-main'); let tick = false;
+    addEventListener('scroll', () => { if (tick) return; tick = true; requestAnimationFrame(() => {
+      const y = scrollY, h = hero.offsetHeight; tick = false; if (y > h) return;
+      bg.style.transform = `translate3d(0,${y * .32}px,0)`;
+      main.style.transform = `translate3d(0,${y * .12}px,0)`; main.style.opacity = Math.max(0, 1 - y / (h * .75));
+    }); }, {passive: true});
+  }
+
+
+  /* 收益计算器：示例数据，单利、未扣费 */
+  const yAmt = document.getElementById('yAmt');
+  if (yAmt) {
+    let rate = .112, kind = 'loan';
+    const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+    const upd = () => {
+      const v = +yAmt.value; yAmt.style.setProperty('--p', ((v - yAmt.min) / (yAmt.max - yAmt.min) * 100) + '%');
+      document.getElementById('yAmtV').textContent = fmt(v);
+      document.getElementById('yOut').textContent = fmt(v * rate / 12);
+      document.getElementById('yYear').textContent = fmt(v * rate);
+      document.getElementById('yOutL').textContent = kind === 'loan' ? 'Paid to you each month' : 'Added to your vault value each month';
+    };
+    document.querySelectorAll('.yseg button').forEach(b => b.addEventListener('click', () => {
+      document.querySelectorAll('.yseg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+      rate = +b.dataset.y; kind = b.dataset.kind; upd();
+    }));
+    yAmt.addEventListener('input', upd); upd();
+  }
+
+  /* 核对演示：六条放款条件，进视口后自动轮播，点了就停 */
+  const CONDS = [
+    ['Fully subscribed', 'Escrow holds the full loan amount from investors. Nothing is released while the loan is short.', 'Escrow contract, automatic', 'Sep 2, 2026', '0x4c1e…a7d2', 'Escrow balance $6,400,000 of $6,400,000'],
+    ['SPV formed, equipment pledged', 'The GPUs belong to a company set up only for this loan, and are pledged to holders.', 'Borrower&rsquo;s counsel', 'Sep 4, 2026', '0x91b0…3e58', 'Certificate of formation, pledge agreement'],
+    ['Lien filed', 'The security interest over the equipment is registered, so holders rank first if the operator fails.', 'Registry filing agent', 'Sep 5, 2026', '0x2f7a…c019', 'Filing number and date'],
+    ['Rent routed to collection contract', 'The AI company pays rent into the contract, not to the operator. All three parties signed.', 'Offtaker, operator and platform', 'Sep 8, 2026', '0xd63e…8b4f', 'Three-party agreement'],
+    ['Equipment verified online', 'All 256 GPUs are online and their serial numbers match the pledge. Checked again every month.', 'Monitoring nodes', 'Sep 9, 2026', '0x7a3f…c91e', '256 of 256 online, 99.7% uptime'],
+    ['Loan within 80% of appraisal', 'The loan is $6.4M against an $8.2M appraisal, so the operator carries the first 22% of any loss.', 'Independent appraiser', 'Sep 10, 2026', '0xb8c2…14a6', '78% loan-to-value']
+  ];
+  const vList = document.querySelector('.vfy-list'), vPanel = document.getElementById('vfyPanel');
+  if (vList) {
+    vList.innerHTML = CONDS.map((c, i) => `<li><button type="button" role="tab" id="vt${i}" aria-controls="vfyPanel" aria-selected="${i === 0}"><i class="ph ph-check" aria-hidden="true"></i><span>${c[0]}</span><i class="bar" aria-hidden="true"></i></button></li>`).join('');
+    const tabs = [...vList.querySelectorAll('button')]; let cur = 0, timer = null, auto = !reduce;
+    const pick = (i, run) => {
+      cur = i; tabs.forEach((t, k) => { t.setAttribute('aria-selected', k === i); t.tabIndex = k === i ? 0 : -1; t.querySelector('.bar').classList.remove('run'); });
+      const c = CONDS[i];
+      vPanel.setAttribute('aria-labelledby', 'vt' + i);
+      vPanel.innerHTML = `<div class="fade"><span class="k">Condition ${i + 1} of 6</span><h3>${c[0]}</h3><p>${c[1]}</p>
+        <dl class="vfy-dl"><dt>Status</dt><dd><span class="ok">Recorded</span></dd><dt>Signed by</dt><dd>${c[2]}</dd><dt>Recorded</dt><dd>${c[3]}</dd><dt>Evidence</dt><dd>${c[5]}</dd><dt>On-chain record</dt><dd class="mono">${c[4]}</dd></dl></div>`;
+      clearTimeout(timer);
+      if (run && auto) { const bar = tabs[i].querySelector('.bar'); void bar.offsetWidth; bar.classList.add('run'); timer = setTimeout(() => pick((i + 1) % CONDS.length, true), 4200); }
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => { auto = false; pick(i, false); });
+      t.addEventListener('keydown', e => { const d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0; if (d) { e.preventDefault(); auto = false; const n = (cur + d + 6) % 6; pick(n, false); tabs[n].focus(); } });
+    });
+    pick(0, false);
+    new IntersectionObserver(([e], io) => { if (e.isIntersecting) { io.disconnect(); setTimeout(() => pick(cur, true), reduce ? 0 : 900); } }, {threshold: .4}).observe(document.querySelector('.vfy'));
+  }
+
+  /* 常见问题：一次只展开一个；带锚点打开时自动展开 */
+  const qas = [...document.querySelectorAll('.qa')];
+  const setQa = (qa, open) => { qa.classList.toggle('open', open); qa.querySelector('button').setAttribute('aria-expanded', open); };
+  qas.forEach(qa => qa.querySelector('button').addEventListener('click', () => {
+    const open = !qa.classList.contains('open'); qas.forEach(o => setQa(o, false)); setQa(qa, open);
+  }));
+  const hashQa = () => { const t = location.hash && document.querySelector(location.hash + '.qa'); if (t) { qas.forEach(o => setQa(o, false)); setQa(t, true); } };
+  addEventListener('hashchange', hashQa); hashQa();
+
+  /* 抽屉表单 */
+  const drawer = document.getElementById('drawer'), scrim = document.getElementById('scrim'), form = document.getElementById('form');
+  const title = document.getElementById('dTitle'), segBtns = [...drawer.querySelectorAll('.seg button')];
+  let opener = null;
+  const setRole = r => {
+    segBtns.forEach(b => b.setAttribute('aria-pressed', b.dataset.role === r));
+    drawer.querySelectorAll('[data-for]').forEach(el => {
+      const show = el.dataset.for === r; el.hidden = !show;
+      el.querySelectorAll('input,select').forEach(f => {
+        f.disabled = !show;
+        if (!show) { const fd = f.closest('.field'); fd.classList.remove('bad'); fd.querySelector('.err').textContent = ''; }
+      });
+    });
+    title.textContent = r === 'investor' ? 'Request access' : 'List an asset';
+  };
+  const focusables = () => [...drawer.querySelectorAll('button,input,select,[tabindex="-1"]')].filter(el => !el.disabled && el.offsetParent !== null);
+  const openDrawer = (r, btn) => {
+    opener = btn; setRole(r);
+    document.body.classList.add('is-open'); drawer.setAttribute('aria-hidden', 'false');
+    document.documentElement.style.overflow = 'hidden';
+    setTimeout(() => { const f = drawer.classList.contains('sent') ? document.getElementById('done') : form.querySelector('input:not(:disabled)'); f && f.focus(); }, reduce ? 0 : 260);
+  };
+  const closeDrawer = () => {
+    document.body.classList.remove('is-open'); drawer.setAttribute('aria-hidden', 'true');
+    document.documentElement.style.overflow = '';
+    if (drawer.classList.contains('sent')) { drawer.classList.remove('sent'); form.reset(); }
+    opener && opener.focus();
+  };
+  document.addEventListener('click', e => { const b = e.target.closest('[data-open]'); if (b) openDrawer(b.dataset.open, b); });
+  segBtns.forEach(b => b.addEventListener('click', () => setRole(b.dataset.role)));
+  document.getElementById('dClose').addEventListener('click', closeDrawer);
+  document.getElementById('doneClose').addEventListener('click', closeDrawer);
+  scrim.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => {
+    if (!document.body.classList.contains('is-open')) return;
+    if (e.key === 'Escape') closeDrawer();
+    if (e.key === 'Tab') {
+      const f = focusables(); if (!f.length) return;
+      if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+  const msg = el => {
+    if (el.validity.valueMissing) return 'This field is required.';
+    if (el.type === 'email' && el.validity.typeMismatch) return 'Enter a valid email address, such as name@company.com.';
+    if (el.name === 'term' && el.value && !/^\d+$/.test(el.value.trim())) return 'Enter the number of months, digits only.';
+    return '';
+  };
+  const check = el => {
+    const m = msg(el), f = el.closest('.field');
+    f.classList.toggle('bad', !!m); f.querySelector('.err').textContent = m; el.setAttribute('aria-invalid', !!m); return !m;
+  };
+  form.addEventListener('focusout', e => { if (e.target.matches('input,select') && (e.target.value || e.target.closest('.field').classList.contains('bad'))) check(e.target); });
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    document.getElementById('formError').classList.remove('show');
+    const bad = [...form.querySelectorAll('input:not(:disabled),select:not(:disabled)')].filter(f => !check(f));
+    if (bad.length) { bad[0].focus(); bad[0].scrollIntoView({block: 'center', behavior: reduce ? 'auto' : 'smooth'}); return; }
+    const btn = document.getElementById('submit'), txt = document.getElementById('submitText');
+    btn.setAttribute('aria-busy', 'true'); txt.textContent = 'Submitting…';
+    /* TODO：接入真实的提交接口。现在是本地模拟，不发送任何数据。 */
+    setTimeout(() => { btn.removeAttribute('aria-busy'); txt.textContent = 'Submit'; drawer.classList.add('sent'); document.getElementById('done').focus(); }, 700);
+  });
+})();
+</script>
+</body>
+</html>
